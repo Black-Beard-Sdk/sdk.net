@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configurationGeneratorDiagram dslVersion="2.0.0.0" Id="b29cee85-8437-411e-ad50-0d47b21cbb1e" absoluteBounds="0, 0, 11, 9" name="MailConfiguration">
+  <configurationModelMoniker Id="74c85cac-58df-4162-8b6f-54d15d90b3ee" />
+  <nestedChildShapes>
+    <sectionCompartmentShape Id="a3f7ab5c-8280-45dd-bd14-141451b4b9cf" absoluteBounds="1.5, 1, 2.375, 1.6956835937500006">
+      <configurationSectionMoniker name="/74c85cac-58df-4162-8b6f-54d15d90b3ee/MailConfiguration" />
+      <nestedChildShapes>
+        <elementListCompartment Id="f8dc79c4-c74a-48b2-9c3f-b6c9615702ab" absoluteBounds="1.5149999999999997, 1.5099999999999998, 2.3449999999999998, 0.63399251302083326" name="Attributes" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="cd00115b-0e68-4589-8d25-932a07a6c1a1" absoluteBounds="1.515, 2.1539925130208335, 2.3449999999999998, 0.44169108072916674" name="Links" titleTextColor="Black" itemTextColor="Black" />
+        <elementPropertyHasTypeConnector Id="d4811d78-7900-4fec-ad63-dcdd4c7d8d78" edgePoints="[(2.6875 : 2.69568359375); (2.6875 : 3.125)]" fixedFrom="Algorithm" fixedTo="Algorithm" TargetRelationshipDomainClassId="19e86913-3649-4ed0-92e1-8673cdba1b35">
+          <relativeChildShapes />
+          <nodes>
+            <sectionCompartmentShapeMoniker Id="a3f7ab5c-8280-45dd-bd14-141451b4b9cf" />
+            <collectionCompartmentShapeMoniker Id="91627583-4191-40e8-934d-bd1ede5efa43" />
+          </nodes>
+        </elementPropertyHasTypeConnector>
+      </nestedChildShapes>
+    </sectionCompartmentShape>
+    <collectionCompartmentShape Id="91627583-4191-40e8-934d-bd1ede5efa43" isExpanded="false" absoluteBounds="1.5, 3.125, 2.375, 0.5">
+      <configurationElementCollectionMoniker name="/74c85cac-58df-4162-8b6f-54d15d90b3ee/ServiceMailProfileCollection" />
+    </collectionCompartmentShape>
+    <configurationElementCompartmentShape Id="852f260b-9221-40e8-95a3-87ab2ba1b8c7" absoluteBounds="1.5, 4.375, 2.375, 4.3879036458333314">
+      <configurationElementMoniker name="/74c85cac-58df-4162-8b6f-54d15d90b3ee/SmtpProfile" />
+      <nestedChildShapes>
+        <elementListCompartment Id="239067d5-75ca-4f5b-9379-6cb609b54202" absoluteBounds="1.5149999999999997, 4.885, 2.3449999999999998, 3.518513997395833" name="Attributes" titleTextColor="Black" itemTextColor="Black" />
+        <elementListCompartment Id="642ab5f9-e6d8-4345-b858-262706f0193d" isExpanded="false" absoluteBounds="1.515, 8.4135139973958317, 2.3449999999999998, 0.2493896484375" name="Links" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </configurationElementCompartmentShape>
+    <collectionItemConnector Id="6f3d1e92-8fa0-4843-acf0-f2f90c87b89b" edgePoints="[(2.6875 : 3.625); (2.6875 : 4.375)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <configurationElementCollectionReferencesTypeItemMoniker Id="679f1ce2-743b-42a3-9044-5d699098532c" />
+      <relativeChildShapes />
+      <nodes>
+        <collectionCompartmentShapeMoniker Id="91627583-4191-40e8-934d-bd1ede5efa43" />
+        <configurationElementCompartmentShapeMoniker Id="852f260b-9221-40e8-95a3-87ab2ba1b8c7" />
+      </nodes>
+    </collectionItemConnector>
+  </nestedChildShapes>
+</configurationGeneratorDiagram>

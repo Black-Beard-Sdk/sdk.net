@@ -1,0 +1,63 @@
+﻿using Bb.Sdk.Net.Mails.Configurations;
+using Bb.Sdk.Net.Mails.Models;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+
+namespace Bb.Sdk.Net.Mails.Renderer
+{
+
+    /// <summary>
+    /// Implementation of message loader
+    /// </summary>
+    public class FolderMessageLoader : IMessageLoader
+    {
+
+        private DirectoryInfo folder;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FolderMessageLoader" /> class.
+        /// </summary>
+        /// <param name="folderTemplate">The folder.</param>
+        public FolderMessageLoader(DirectoryInfo folderTemplate)
+            : base()
+        {
+            this.folder = folderTemplate;
+        }
+
+        /// <summary>
+        /// Loads the template.
+        /// </summary>
+        /// <param name="subKey">The sub key for determine where find the message.</param>
+        /// <param name="MessageKey">Name of the model.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns></returns>
+        public StringBuilder LoadTemplate(string subKey, string MessageKey, CultureInfo culture)
+        {
+
+            StringBuilder body = null;
+
+            if (!string.IsNullOrEmpty(MessageKey))
+            {
+
+                string fileName;
+
+                if (!string.IsNullOrEmpty(subKey))
+                    fileName = Path.Combine(folder.FullName, subKey.Trim('\\'), MessageKey) + ".cshtml";
+                else
+                    fileName = Path.Combine(folder.FullName, culture.IetfLanguageTag, MessageKey) + ".cshtml";
+
+                if (File.Exists(fileName))
+                    body = new StringBuilder(File.ReadAllText(fileName));
+
+            }
+
+            return body;
+        
+        }
+
+
+    }
+}
