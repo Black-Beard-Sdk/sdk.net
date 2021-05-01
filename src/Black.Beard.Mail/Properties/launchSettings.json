@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Black.Beard.Mail": {
+      "commandName": "Project",
+      "commandLineArgs": "generate rendering debug \"D:\\Src\\Sdk\\sdk.net\\src\\Tests\" \"D:\\Src\\Sdk\\sdk.net\\src\\Tests\\model.json\""
+    }
+  }
+}

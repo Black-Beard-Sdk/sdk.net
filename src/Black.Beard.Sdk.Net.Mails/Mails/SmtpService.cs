@@ -22,8 +22,8 @@ namespace Bb.Sdk.Net.Mails
 
         private SmtpProfile profile;
         private SmtpClient _client;
-        private MessageReceiverModel BccAddress;
-        private MessageReceiverModel fromAddress;
+        private ContactAddress BccAddress;
+        private ContactAddress fromAddress;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmtpService"/> class.
@@ -37,14 +37,14 @@ namespace Bb.Sdk.Net.Mails
 
             if (!string.IsNullOrEmpty(this.profile.SenderAddress))
             {
-                this.fromAddress = new MessageReceiverModel(this.profile.SenderAddress) { Libelle = this.profile.SenderName };
+                this.fromAddress = new ContactAddress(this.profile.SenderAddress) { Libelle = this.profile.SenderName };
                 if (!this.fromAddress.IsValidEmail)
                     throw new InvalidAddressException(string.Format("invalid reply email address '{0}'", this.fromAddress.Email));
             }
 
             if (!string.IsNullOrEmpty(this.profile.BccAddress))
             {
-                this.BccAddress = new MessageReceiverModel(this.profile.BccAddress);
+                this.BccAddress = new ContactAddress(this.profile.BccAddress);
                 if (!this.BccAddress.IsValidEmail)
                     throw new InvalidAddressException(string.Format("invalid reply email address '{0}'", this.BccAddress.Email));
             }
@@ -62,28 +62,9 @@ namespace Bb.Sdk.Net.Mails
         /// </exception>
         public void SendMail(MailMessage email)
         {
-
-            Trace.Fail(string.Format("MailService : Envoi d'un email à {0}", email.To.Select(o => o.Address).Aggregate((current, next) => current = current + "; " + next)));
-
-            // Si on est en debug, on envoie uniquement les mails a _MailDebugTo
-            if (this.profile.DebugMode)
-            {
-                email.To.Clear();
-                email.To.Add(new MailAddress(this.profile.MailDebugTo));
-            }
-            else
-            {
-                if (fromAddress != null && email.From == null)
-                    email.From = fromAddress.GetAdress();
-
-                if (this.BccAddress != null)
-                    email.Bcc.Add(this.BccAddress.GetAdress());
-            }
-
+            Trace.WriteLine(string.Format("MailService : sending email at {0}", email.To.Select(o => o.Address).Aggregate((current, next) => current = current + "; " + next)));
             _client.Send(email);
-
-            Trace.Fail("MailService : Envoi de l'email réussi");
-
+            Trace.WriteLine("MailService : email sended succefully");
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -20,12 +21,14 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
         }
 
+        [Required]
         public string Name { get; set; }
 
-
+        [Required]
         public string HostName { get; set; }
 
-        public int Port { get; set; }
+        [Required]
+        public int Port { get; set; } = 25;
 
         public bool EnabledSsl { get; set; }
 
@@ -35,11 +38,11 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
         public SmtpDeliveryMethod DeliveryMethod { get; set; }
 
-        public int TimeOut { get; set; }
+        public int TimeOut { get; set; } = 1000;
 
         public string Username { get; set; }
 
-        public SecureString Password { get; set; }
+        public string Password { get; set; }
 
         public int MinPool { get; set; } = 1;
 
@@ -55,6 +58,28 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
         public string MailDebugTo { get; set; }
 
+
+        public MailAddress GetSenderEmail()
+        {
+
+            if (_senderAddress == null)
+            {
+                if (!string.IsNullOrEmpty(SenderName))
+                    _senderAddress = new MailAddress(SenderAddress, SenderName);
+
+                else
+                    _senderAddress = new MailAddress(SenderAddress);
+            }
+
+            return _senderAddress;
+        }
+
+        public MailAddress GetBccEmail()
+        {
+            if (this._bccAddress == null)
+                this._bccAddress = new MailAddress(BccAddress);
+            return this._bccAddress;
+        }
 
         /// <summary>
         /// Gets the smtp client.
@@ -73,21 +98,32 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
             if (DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && !String.IsNullOrEmpty(PickupDirectoryLocation))
             {
+
                 if (!Directory.Exists(PickupDirectoryLocation))
-                {
                     throw new System.IO.DirectoryNotFoundException(PickupDirectoryLocation);
-                }
+
                 _client.PickupDirectoryLocation = PickupDirectoryLocation;
             }
 
             if (!string.IsNullOrEmpty(Username))
-                _client.Credentials = new NetworkCredential(Username, Password);
+            {
+
+                var pwd = new SecureString();
+
+                foreach (var item in Password)
+                    pwd.AppendChar(item);
+
+                _client.Credentials = new NetworkCredential(Username, pwd);
+
+            }
 
             return _client;
 
         }
-    
-    
+
+
+        private MailAddress _bccAddress;
+        private MailAddress _senderAddress;
     }
 
 

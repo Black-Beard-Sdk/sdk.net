@@ -18,7 +18,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// <param name="MessageKey">Name of the model.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>the template</returns>
-        StringBuilder LoadTemplate(string subKey, string MessageKey, CultureInfo culture);
+        StringBuilder LoadTemplate(string MessageKey, CultureInfo culture);
 
 
     }

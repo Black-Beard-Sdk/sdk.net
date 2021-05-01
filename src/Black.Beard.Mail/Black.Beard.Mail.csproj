@@ -1,22 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Mail</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Mails\Configurations\MailConfiguration.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Mails\Configurations\MailConfiguration.xsd" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NJsonSchema" Version="10.4.1" />
-    <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
     <PackageReference Include="Ude.NetStandard" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Sdk.Net.Mails\Black.Beard.Sdk.Net.Mails.csproj" />
   </ItemGroup>
 
 </Project>

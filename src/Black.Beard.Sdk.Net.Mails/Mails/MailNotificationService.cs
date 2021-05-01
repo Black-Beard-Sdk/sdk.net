@@ -38,7 +38,10 @@ namespace Bb.Sdk.Net.Mails
         /// <param name="renderer">The renderer.</param>
         public MailNotificationService(string profileName, IMessageRenderer renderer)
         {
-            this.profile = Configuration.Instance.SptmProfiles.First(c => c.Name == profileName);
+            this.profile = Configuration.Instance.SmtpProfiles.FirstOrDefault(c => c.Name == profileName);
+            if (profile == null)
+                throw new MissingProfileException(profileName);
+
             this.pool = new ObjectPool<SmtpService>(() => new SmtpService(profile), profile.MinPool) { MaxObject = profile.MaxPool };
             this.renderer = renderer;
         }
@@ -52,7 +55,7 @@ namespace Bb.Sdk.Net.Mails
 
             _inTreatment++;
 
-            Trace.WriteLine(string.Format("MailNotificationService : Début de la génération et de l'envoi d'email. Nom du model : {0}", model.GetType().FullName));
+            Trace.WriteLine(string.Format("MailNotificationService : Starting render generation. model'name : {0}", model.GetType().FullName));
 
             try
             {
@@ -84,7 +87,7 @@ namespace Bb.Sdk.Net.Mails
                 _inTreatment--;
             }
 
-            Trace.WriteLine("MailNotificationService : Envoi d'email effectué avec succès.");
+            Trace.WriteLine("MailNotificationService : sending process ended");
 
         }
 
@@ -97,16 +100,13 @@ namespace Bb.Sdk.Net.Mails
         /// <returns></returns>
         private async Task Send(SmtpService srv, MailMessage message, MailEventArgs eventArg)
         {
+
+            Notify(eventArg, MailStatusEnum.Sending);
+
             try
             {
-
-                Notify(eventArg, MailStatusEnum.Sending);
-
-                await Task.Run(() => { srv.SendMail(message); });
+                srv.SendMail(message);
                 _sendedCount++;
-
-                Notify(eventArg, MailStatusEnum.Sended);
-
             }
             catch (SmtpException smtpException)
             {
@@ -122,6 +122,11 @@ namespace Bb.Sdk.Net.Mails
                 eventArg.Exception = exception;
                 Notify(eventArg, MailStatusEnum.Error);
             }
+
+            Notify(eventArg, MailStatusEnum.Sended);
+
+            await Task.CompletedTask;
+
         }
 
         private void Notify(MailEventArgs eventArg, MailStatusEnum mailStatusEnum)
@@ -145,24 +150,51 @@ namespace Bb.Sdk.Net.Mails
         /// <exception cref="Exception"></exception>
         private MailMessage CreateMail(RendererResult mailResult, MessageModelBase model)
         {
-         
+
             if (!model.To.IsValidEmail)
                 throw new InvalidAddressException(string.Format("invalid receiver email address '{0}'", model.To.Email));
 
-            MailMessage message = new MailMessage() { IsBodyHtml = model.IsBodyHtml };
+            MailMessage message = new MailMessage();
 
             try
             {
                 message.Subject = mailResult.Subject;
             }
             catch (Exception)
-            {               
+            {
                 throw new InvalidEmailSubjectContentException();
             }
 
 
-            message.To.Add(model.To.GetAdress());
-            message.From = model.From.GetAdress();
+            if (model.From != null)
+                message.From = model.From.GetAdress();
+
+            else if (!string.IsNullOrEmpty(this.profile.SenderAddress))
+                message.From = this.profile.GetSenderEmail();
+
+            else
+                throw new MissingEmailException("sender");
+
+
+            // Si on est en debug, on envoie uniquement les mails a _MailDebugTo
+            if (this.profile.DebugMode)
+                message.To.Add(new MailAddress(this.profile.MailDebugTo));
+
+            else
+            {
+
+                if (this.profile.BccAddress != null)
+                    message.Bcc.Add(profile.GetBccEmail());
+
+                if (model.To != null)
+                    message.To.Add(model.To.GetAdress());
+                else
+                    throw new MissingEmailException("receiver");
+
+            }
+
+
+
 
             if (!object.ReferenceEquals(model.ReplyTo, null) && string.IsNullOrEmpty(model.ReplyTo.Email))
             {

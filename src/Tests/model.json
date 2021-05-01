@@ -1,0 +1,41 @@
+{
+
+    "$schema": ".\\MailModel.schema.json",
+
+    "Culture":"French_France",
+
+    "Mails": [
+        {
+
+            "Subject":"Mysubject",
+            "HtmlTemplateName":"fr.template",
+
+            "From":
+            {
+                "Email":"gaelgaelFrom@gmail.com",
+                "Libelle":"gael beard",
+                "Civility":"Mr"
+            },
+
+            "To":
+            {
+                "Email":"gaelgael5@gmail.com",
+                "Libelle":"gael beard",
+                "Civility":"Mr"
+            },
+
+            "ReplyTo":
+            {
+                "Email":"gaelgael5ReplyTo@gmail.com",
+                "Libelle":"gael beard",
+                "Civility":"Mr"
+            },
+
+            "Attachments": [],
+
+            "Datas": {"Name":"Beard"}
+
+        }
+    ]
+
+}

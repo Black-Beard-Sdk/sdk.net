@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net.Mail;
@@ -18,13 +19,12 @@ namespace Bb.Sdk.Net.Mails.Models
         /// </summary>
         /// <param name="from">From.</param>
         /// <param name="to">The receiver.</param>
-        public MessageModelBase(MessageReceiverModel @from, MessageReceiverModel to)
+        public MessageModelBase(ContactAddress @from, ContactAddress to)
         {
             this.From = from;
             this.To = to;
             Attachments = new List<Attachment>();
             Culture = CultureInfo.CurrentCulture;
-            IsBodyHtml = true;
         }
 
         /// <summary>
@@ -56,12 +56,11 @@ namespace Bb.Sdk.Net.Mails.Models
         /// <value>
         /// The sub path.
         /// </value>
-        public string SubKey { get; set; }
 
         /// <summary>
         /// ReplyTo description
         /// </summary>
-        public MessageReceiverModel ReplyTo { get; set; }
+        public ContactAddress ReplyTo { get; set; }
 
         /// <summary>
         /// Gets from.
@@ -69,7 +68,7 @@ namespace Bb.Sdk.Net.Mails.Models
         /// <value>
         /// From.
         /// </value>
-        public MessageReceiverModel From { get; private set; }
+        public ContactAddress From { get; set; }
 
         /// <summary>
         /// Gets or sets the culture.
@@ -85,7 +84,7 @@ namespace Bb.Sdk.Net.Mails.Models
         /// <value>
         /// The receivers.
         /// </value>
-        public MessageReceiverModel To { get; private set; }
+        public ContactAddress To { get; private set; }
 
         /// <summary>
         /// Gets or sets the attachments.
@@ -95,14 +94,8 @@ namespace Bb.Sdk.Net.Mails.Models
         /// </value>
         public List<Attachment> Attachments { get; private set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is body HTML.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance is body HTML; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsBodyHtml { get; set; }
-
+        public JToken Datas { get; internal set; }
 
     }
+
 }

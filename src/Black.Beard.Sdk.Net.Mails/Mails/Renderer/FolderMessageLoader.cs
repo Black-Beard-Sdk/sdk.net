@@ -34,7 +34,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// <param name="MessageKey">Name of the model.</param>
         /// <param name="culture">The culture.</param>
         /// <returns></returns>
-        public StringBuilder LoadTemplate(string subKey, string MessageKey, CultureInfo culture)
+        public StringBuilder LoadTemplate(string MessageKey, CultureInfo culture)
         {
 
             StringBuilder body = null;
@@ -43,19 +43,14 @@ namespace Bb.Sdk.Net.Mails.Renderer
             {
 
                 string fileName;
-
-                if (!string.IsNullOrEmpty(subKey))
-                    fileName = Path.Combine(folder.FullName, subKey.Trim('\\'), MessageKey) + ".cshtml";
-                else
-                    fileName = Path.Combine(folder.FullName, culture.IetfLanguageTag, MessageKey) + ".cshtml";
+                fileName = Path.Combine(folder.FullName, MessageKey) + ".cshtml";
 
                 if (File.Exists(fileName))
-                    body = new StringBuilder(File.ReadAllText(fileName));
-
+                    body = new StringBuilder(ContentHelper.LoadContentFromFile(fileName));
             }
 
             return body;
-        
+
         }
 
 

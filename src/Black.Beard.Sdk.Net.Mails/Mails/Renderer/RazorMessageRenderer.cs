@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Text;
 using RazorEngine;
 using RazorEngine.Templating; // For extension methods.
+using Black.Beard.Sdk.Net.Mails;
+using Bb.Sdk.Exceptions;
 
 namespace Bb.Sdk.Net.Mails.Renderer
 {
@@ -25,7 +27,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// </summary>
         public RazorMessageRenderer()
         {
-            this.defaultCulture = CultureInfo.GetCultureInfo(Configuration.Instance.DefaultCulture);
+            this.defaultCulture = Configuration.Instance.DefaultCulture.ToCulture();
         }
 
         /// <summary>
@@ -48,17 +50,17 @@ namespace Bb.Sdk.Net.Mails.Renderer
 
             string htmlBody = string.Empty;
 
-            if (model.IsBodyHtml)
-                result.HtmlBody = LoadMessage(model.SubKey, model.HtmlTemplateName, model.Culture, model);
+            if (!string.IsNullOrEmpty(model.HtmlTemplateName))
+                result.HtmlBody = LoadMessage(model.HtmlTemplateName, model.Culture, model);
 
-            result.TextBody = LoadMessage(model.SubKey, model.TextTemplateName, model.Culture, model);
+            if (!string.IsNullOrEmpty(model.TextTemplateName))
+                result.TextBody = LoadMessage(model.TextTemplateName, model.Culture, model);
 
             if (!string.IsNullOrEmpty(model.SubjectTemplateName))
-            {
-                result.Subject = LoadMessage(model.SubKey, model.SubjectTemplateName, model.Culture, model);
-                if (string.IsNullOrEmpty(result.Subject))
-                    result.Subject = model.Subject;
-            }
+                result.Subject = LoadMessage(model.SubjectTemplateName, model.Culture, model);
+
+            if (string.IsNullOrEmpty(result.Subject))
+                result.Subject = model.Subject;
 
             return result;
 
@@ -73,23 +75,31 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// <param name="model">The model.</param>
         /// <returns></returns>
         /// <exception cref="System.NullReferenceException">please set the property MessageLoader with a message loder implementation</exception>
-        private string LoadMessage(string subKey, string messageKey, CultureInfo culture, MessageModelBase model)
+        private string LoadMessage(string messageKey, CultureInfo culture, MessageModelBase model)
         {
 
             if (MessageLoader == null)
                 throw new NullReferenceException("please set the property MessageLoader with a message loder implementation");
 
-            StringBuilder template = MessageLoader.LoadTemplate(subKey, messageKey, culture);
+            StringBuilder template = MessageLoader.LoadTemplate(messageKey, culture);
 
-            string body = null;
+            if (template != null)
+            {
 
-            if (template.Length > 0)
-            body= Engine.Razor.RunCompile(template.ToString(), "templateKey", null, model);
+                string body = null;
 
-            return body.Trim();
+                if (template.Length > 0)
+                    body = Engine.Razor.RunCompile(template.ToString(), "templateKey", typeof(Newtonsoft.Json.Linq.JObject), model.Datas);
+
+                return body.Trim();
+
+            }
+
+            throw new MissingMailViewException(messageKey);
 
         }
 
     }
+
 
 }
