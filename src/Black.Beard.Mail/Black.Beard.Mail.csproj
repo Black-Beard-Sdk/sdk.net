@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Mail</AssemblyName>
+    <StartupObject>Black.Beard.Mail.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
