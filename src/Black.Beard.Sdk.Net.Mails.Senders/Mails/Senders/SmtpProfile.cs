@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Bb.Sdk.Net.Mails.Configurations;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -9,20 +11,16 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bb.Sdk.Net.Mails.Configurations
+namespace Bb.Sdk.Net.Mails.Senders
 {
 
-
-    public partial class SmtpProfile
+    public partial class SmtpProfile : MailProfile
     {
 
         public SmtpProfile()
         {
-
+            
         }
-
-        [Required]
-        public string Name { get; set; }
 
         [Required]
         public string HostName { get; set; }
@@ -38,47 +36,15 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
         public SmtpDeliveryMethod DeliveryMethod { get; set; }
 
-        public int TimeOut { get; set; } = 1000;
-
+        [JsonConverter(typeof(SecureConverter))]
         public string Username { get; set; }
 
+        [JsonConverter(typeof(SecureConverter))]
         public string Password { get; set; }
 
-        public int MinPool { get; set; } = 1;
-
-        public int MaxPool { get; set; } = 1;
-
-        public string SenderAddress { get; set; }
-
-        public string SenderName { get; set; }
-
-        public string BccAddress { get; set; }
-
-        public bool DebugMode { get; set; }
-
-        public string MailDebugTo { get; set; }
-
-
-        public MailAddress GetSenderEmail()
+        public override IEmailService GetService()
         {
-
-            if (_senderAddress == null)
-            {
-                if (!string.IsNullOrEmpty(SenderName))
-                    _senderAddress = new MailAddress(SenderAddress, SenderName);
-
-                else
-                    _senderAddress = new MailAddress(SenderAddress);
-            }
-
-            return _senderAddress;
-        }
-
-        public MailAddress GetBccEmail()
-        {
-            if (this._bccAddress == null)
-                this._bccAddress = new MailAddress(BccAddress);
-            return this._bccAddress;
+            return new SmtpService((SmtpProfile)this);
         }
 
         /// <summary>
@@ -95,6 +61,8 @@ namespace Bb.Sdk.Net.Mails.Configurations
                 DeliveryMethod = DeliveryMethod,
                 DeliveryFormat = DeliveryFormat
             };
+
+            
 
             if (DeliveryMethod == SmtpDeliveryMethod.SpecifiedPickupDirectory && !String.IsNullOrEmpty(PickupDirectoryLocation))
             {
@@ -115,6 +83,11 @@ namespace Bb.Sdk.Net.Mails.Configurations
 
                 _client.Credentials = new NetworkCredential(Username, pwd);
 
+            }
+            else
+            {
+                _client.UseDefaultCredentials = false;
+                _client.Credentials = new NetworkCredential();
             }
 
             return _client;

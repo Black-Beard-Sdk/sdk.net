@@ -2,7 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>Bb.Sdk.Net</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Pools\**" />
+    <EmbeddedResource Remove="Pools\**" />
+    <None Remove="Pools\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Mails\Configurations\MailConfiguration.cs" />

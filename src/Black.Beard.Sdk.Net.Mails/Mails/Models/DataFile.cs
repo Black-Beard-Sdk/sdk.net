@@ -1,11 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Black.Beard.Sdk.Net.Mails
+namespace Bb.Sdk.Net.Mails.Models
 {
 
     public class DataFile

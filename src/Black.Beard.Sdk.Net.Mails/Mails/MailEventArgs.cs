@@ -21,7 +21,7 @@ namespace Bb.Sdk.Net.Mails
         /// </summary>
         /// <param name="model">The model.</param>
         /// <param name="mail">The mail.</param>
-        public MailEventArgs(MessageModelBase model, MailMessage mail)
+        public MailEventArgs(MessageModelBase model, object mail)
         {
             this.Model = model;
             this.Mail = mail;
@@ -36,12 +36,13 @@ namespace Bb.Sdk.Net.Mails
         public MessageModelBase Model { get; set; }
 
         /// <summary>
-        /// Gets or sets the mail.
+        /// Gets or sets the mail convert by the mail service.
         /// </summary>
         /// <value>
         /// The mail.
         /// </value>
-        public MailMessage Mail { get; set; }
+        public object Mail { get; set; }
+
         /// <summary>
         /// Gets the status.
         /// </summary>
@@ -68,9 +69,9 @@ namespace Bb.Sdk.Net.Mails
     {
 
         /// <summary>
-        /// The mail is pooled and wait for processing that a service is available
+        /// The mail is initialized and reader to start
         /// </summary>
-        Pooled,
+        Initialized,
 
         /// <summary>
         /// The mail is sending
@@ -85,7 +86,7 @@ namespace Bb.Sdk.Net.Mails
         /// <summary>
         /// The mail was in error
         /// </summary>
-        Error
+        Error,
     }
 
 }

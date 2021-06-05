@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Sdk.Net.Mails.Senders\Black.Beard.Sdk.Net.Mails.Senders.csproj" />
     <ProjectReference Include="..\Black.Beard.Sdk.Net.Mails\Black.Beard.Sdk.Net.Mails.csproj" />
   </ItemGroup>
 

@@ -10,12 +10,11 @@ namespace Bb.Sdk.Net.Mails.Renderer
 {
 
     /// <summary>
-    /// Implementation of message loader
+    /// Implementation of template loader
+    /// Load the template from a directory
     /// </summary>
-    public class FolderMessageLoader : IMessageLoader
+    public class FolderMessageLoader : ITemplateLoader
     {
-
-        private DirectoryInfo folder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FolderMessageLoader" /> class.
@@ -47,12 +46,14 @@ namespace Bb.Sdk.Net.Mails.Renderer
 
                 if (File.Exists(fileName))
                     body = new StringBuilder(ContentHelper.LoadContentFromFile(fileName));
+
             }
 
             return body;
 
         }
 
+        private DirectoryInfo folder;
 
     }
 }

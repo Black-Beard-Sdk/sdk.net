@@ -1,22 +1,12 @@
 ﻿using Bb.CommandLines;
-using Bb.CommandLines.Ins;
-using Bb.CommandLines.Outs;
 using Bb.CommandLines.Validators;
 using Bb.Sdk.Net.Mails;
 using Bb.Sdk.Net.Mails.Configurations;
 using Bb.Sdk.Net.Mails.Models;
 using Bb.Sdk.Net.Mails.Renderer;
-using Black.Beard.Sdk.Net.Mails;
 using Microsoft.Extensions.CommandLineUtils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Reflection;
-using System.Text;
 
 namespace Bb.Mails.Commands
 {
@@ -24,6 +14,8 @@ namespace Bb.Mails.Commands
 
     /*
      
+    // generate rendering debug "D:\Src\Sdk\sdk.net\src\Tests\Templates" "C:\Users\g.beard\Desktop\consignes\test\mailtosend.json"
+
     // render models
     .\mail.exe generate rendering debug "D:\Src\Sdk\sdk.net\src\Tests" "D:\Src\Sdk\sdk.net\src\Tests\model.json"
 
@@ -62,7 +54,6 @@ namespace Bb.Mails.Commands
                 var validator = new GroupArgument(config);
 
                 var argsmtpName = validator.Argument("<Smtp profile>", "Smtp profile in the configuration file"
-                    , ValidatorExtension.EvaluateDirectoryPathIsValid
                     , ValidatorExtension.EvaluateRequired
                     );
 
@@ -93,44 +84,39 @@ namespace Bb.Mails.Commands
                     var sourceDir = new DirectoryInfo(argTemplatePath.Value);
                     LoadConfiguration(argconfig, sourceDir);
 
-
                     // load model
                     var model = argModelPath.Value
-                                            .LoadContentFromFile()
-                                            .Deserialize<DataModel>();
+                        .LoadContentFromFile()
+                        .Deserialize<DataModel>();
 
-                    // init render
-                    //var targetDir = new DirectoryInfo(argtarget.Value.TrimPath());
+                    string profileName = argsmtpName.Value;
 
+                    MailNotificationServiceProvider provider = 
+                        new MailNotificationServiceProvider()
+                        .AddTemplateLoader(profileName, new FolderMessageLoader(new System.IO.DirectoryInfo(argTemplatePath.Value.TrimPath())))
+                        ;
 
+                    var service  = provider.GetService(profileName);
 
-
-                    RazorMessageRenderer render = new RazorMessageRenderer()
-                    {
-                        MessageLoader = new FolderMessageLoader(sourceDir)
-                    };
-
-                    MailNotificationService service = new MailNotificationService(argsmtpName.Value, render)
+                    EventHandler<MailEventArgs> trace = (sender, e) =>
                     {
                         
                     };
 
-                    service.MailEvents += (sender, e) =>
-                    {
-
-                    };
+                    service.MailEvents += trace;
 
                     foreach (var item in model.GetDatas())
                     {
-                       service.Send(item);
+                        var result = service.Send(item).Result;
                     }
+
+                    service.MailEvents -= trace;
 
                     return 0;
 
                 });
 
             });
-
 
             cmd.Command("schemas", config =>
             {
@@ -144,7 +130,7 @@ namespace Bb.Mails.Commands
                      , ValidatorExtension.EvaluateRequired
                      );
 
-                var argSource = validator.Option("--source", "json source file path that contains data source. if option is missing source is readed from stdin stream");
+                //var argSource = validator.Option("--source", "json source file path that contains data source. if option is missing source is readed from stdin stream");
 
                 config.OnExecute(() =>
                 {
@@ -166,7 +152,7 @@ namespace Bb.Mails.Commands
                     NJsonSchema.JsonSchema.FromType<Bb.Sdk.Net.Mails.Configurations.Configuration>(setting)
                         .AllowAdditionalProperties()
                         .ToJson()
-                        .Save(Path.Combine(targetDir.FullName, "Configuration.schema.json"));
+                        .Save(Path.Combine(targetDir.FullName, "mails.Configuration.schema.json"));
 
 
                     NJsonSchema.JsonSchema.FromType<DataModel>(setting)
@@ -180,8 +166,6 @@ namespace Bb.Mails.Commands
                 });
 
             });
-
-
 
             return app;
 
@@ -199,20 +183,16 @@ namespace Bb.Mails.Commands
 
             if (!Configuration.Initialized)
             {
-
-                var file = new FileInfo(Path.Combine(sourceDir.FullName, "config.json"));
+                var file = new FileInfo(Path.Combine(sourceDir.FullName, "mail.config.json"));
                 file.Refresh();
-                if (file.Exists)
-                    Configuration.InitializeConfiguration(file.FullName);
-                else
-                    Configuration.TryToInitialiseFromDirectoryWork();
-
+                Configuration.InitializeConfiguration(file.FullName);
             }
 
             if (!Configuration.Initialized)
             {
 
             }
+
         }
     }
 

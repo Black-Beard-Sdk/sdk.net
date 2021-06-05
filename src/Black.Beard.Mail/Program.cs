@@ -15,6 +15,8 @@ namespace Black.Beard.Mail
         public static void Main(params string[] args)
         {
 
+            Bb.Sdk.Net.Mails.RegisterProfiles.Register();
+
             CommandLineApplication app = null;
             try
             {
@@ -22,6 +24,7 @@ namespace Black.Beard.Mail
                 app = new CommandLineApplication()
                     .Initialize()
                     .CommandExport()
+                    .CommandSmtp()
                 ;
 
                 int result = app.Execute(args);

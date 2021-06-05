@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Text;
 using RazorEngine;
 using RazorEngine.Templating; // For extension methods.
-using Black.Beard.Sdk.Net.Mails;
 using Bb.Sdk.Exceptions;
 
 namespace Bb.Sdk.Net.Mails.Renderer
@@ -16,6 +15,12 @@ namespace Bb.Sdk.Net.Mails.Renderer
     /// </summary>
     public class RazorMessageRenderer : IMessageRenderer
     {
+
+
+        public RazorMessageRenderer(ITemplateLoader messageLoader)
+        {
+            this.MessageLoader = messageLoader;
+        }
 
         /// <summary>
         /// The default culture
@@ -36,7 +41,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// <value>
         /// The message loader.
         /// </value>
-        public IMessageLoader MessageLoader { get; set; }
+        public ITemplateLoader MessageLoader { get; }
 
         /// <summary>
         /// Uses the Razor engine to generate both html and text based mailbody
@@ -74,7 +79,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
         /// <param name="culture">The culture.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        /// <exception cref="System.NullReferenceException">please set the property MessageLoader with a message loder implementation</exception>
+        /// <exception cref="System.NullReferenceException">please set the property MessageLoader with a message loader implementation</exception>
         private string LoadMessage(string messageKey, CultureInfo culture, MessageModelBase model)
         {
 

@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Sdk.Net.Mails", "Black.Beard.Sdk.Net.Mails\Black.Beard.Sdk.Net.Mails.csproj", "{C522F2E6-0207-44FC-9363-3F0646EC46E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Mail", "Black.Beard.Mail\Black.Beard.Mail.csproj", "{4EC3287F-A7E0-4A3E-9506-16CB0E0A2FA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Mail", "Black.Beard.Mail\Black.Beard.Mail.csproj", "{4EC3287F-A7E0-4A3E-9506-16CB0E0A2FA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Sdk.Net.Mails.Senders", "Black.Beard.Sdk.Net.Mails.Senders\Black.Beard.Sdk.Net.Mails.Senders.csproj", "{94791085-67E1-48D9-B976-1F08E50FED48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4EC3287F-A7E0-4A3E-9506-16CB0E0A2FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EC3287F-A7E0-4A3E-9506-16CB0E0A2FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EC3287F-A7E0-4A3E-9506-16CB0E0A2FA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94791085-67E1-48D9-B976-1F08E50FED48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94791085-67E1-48D9-B976-1F08E50FED48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94791085-67E1-48D9-B976-1F08E50FED48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94791085-67E1-48D9-B976-1F08E50FED48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

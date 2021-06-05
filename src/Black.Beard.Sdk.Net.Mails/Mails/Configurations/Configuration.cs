@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,12 +6,13 @@ using System.Reflection;
 
 namespace Bb.Sdk.Net.Mails.Configurations
 {
+
     public class Configuration
     {
 
         public Configuration()
         {
-            this.SmtpProfiles = new List<SmtpProfile>();
+            this.Profiles = new List<MailProfile>();
         }
 
         public static Configuration Instance
@@ -21,15 +21,24 @@ namespace Bb.Sdk.Net.Mails.Configurations
             {
 
                 if (_instance == null)
-                    InitializeConfiguration("config.json");
+                    InitializeConfiguration("mail.config.json");
 
                 return _instance;
             }
         }
 
-        public List<SmtpProfile> SmtpProfiles { get; }
+        
+        public List<MailProfile> Profiles { get; }
+
+
+        public static bool Initialized { get => _instance != null; }
+
+        [JsonIgnore]
+        public FileInfo Filename { get; private set; }
 
         public CultureEnum DefaultCulture { get; set; } = CultureEnum.Invariant_Language_Invariant_Country;
+
+        #region In / out
 
         public static void InitializeConfiguration(string filename)
         {
@@ -42,32 +51,71 @@ namespace Bb.Sdk.Net.Mails.Configurations
                 if (_instance == null)
                 {
                     if (file.Exists)
-                        _instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(file.FullName));
+                    {
+                        var converter = new ProfileConverter();
+                        _instance = JsonConvert.DeserializeObject<Configuration>(File.ReadAllText(file.FullName), converter);
+                        _instance.Filename = file;
+                    }
+                    else
+                    {
+                        _instance = new Configuration()
+                        {
+                            DefaultCulture = CultureEnum.Invariant_Language_Invariant_Country,
+                        };
+                        _instance.Filename = file;
+
+                        _instance.Save();
+
+                    }
                 }
 
         }
 
-        public static void TryToInitialiseFromDirectoryWork()
+        public void Save()
         {
-            var file = new FileInfo(Assembly.GetEntryAssembly().Location);
-            file = new FileInfo(Path.Combine(file.Directory.FullName, "config.json"));
-            file.Refresh();
-            if (file.Exists)
-                InitializeConfiguration(file.FullName);
 
-            else
+            this.Filename.Refresh();
+            bool saved = false;
+            bool ok = false;
+            string fileBack = this.Filename.FullName + ".back";
+
+
+            if (this.Filename.Exists)
             {
-                file = new FileInfo(Path.Combine(Environment.CurrentDirectory, "config.json"));
-                file.Refresh();
-                if (file.Exists)
-                    InitializeConfiguration(file.FullName);
+                var b = new FileInfo(Filename.FullName);
+                b.Refresh();
+                b.MoveTo(fileBack);
+                saved = true;
             }
+
+            try
+            {
+                File.WriteAllText(this.Filename.FullName, JsonConvert.SerializeObject(_instance, Formatting.Indented));
+                ok = true;
+            }
+            finally
+            {
+
+                if (saved)
+                {
+                    if (ok)
+                        File.Delete(fileBack);
+                    else
+                    {
+                        var b = new FileInfo(fileBack);
+                        b.Refresh();
+                        b.MoveTo(this.Filename.FullName);
+                    }
+
+                }
+
+            }
+
+
 
         }
 
-        public static bool Initialized { get => _instance != null; }
-
-
+        #endregion In / out
 
 
         private static Configuration _instance;

@@ -8,7 +8,7 @@ namespace Bb.Sdk.Net.Mails.Renderer
     /// <summary>
     /// load the template
     /// </summary>
-    public interface IMessageLoader
+    public interface ITemplateLoader
     {
 
         /// <summary>

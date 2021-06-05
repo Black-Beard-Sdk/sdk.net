@@ -1,9 +1,9 @@
 ﻿using Bb.Sdk.Net.Mails.Configurations;
-using Bb.Sdk.Net.Mails.Models;
 using System.Collections.Generic;
 
-namespace Black.Beard.Sdk.Net.Mails
+namespace Bb.Sdk.Net.Mails.Models
 {
+
     public class DataModel
     {
 

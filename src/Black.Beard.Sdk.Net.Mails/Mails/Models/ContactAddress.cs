@@ -1,6 +1,6 @@
-﻿
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Text.RegularExpressions;
+
 namespace Bb.Sdk.Net.Mails.Models
 {
 
@@ -63,7 +63,7 @@ namespace Bb.Sdk.Net.Mails.Models
 
 
 
-        internal MailAddress GetAdress()
+        public MailAddress GetAdress()
         {
             if (!string.IsNullOrEmpty(Libelle))
                 return new MailAddress(Email, Libelle);
@@ -72,4 +72,5 @@ namespace Bb.Sdk.Net.Mails.Models
         }
 
     }
+
 }

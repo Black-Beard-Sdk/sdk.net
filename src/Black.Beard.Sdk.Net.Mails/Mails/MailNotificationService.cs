@@ -1,20 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Net.Mail;
-using Bb.Sdk.Net.Mails;
-using Bb.Sdk;
+﻿using System.Net.Mail;
 using Bb.Sdk.Net.Mails.Configurations;
 using Bb.Sdk.Net.Mails.Renderer;
 using Bb.Sdk.Net.Mails.Models;
 using System;
 using System.Threading.Tasks;
 using Bb.Sdk.Exceptions;
-using Bb.Pools;
 using System.Diagnostics;
-using Bb.Helpers;
-using System.Linq;
 
 namespace Bb.Sdk.Net.Mails
 {
+
 
     /// <summary>
     /// Mail Service notifier
@@ -22,27 +17,14 @@ namespace Bb.Sdk.Net.Mails
     public class MailNotificationService
     {
 
-        private SmtpProfile profile;
-        private ObjectPool<SmtpService> pool;
-        private IMessageRenderer renderer;
-
-        private int _sendingCount = 0;
-        private int _sendedCount = 0;
-        private int _errorCount = 0;
-        private int _inTreatment = 0;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MailNotificationService"/> class.
         /// </summary>
         /// <param name="profileName">Name of the profile.</param>
         /// <param name="renderer">The renderer.</param>
-        public MailNotificationService(string profileName, IMessageRenderer renderer)
+        public MailNotificationService(IMessageRenderer renderer, IEmailService mailService)
         {
-            this.profile = Configuration.Instance.SmtpProfiles.FirstOrDefault(c => c.Name == profileName);
-            if (profile == null)
-                throw new MissingProfileException(profileName);
-
-            this.pool = new ObjectPool<SmtpService>(() => new SmtpService(profile), profile.MinPool) { MaxObject = profile.MaxPool };
+            this._mailService = mailService;
             this.renderer = renderer;
         }
 
@@ -50,44 +32,64 @@ namespace Bb.Sdk.Net.Mails
         /// Sends the mail to the specified receivers.
         /// </summary>
         /// <param name="model">The model.</param>
-        public async void Send(MessageModelBase model)
+        public async Task<bool> Send(MessageModelBase model)
         {
 
-            _inTreatment++;
+            _inTreatment = true;
+            bool ok = false;
 
             Trace.WriteLine(string.Format("MailNotificationService : Starting render generation. model'name : {0}", model.GetType().FullName));
+
+            object message = null;
 
             try
             {
 
+
                 // Generate the rendered from the model
-                RendererResult result = renderer.Render(model);
+                RendererResult mailrendered = renderer.Render(model);
 
                 // Generate the MailMessage
-                using (var message = CreateMail(result, model))
-                {
+                message = this._mailService.GenerateMail(mailrendered, model);
+                MailEventArgs eventArg = new MailEventArgs(model, message);
 
-                    _sendingCount++;
+                _sendingCount++;
+                Notify(eventArg, MailStatusEnum.Initialized);
 
-                    MailEventArgs eventArg = new MailEventArgs(model, message);
-                    Notify(eventArg, MailStatusEnum.Pooled);
+                ok = await ExecuteSend(message, eventArg);
 
-                    // wait the next available service.
-                    using (PooledObject<SmtpService> service = this.pool.WaitForGet())
-                    {
-                        var srv = service.Instance;
-                        await Send(srv, message, eventArg);
-                    }
-
-                }
+                return ok;
 
             }
             finally
             {
-                _inTreatment--;
+
+                if (message != null)
+                {
+
+                    if (message is IDisposable d)
+                        try
+                        {
+                            d.Dispose();
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.WriteLine(e.ToString(), erroCategory);
+                        }
+
+                    message = null;
+
+                }
+
+                if (ok)
+                    Trace.WriteLine("MailNotificationService : sending process succesfully ended");
+                else
+                    Trace.WriteLine("MailNotificationService : sending process failed ended");
+
+                _inTreatment = false;
+
             }
 
-            Trace.WriteLine("MailNotificationService : sending process ended");
 
         }
 
@@ -98,22 +100,18 @@ namespace Bb.Sdk.Net.Mails
         /// <param name="message">The message.</param>
         /// <param name="eventArg">The <see cref="MailEventArgs"/> instance containing the event data.</param>
         /// <returns></returns>
-        private async Task Send(SmtpService srv, MailMessage message, MailEventArgs eventArg)
+        private async Task<bool> ExecuteSend(object message, MailEventArgs eventArg)
         {
+
+            bool result = false;
 
             Notify(eventArg, MailStatusEnum.Sending);
 
             try
             {
-                srv.SendMail(message);
+                this._mailService.SendMail(message);
                 _sendedCount++;
-            }
-            catch (SmtpException smtpException)
-            {
-                _errorCount++;
-                Trace.Fail(smtpException.ToString());
-                eventArg.Exception = smtpException;
-                Notify(eventArg, MailStatusEnum.Error);
+                Notify(eventArg, MailStatusEnum.Sended);
             }
             catch (Exception exception)
             {
@@ -123,9 +121,7 @@ namespace Bb.Sdk.Net.Mails
                 Notify(eventArg, MailStatusEnum.Error);
             }
 
-            Notify(eventArg, MailStatusEnum.Sended);
-
-            await Task.CompletedTask;
+            return await Task.FromResult(result);
 
         }
 
@@ -218,6 +214,8 @@ namespace Bb.Sdk.Net.Mails
             {
                 AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mailResult.HtmlBody, null, "text/html");
                 message.AlternateViews.Add(htmlView);
+                message.Body = mailResult.HtmlBody;
+                message.IsBodyHtml = true;
             }
 
             foreach (var item in model.Attachments)
@@ -261,7 +259,17 @@ namespace Bb.Sdk.Net.Mails
         /// <value>
         /// The in treatment.
         /// </value>
-        public int InTreatment { get { return _inTreatment; } }
+        public bool InTreatment { get { return _inTreatment; } }
+
+        private MailProfile profile;
+        private IEmailService _mailService;
+        private IMessageRenderer renderer;
+        private int _sendingCount = 0;
+        private int _sendedCount = 0;
+        private int _errorCount = 0;
+        private bool _inTreatment;
+
+        private static string erroCategory = System.Diagnostics.TraceLevel.Error.ToString();
 
     }
 

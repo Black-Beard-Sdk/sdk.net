@@ -1,6 +1,5 @@
-﻿using Bb.Sdk.Net.Mails.Models;
-
-namespace Black.Beard.Sdk.Net.Mails
+﻿
+namespace Bb.Sdk.Net.Mails.Models
 {
     public class ContactFile
     {
