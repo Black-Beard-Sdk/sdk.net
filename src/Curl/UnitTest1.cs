@@ -1,5 +1,5 @@
-using Bb.Curl.Commands;
-using Flurl;
+using Bb;
+using Bb.Curls;
 using System;
 
 namespace Curl

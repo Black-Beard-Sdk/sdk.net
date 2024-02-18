@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Black.Beard.Curl\Black.Beard.Curl.csproj" />
+    <ProjectReference Include="..\Black.Beard.Http\Black.Beard.Http.csproj" />
   </ItemGroup>
 
 </Project>

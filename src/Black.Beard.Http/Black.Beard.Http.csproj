@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Bb</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CodeGen\Program.cs" />
+  </ItemGroup>
+
+</Project>
