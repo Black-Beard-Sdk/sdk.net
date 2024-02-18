@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Curls\**" />
+    <EmbeddedResource Remove="Curls\**" />
+    <None Remove="Curls\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="CodeGen\Program.cs" />
   </ItemGroup>
 
