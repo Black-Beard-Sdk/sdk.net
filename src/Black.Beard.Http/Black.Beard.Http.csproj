@@ -7,10 +7,4 @@
     <RootNamespace>Bb</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="CodeGen\**" />
-    <EmbeddedResource Remove="CodeGen\**" />
-    <None Remove="CodeGen\**" />
-  </ItemGroup>
-
 </Project>
