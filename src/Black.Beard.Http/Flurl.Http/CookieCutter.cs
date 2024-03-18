@@ -23,7 +23,7 @@ namespace Bb.Http
 		}
 
 		/// <summary>
-		/// Parses a Set-Cookie response header to a FlurlCookie.
+		/// Parses a Set-Cookie response header to a UrlCookie.
 		/// </summary>
 		/// <param name="url">The URL that sent the response.</param>
 		/// <param name="headerValue">Value of the Set-Cookie header.</param>
@@ -252,20 +252,5 @@ namespace Bb.Http
 			return false;
 		}
 
-		// Possible future enhancement: https://github.com/tmenier/Flurl/issues/538
-		// This method works, but the feature still needs caching of some kind and an opt-in config setting.
-		//private static async Task<bool> IsPublicSuffixesAsync(string domain) {
-		//	using (var stream = await "https://publicsuffix.org/list/public_suffix_list.dat".GetStreamAsync())
-		//	using (var reader = new StreamReader(stream)) {
-		//		while (true) {
-		//			var line = await reader.ReadLineAsync();
-		//			if (line == null) break;
-		//			if (line.Trim() == "") continue;
-		//			if (line.OrdinalStartsWith("//")) continue;
-		//			if (line == domain) return true;
-		//		}
-		//	}
-		//	return false;
-		//}
 	}
 }

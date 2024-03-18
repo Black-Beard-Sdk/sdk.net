@@ -5,7 +5,7 @@ using Bb.Http.Testing;
 namespace Bb.Http.Configuration
 {
     /// <summary>
-    /// A set of properties that affect Flurl.Http behavior
+    /// A set of properties that affect Url.Http behavior
     /// </summary>
     public class UrlHttpSettings
 	{
@@ -16,7 +16,7 @@ namespace Bb.Http.Configuration
 		private UrlHttpSettings _defaults;
 
 		/// <summary>
-		/// Creates a new FlurlHttpSettings object.
+		/// Creates a new UrlHttpSettings object.
 		/// </summary>
 		public UrlHttpSettings() {
 			Redirects = new RedirectSettings(this);
@@ -39,7 +39,7 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// Gets or sets a pattern representing a range of HTTP status codes which (in addtion to 2xx) will NOT result in Flurl.Http throwing an Exception.
+		/// Gets or sets a pattern representing a range of HTTP status codes which (in addtion to 2xx) will NOT result in Url.Http throwing an Exception.
 		/// Examples: "3xx", "100,300,600", "100-299,6xx", "*" (allow everything)
 		/// 2xx will never throw regardless of this setting.
 		/// </summary>
@@ -65,7 +65,7 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// Gets object whose properties describe how Flurl.Http should handle redirect (3xx) responses.
+		/// Gets object whose properties describe how Url.Http should handle redirect (3xx) responses.
 		/// </summary>
 		public RedirectSettings Redirects { get; }
 
@@ -140,8 +140,8 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// Resets all overridden settings to their default values. For example, on a FlurlRequest,
-		/// all settings are reset to FlurlClient-level settings.
+		/// Resets all overridden settings to their default values. For example, on a UrlRequest,
+		/// all settings are reset to UrlClient-level settings.
 		/// </summary>
 		public virtual void ResetDefaults() {
 			_vals.Clear();

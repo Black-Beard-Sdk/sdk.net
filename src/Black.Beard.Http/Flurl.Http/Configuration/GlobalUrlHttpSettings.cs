@@ -1,7 +1,7 @@
 ﻿namespace Bb.Http.Configuration
 {
     /// <summary>
-    /// Global default settings for Flurl.Http
+    /// Global default settings for Uurl.Http
     /// </summary>
     public class GlobalUrlHttpSettings : UrlHttpSettings
 	{
@@ -18,10 +18,10 @@
 		}
 
 		/// <summary>
-		/// Gets or sets the factory that defines creating, caching, and reusing FlurlClient instances and,
+		/// Gets or sets the factory that defines creating, caching, and reusing UrlClient instances and,
 		/// by proxy, HttpClient instances.
 		/// </summary>
-		public IUrlClientFactory FlurlClientFactory {
+		public IUrlClientFactory UrlClientFactory {
 			get => Get<IUrlClientFactory>();
 			set => Set(value);
 		}
@@ -34,7 +34,7 @@
 			Timeout = TimeSpan.FromSeconds(100); // same as HttpClient
 			JsonSerializer = new DefaultJsonSerializer();
 			UrlEncodedSerializer = new DefaultUrlEncodedSerializer();
-			FlurlClientFactory = new DefaultFlurlClientFactory();
+			UrlClientFactory = new DefaultUrlClientFactory();
 			Redirects.Enabled = true;
 			Redirects.AllowSecureToInsecure = false;
 			Redirects.ForwardHeaders = false;

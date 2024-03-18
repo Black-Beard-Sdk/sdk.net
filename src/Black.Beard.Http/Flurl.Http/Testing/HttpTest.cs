@@ -5,7 +5,7 @@ using Bb.Http.Configuration;
 namespace Bb.Http.Testing
 {
 	/// <summary>
-	/// An object whose existence puts Flurl.Http into test mode where actual HTTP calls are faked. Provides a response
+	/// An object whose existence puts Url.Http into test mode where actual HTTP calls are faked. Provides a response
 	/// queue, call log, and assertion helpers for use in Arrange/Act/Assert style tests.
 	/// </summary>
 	[Serializable]
@@ -35,7 +35,7 @@ namespace Bb.Http.Testing
 		public IReadOnlyList<UrlCall> CallLog => new ReadOnlyCollection<UrlCall>(_calls.ToList());
 
 		/// <summary>
-		/// Change FlurlHttpSettings for the scope of this HttpTest.
+		/// Change UrlHttpSettings for the scope of this HttpTest.
 		/// </summary>
 		/// <param name="action">Action defining the settings changes.</param>
 		/// <returns>This HttpTest</returns>

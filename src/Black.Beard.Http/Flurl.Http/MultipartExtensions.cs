@@ -11,10 +11,10 @@ namespace Bb.Http
 		/// Sends an asynchronous multipart/form-data POST request.
 		/// </summary>
 		/// <param name="buildContent">A delegate for building the content parts.</param>
-		/// <param name="request">The IFlurlRequest.</param>
+		/// <param name="request">The IUrlRequest.</param>
 		/// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
 		/// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-		/// <returns>A Task whose result is the received IFlurlResponse.</returns>
+		/// <returns>A Task whose result is the received IUrlResponse.</returns>
 		public static Task<IUrlResponse> PostMultipartAsync(this IUrlRequest request, Action<CapturedMultipartContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default) {
 			var cmc = new CapturedMultipartContent(request.Settings);
 			buildContent(cmc);

@@ -3,7 +3,7 @@
 namespace Bb.Http.Configuration
 {
 	/// <summary>
-	/// A set of properties that affect Flurl.Http behavior specific to auto-redirecting.
+	/// A set of properties that affect Url.Http behavior specific to auto-redirecting.
 	/// </summary>
 	public class RedirectSettings
 	{
@@ -17,9 +17,9 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// If false, all of Flurl's mechanisms for handling redirects, including raising the OnRedirect event,
+		/// If false, all of Url's mechanisms for handling redirects, including raising the OnRedirect event,
 		/// are disabled entirely. This could also impact cookie functionality. Default is true. If you don't
-		/// need Flurl's redirect or cookie functionality, or you are providing an HttpClient whose HttpClientHandler
+		/// need Url's redirect or cookie functionality, or you are providing an HttpClient whose HttpClientHandler
 		/// is providing these services, then it is safe to set this to false.
 		/// </summary>
 		public bool Enabled {
@@ -39,7 +39,7 @@ namespace Bb.Http.Configuration
 		/// <summary>
 		/// If true, request-level headers sent in the original request are forwarded in the redirect, with the
 		/// exception of Authorization (use ForwardAuthorizationHeader) and Cookie (use a CookieJar). Also, any
-		/// headers set on FlurlClient are automatically sent with all requests, including redirects. Default is true.
+		/// headers set on UrlClient are automatically sent with all requests, including redirects. Default is true.
 		/// </summary>
 		public bool ForwardHeaders {
 			get => _settings.Get<bool>("Redirects_ForwardHeaders");
@@ -56,7 +56,7 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// Maximum number of redirects that Flurl will automatically follow in a single request. Default is 10.
+		/// Maximum number of redirects that Url will automatically follow in a single request. Default is 10.
 		/// </summary>
 		public int MaxAutoRedirects {
 			get => _settings.Get<int>("Redirects_MaxRedirects");

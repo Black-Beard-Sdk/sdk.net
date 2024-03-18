@@ -1,13 +1,13 @@
 ﻿namespace Bb.Http
 {
     /// <summary>
-    /// Represents an HTTP request. Can be created explicitly via new FlurlRequest(), fluently via Url.Request(),
+    /// Represents an HTTP request. Can be created explicitly via new UrlRequest(), fluently via Url.Request(),
     /// or implicitly when a call is made via methods like Url.GetAsync().
     /// </summary>
     public interface IUrlRequest : IHttpSettingsContainer
 	{
 		/// <summary>
-		/// Gets or sets the IFlurlClient to use when sending the request.
+		/// Gets or sets the IUrlClient to use when sending the request.
 		/// </summary>
 		IUrlClient Client { get; set; }
 
@@ -40,7 +40,7 @@
 		CookieJar CookieJar { get; set; }
 
 		/// <summary>
-		/// The FlurlCall that received a 3xx response and automatically triggered this request.
+		/// The UrlCall that received a 3xx response and automatically triggered this request.
 		/// </summary>
 		UrlCall RedirectedFrom { get; set; }
 
@@ -51,7 +51,7 @@
 		/// <param name="content">Contents of the request body.</param>
 		/// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
 		/// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
-		/// <returns>A Task whose result is the received IFlurlResponse.</returns>
+		/// <returns>A Task whose result is the received IUrlResponse.</returns>
 		Task<IUrlResponse> SendAsync(HttpMethod verb, HttpContent? content = null, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
 	}
 }

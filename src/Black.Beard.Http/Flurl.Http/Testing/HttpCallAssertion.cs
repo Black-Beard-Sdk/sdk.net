@@ -40,7 +40,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Asserts whether calls were made matching the given predicate function.
 		/// </summary>
-		/// <param name="match">Predicate (usually a lambda expression) that tests a FlurlCall and returns a bool.</param>
+		/// <param name="match">Predicate (usually a lambda expression) that tests a UrlCall and returns a bool.</param>
 		/// <param name="descrip">A description of what is being asserted.</param>
 		public HttpCallAssertion With(Func<UrlCall, bool> match, string descrip = null) {
 		    if (!string.IsNullOrEmpty(descrip))
@@ -53,7 +53,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Asserts whether calls were made that do NOT match the given predicate function.
 		/// </summary>
-		/// <param name="match">Predicate (usually a lambda expression) that tests a FlurlCall and returns a bool.</param>
+		/// <param name="match">Predicate (usually a lambda expression) that tests a UrlCall and returns a bool.</param>
 		/// <param name="descrip">A description of what is being asserted.</param>
 		public HttpCallAssertion Without(Func<UrlCall, bool> match, string descrip = null) {
 		    return With(c => !match(c), descrip);

@@ -247,7 +247,7 @@ namespace Bb.Curls
         public CurlInterpreter(string[] arguments)
         {
             _arguments = new ArgumentSource(arguments);
-            this.Factory = UrlHttp.GlobalSettings.FlurlClientFactory;
+            this.Factory = UrlHttp.GlobalSettings.UrlClientFactory;
             _handlers = new List<CurlInterpreterAction>();
         }
 

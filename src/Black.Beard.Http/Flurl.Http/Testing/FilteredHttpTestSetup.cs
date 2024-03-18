@@ -13,7 +13,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Constructs a new instance of FilteredHttpTestSetup.
 		/// </summary>
-		/// <param name="settings">FlurlHttpSettings used in fake calls.</param>
+		/// <param name="settings">UrlHttpSettings used in fake calls.</param>
 		/// <param name="urlPatterns">URL(s) or URL pattern(s) that this HttpTestSetup applies to. Can contain * wildcard.</param>
 		public FilteredHttpTestSetup(UrlHttpSettings settings, params string[] urlPatterns) : base(settings) {
 			if (urlPatterns.Any())
@@ -21,7 +21,7 @@ namespace Bb.Http.Testing
 		}
 
 		/// <summary>
-		/// Returns true if the given FlurlCall matches one of the URL patterns and all other criteria defined for this HttpTestSetup.
+		/// Returns true if the given UrlCall matches one of the URL patterns and all other criteria defined for this HttpTestSetup.
 		/// </summary>
 		internal bool IsMatch(UrlCall call) => _filters.All(f => f(call));
 

@@ -1,13 +1,13 @@
 ﻿namespace Bb.Http
 {
     /// <summary>
-    /// Interface defining FlurlClient's contract (useful for mocking and DI)
+    /// Interface defining UrlClient's contract (useful for mocking and DI)
     /// </summary>
     public interface IUrlClient : IHttpSettingsContainer, IDisposable
     {
         /// <summary>
         /// Gets the HttpClient to be used in subsequent HTTP calls. Creation (when necessary) is delegated
-        /// to FlurlHttp.FlurlClientFactory. Reused for the life of the FlurlClient.
+        /// to UrlHttp.UrlClientFactory. Reused for the life of the UrlClient.
         /// </summary>
         HttpClient HttpClient { get; }
 
@@ -17,10 +17,10 @@
         string BaseUrl { get; set; }
 
         /// <summary>
-        /// Creates a new IFlurlRequest that can be further built and sent fluently.
+        /// Creates a new IUrlRequest that can be further built and sent fluently.
         /// </summary>
         /// <param name="urlSegments">The URL or URL segments for the request. If BaseUrl is defined, it is assumed that these are path segments off that base.</param>
-        /// <returns>A new IFlurlRequest</returns>
+        /// <returns>A new IUrlRequest</returns>
         IUrlRequest Request(params object[] urlSegments);
 
         /// <summary>
@@ -31,10 +31,10 @@
         /// <summary>
         /// Asynchronously sends an HTTP request.
         /// </summary>
-        /// <param name="request">The IFlurlRequest to send.</param>
+        /// <param name="request">The IUrlRequest to send.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
-        /// <returns>A Task whose result is the received IFlurlResponse.</returns>
+        /// <returns>A Task whose result is the received IUrlResponse.</returns>
         Task<IUrlResponse> SendAsync(IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
     }
 }

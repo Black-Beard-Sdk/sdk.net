@@ -14,12 +14,12 @@ namespace Bb.Http.Testing
 	internal static class Util
 	{
 		internal static bool HasAnyVerb(this UrlCall call, HttpMethod[] verbs) {
-			// for good measure, check both FlurlRequest.Verb and HttpRequestMessage.Method
+			// for good measure, check both UrlRequest.Verb and HttpRequestMessage.Method
 			return verbs.Any(verb => call.Request.Verb == verb && call.HttpRequestMessage.Method == verb);
 		}
 
 		internal static bool HasAnyVerb(this UrlCall call, string[] verbs) {
-			// for good measure, check both FlurlRequest.Verb and HttpRequestMessage.Method
+			// for good measure, check both UrlRequest.Verb and HttpRequestMessage.Method
 			return verbs.Any(verb =>
 				call.Request.Verb.Method.OrdinalEquals(verb, true) &&
 				call.HttpRequestMessage.Method.Method.OrdinalEquals(verb, true));

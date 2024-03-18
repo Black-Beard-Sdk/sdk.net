@@ -1,20 +1,17 @@
 
 
-
-// Please visit : https://flurl.dev
-
 ```CSHARP
 
     var person = await "https://api.com"
         .AppendPathSegment("person")
         .SetQueryParams(new { a = 1, b = 2 })
         .WithOAuthBearerToken("my_oauth_token")
-        .PostJsonAsync(new
+        .PostObjectAsync(new
         {
             first_name = "Claire",
             last_name = "Underwood"
         })
-        .ReceiveJson<Person>();
+        .ReceiveObject<Person>();
 
 ```
 
@@ -25,7 +22,7 @@ string are implicit converted in Url
 ```
 
 
-Create a Url object with segement
+Create a Url object with segment
 ```CSHARP
     var url = new Url("https://api.com", "segment");        
 ```

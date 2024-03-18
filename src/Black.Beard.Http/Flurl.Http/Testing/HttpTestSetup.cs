@@ -18,13 +18,13 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Constructs a new instance of HttpTestSetup.
 		/// </summary>
-		/// <param name="settings">FlurlHttpSettings used in fake calls.</param>
+		/// <param name="settings">UrlHttpSettings used in fake calls.</param>
 		protected HttpTestSetup(UrlHttpSettings settings) {
 			Settings = settings;
 		}
 
 		/// <summary>
-		/// The FlurlHttpSettings used in fake calls.
+		/// The UrlHttpSettings used in fake calls.
 		/// </summary>
 		public UrlHttpSettings Settings { get; }
 

@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="CodeGen\Program.cs" />
+    <Compile Remove="CodeGen\**" />
+    <EmbeddedResource Remove="CodeGen\**" />
+    <None Remove="CodeGen\**" />
   </ItemGroup>
 
 </Project>

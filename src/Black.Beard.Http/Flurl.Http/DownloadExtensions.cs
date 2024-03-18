@@ -10,7 +10,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Asynchronously downloads a file at the specified URL.
 		/// </summary>
-		/// <param name="request">The flurl request.</param>
+		/// <param name="request">The Url request.</param>
 		/// <param name="localFolderPath">Path of local folder where file is to be downloaded.</param>
 		/// <param name="localFileName">Name of local file. If not specified, the source filename (from Content-Dispostion header, or last segment of the URL) is used.</param>
 		/// <param name="bufferSize">Buffer size in bytes. Default is 4096.</param>

@@ -16,7 +16,7 @@
 		public int Count { get; set; }
 
 		/// <summary>
-		/// If true, Flurl will automatically send a redirect request. Set to false to prevent auto-redirect.
+		/// If true, Url will automatically send a redirect request. Set to false to prevent auto-redirect.
 		/// </summary>
 		public bool Follow { get; set; }
 

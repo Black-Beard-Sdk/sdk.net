@@ -17,16 +17,16 @@ namespace Bb.Http
         /// </summary>
         /// <param name="baseUrl">The base URL associated with this client.</param>
         public UrlClient(string baseUrl = null) :
-            this(UrlHttp.GlobalSettings.FlurlClientFactory.CreateHttpClient(), baseUrl)
+            this(UrlHttp.GlobalSettings.UrlClientFactory.CreateHttpClient(), baseUrl)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="UrlClient"/>, wrapping an existing HttpClient.
-        /// Generally, you should let Flurl create and manage HttpClient instances for you, but you might, for
+        /// Generally, you should let Url create and manage HttpClient instances for you, but you might, for
         /// example, have an HttpClient instance that was created by a 3rd-party library and you want to use
-        /// Flurl to build and send calls with it. Be aware that if the HttpClient has an underlying
+        /// Url to build and send calls with it. Be aware that if the HttpClient has an underlying
         /// HttpMessageHandler that processes cookies and automatic redirects (as is the case by default),
-        /// Flurl's re-implementation of those features may not work properly.
+        /// Url's re-implementation of those features may not work properly.
         /// </summary>
         /// <param name="httpClient">The instantiated HttpClient instance.</param>
         /// <param name="baseUrl">The base URL associated with this client.</param>
@@ -114,15 +114,15 @@ namespace Bb.Http
 
         private void SyncHeaders(IUrlRequest req, HttpRequestMessage reqMsg)
         {
-            // copy any client-level (default) headers to FlurlRequest
+            // copy any client-level (default) headers to UrlRequest
             foreach (var header in this.Headers.Where(h => !req.Headers.Contains(h.Name)).ToList())
                 req.Headers.Add(header.Name, header.Value);
 
-            // copy headers from FlurlRequest to HttpRequestMessage
+            // copy headers from UrlRequest to HttpRequestMessage
             foreach (var header in req.Headers)
                 reqMsg.SetHeader(header.Name, header.Value.Trim(), false);
 
-            // copy headers from HttpContent to FlurlRequest
+            // copy headers from HttpContent to UrlRequest
             if (reqMsg.Content != null)
             {
                 foreach (var header in reqMsg.Content.Headers)

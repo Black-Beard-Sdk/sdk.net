@@ -5,12 +5,12 @@ namespace Bb.Http
 
     /// <summary>
     /// Encapsulates request, response, and other details associated with an HTTP call. Useful for diagnostics and available in
-    /// global event handlers and FlurlHttpException.Call.
+    /// global event handlers and UrlHttpException.Call.
     /// </summary>
     public class UrlCall
 	{
 		/// <summary>
-		/// The IFlurlRequest associated with this call.
+		/// The IUrlRequest associated with this call.
 		/// </summary>
 		public IUrlRequest Request { get; set; }
 
@@ -20,12 +20,12 @@ namespace Bb.Http
 		public HttpRequestMessage HttpRequestMessage { get; set; }
 
 		/// <summary>
-		/// Captured request body. Available ONLY if HttpRequestMessage.Content is a Flurl.Http.Content.CapturedStringContent.
+		/// Captured request body. Available ONLY if HttpRequestMessage.Content is a Url.Http.Content.CapturedStringContent.
 		/// </summary>
-		public string RequestBody => (HttpRequestMessage.Content as CapturedStringContent)?.Content;
+		public string? RequestBody => (HttpRequestMessage.Content as CapturedStringContent)?.Content;
 
 		/// <summary>
-		/// The IFlurlResponse associated with this call if the call completed, otherwise null.
+		/// The IUrlResponse associated with this call if the call completed, otherwise null.
 		/// </summary>
 		public IUrlResponse Response { get; set; }
 

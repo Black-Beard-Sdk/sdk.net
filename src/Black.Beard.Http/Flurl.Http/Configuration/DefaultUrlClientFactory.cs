@@ -3,11 +3,11 @@
 namespace Bb.Http.Configuration
 {
 	/// <summary>
-	/// An IFlurlClientFactory implementation that caches and reuses the same one instance of
-	/// FlurlClient per combination of scheme, host, and port. This is the default
+	/// An IUrlClientFactory implementation that caches and reuses the same one instance of
+	/// UrlClient per combination of scheme, host, and port. This is the default
 	/// implementation used when calls are made fluently off Urls/strings.
 	/// </summary>
-	public class DefaultFlurlClientFactory : UrlClientFactoryBase
+	public class DefaultUrlClientFactory : UrlClientFactoryBase
 	{
 		/// <summary>
 		/// Returns a unique cache key based on scheme, host, and port of the given URL.

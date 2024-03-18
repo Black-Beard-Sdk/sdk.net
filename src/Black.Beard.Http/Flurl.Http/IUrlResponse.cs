@@ -18,7 +18,7 @@ namespace Bb.Http
         IReadOnlyList<UrlCookie> Cookies { get; }
 
         /// <summary>
-        /// Gets the raw HttpResponseMessage that this IFlurlResponse wraps.
+        /// Gets the raw HttpResponseMessage that this IUrlResponse wraps.
         /// </summary>
         HttpResponseMessage ResponseMessage { get; }
 

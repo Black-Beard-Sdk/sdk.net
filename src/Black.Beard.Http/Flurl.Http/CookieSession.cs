@@ -17,7 +17,7 @@ namespace Bb.Http
 		}
 
 		/// <summary>
-		/// Creates a new CookieSession where all requests are made using the provided IFlurlClient
+		/// Creates a new CookieSession where all requests are made using the provided IUrlClient
 		/// </summary>
 		public CookieSession(IUrlClient client) {
 			_client = client;
@@ -29,7 +29,7 @@ namespace Bb.Http
 		public CookieJar Cookies { get; } = new CookieJar();
 
 		/// <summary>
-		/// Creates a new IFlurlRequest with this session's CookieJar that can be further built and sent fluently.
+		/// Creates a new IUrlRequest with this session's CookieJar that can be further built and sent fluently.
 		/// </summary>
 		/// <param name="urlSegments">The URL or URL segments for the request.</param>
 		public IUrlRequest Request(params object[] urlSegments) => (_client == null) ?

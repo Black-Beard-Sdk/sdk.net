@@ -2,7 +2,7 @@
 namespace Bb.Http
 {
     /// <summary>
-    /// An exception that is thrown when an HTTP call made by Flurl.Http fails, including when the response
+    /// An exception that is thrown when an HTTP call made by Url.Http fails, including when the response
     /// indicates an unsuccessful HTTP status code.
     /// </summary>
     public class UrlHttpException : Exception
@@ -64,7 +64,7 @@ namespace Bb.Http
 	}
 
 	/// <summary>
-	/// An exception that is thrown when an HTTP call made by Flurl.Http times out.
+	/// An exception that is thrown when an HTTP call made by Url.Http times out.
 	/// </summary>
 	public class UrlHttpTimeoutException : UrlHttpException
 	{

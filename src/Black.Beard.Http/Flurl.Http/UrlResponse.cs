@@ -28,7 +28,7 @@ namespace Bb.Http
         public int StatusCode => (int)ResponseMessage.StatusCode;
 
         /// <summary>
-        /// Creates a new FlurlResponse that wraps the give HttpResponseMessage.
+        /// Creates a new UrlResponse that wraps the give HttpResponseMessage.
         /// </summary>
         public UrlResponse(UrlCall call, CookieJar cookieJar = null)
         {
@@ -89,7 +89,7 @@ namespace Bb.Http
                     // Stream was read but captured as a different type than T. If it was captured as a string,
                     // we should be in good shape. If it was deserialized to a different type, the best we can
                     // do is serialize it and then deserialize to T, and we could lose data. But that's a very
-                    // uncommon scenario, hopefully. https://github.com/tmenier/Flurl/issues/571#issuecomment-881712479
+                    // uncommon scenario, hopefully. https://github.com/tmenier/Url/issues/571#issuecomment-881712479
                     var s = _capturedBody as string ?? _serializer.Serialize(_capturedBody);
                     _capturedBody = _serializer.Deserializes<T>(s);
                 }
@@ -137,7 +137,6 @@ namespace Bb.Http
 #endif
             // strip quotes from charset so .NET doesn't choke on them
             // https://github.com/dotnet/corefx/issues/5014
-            // https://github.com/tmenier/Flurl/pull/76
             var ct = ResponseMessage.Content.Headers?.ContentType;
             if (ct?.CharSet != null)
                 ct.CharSet = ct.CharSet.StripQuotes();

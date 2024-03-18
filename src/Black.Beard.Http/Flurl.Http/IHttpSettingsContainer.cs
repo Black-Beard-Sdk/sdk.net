@@ -4,12 +4,12 @@ using Bb.Util;
 namespace Bb.Http
 {
 	/// <summary>
-	/// Defines stateful aspects (headers, cookies, etc) common to both IFlurlClient and IFlurlRequest
+	/// Defines state full aspects (headers, cookies, etc) common to both IUrlClient and IUrlRequest
 	/// </summary>
 	public interface IHttpSettingsContainer
 	{
 	    /// <summary>
-	    /// Gets the FlurlHttpSettings object used by this client or request.
+	    /// Gets the UrlHttpSettings object used by this client or request.
 	    /// </summary>
 	    UrlHttpSettings Settings { get; }
 

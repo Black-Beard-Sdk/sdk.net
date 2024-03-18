@@ -12,10 +12,10 @@ namespace Bb.Http
 		/// Adds or updates a name-value pair in this request's Cookie header.
 		/// To automatically maintain a cookie "session", consider using a CookieJar or CookieSession instead.
 		/// </summary>
-		/// <param name="request">The IFlurlRequest.</param>
+		/// <param name="request">The IUrlRequest.</param>
 		/// <param name="name">The cookie name.</param>
 		/// <param name="value">The cookie value.</param>
-		/// <returns>This IFlurlClient instance.</returns>
+		/// <returns>This IUrlClient instance.</returns>
 		public static IUrlRequest WithCookie(this IUrlRequest request, string name, object value) {
 			var cookies = new NameValueList<string>(request.Cookies, true); // cookie names are case-sensitive https://stackoverflow.com/a/11312272/62600
 			cookies.AddOrReplace(name, value.ToInvariantString());
@@ -27,9 +27,9 @@ namespace Bb.Http
 		/// of the provided object, or keys/values if object is a dictionary.
 		/// To automatically maintain a cookie "session", consider using a CookieJar or CookieSession instead.
 		/// </summary>
-		/// <param name="request">The IFlurlRequest.</param>
+		/// <param name="request">The IUrlRequest.</param>
 		/// <param name="values">Names/values of HTTP cookies to set. Typically an anonymous object or IDictionary.</param>
-		/// <returns>This IFlurlClient.</returns>
+		/// <returns>This IUrlClient.</returns>
 		public static IUrlRequest WithCookies(this IUrlRequest request, object values) {
 			var cookies = new NameValueList<string>(request.Cookies, true); // cookie names are case-sensitive https://stackoverflow.com/a/11312272/62600
 			// although rare, we need to accommodate the possibility of multiple cookies with the same name
@@ -47,9 +47,9 @@ namespace Bb.Http
 		/// Sets the CookieJar associated with this request, which will be updated with any Set-Cookie headers present
 		/// in the response and is suitable for reuse in subsequent requests.
 		/// </summary>
-		/// <param name="request">The IFlurlRequest.</param>
+		/// <param name="request">The IUrlRequest.</param>
 		/// <param name="cookieJar">The CookieJar.</param>
-		/// <returns>This IFlurlClient instance.</returns>
+		/// <returns>This IUrlClient instance.</returns>
 		public static IUrlRequest WithCookies(this IUrlRequest request, CookieJar cookieJar) {
 			request.CookieJar = cookieJar;
 			return request;
@@ -59,9 +59,9 @@ namespace Bb.Http
 		/// Creates a new CookieJar and associates it with this request, which will be updated with any Set-Cookie
 		/// headers present in the response and is suitable for reuse in subsequent requests.
 		/// </summary>
-		/// <param name="request">The IFlurlRequest.</param>
+		/// <param name="request">The IUrlRequest.</param>
 		/// <param name="cookieJar">The created CookieJar, which can be reused in subsequent requests.</param>
-		/// <returns>This IFlurlClient instance.</returns>
+		/// <returns>This IUrlClient instance.</returns>
 		public static IUrlRequest WithCookies(this IUrlRequest request, out CookieJar cookieJar) {
 			cookieJar = new CookieJar();
 			return request.WithCookies(cookieJar);

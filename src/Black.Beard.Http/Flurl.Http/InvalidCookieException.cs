@@ -1,7 +1,7 @@
 ﻿namespace Bb.Http
 {
     /// <summary>
-    /// Exception thrown when attempting to add or update an invalid FlurlCookie to a CookieJar.
+    /// Exception thrown when attempting to add or update an invalid UrlCookie to a CookieJar.
     /// </summary>
     public class InvalidCookieException : Exception
 	{

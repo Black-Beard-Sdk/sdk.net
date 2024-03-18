@@ -172,7 +172,7 @@ namespace Bb
         }
 
         /// <summary>
-        /// Parses a URL string into a Flurl.Url object.
+        /// Parses a URL string into a Url object.
         /// </summary>
         public static Url Parse(string url) => new Url(url).ParseInternal();
 
@@ -591,7 +591,7 @@ namespace Bb
         public static implicit operator Url(string url) => new Url(url);
 
         /// <summary>
-        /// Implicit conversion from System.Uri to Flurl.Url.
+        /// Implicit conversion from System.Uri to Url.
         /// </summary>
         /// <returns>The string</returns>
         public static implicit operator Url(Uri uri) => new Url(uri.ToString());

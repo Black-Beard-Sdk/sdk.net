@@ -14,20 +14,20 @@ namespace Bb.Http
 		/// <summary>
 		/// Initializes a new instance of the <see cref="UrlRequest"/> class.
 		/// </summary>
-		/// <param name="url">The URL to call with this FlurlRequest instance.</param>
+		/// <param name="url">The URL to call with this UrlRequest instance.</param>
 		public UrlRequest(Url url = null) {
 			Url = url;
 		}
 
 		/// <summary>
-		/// Used internally by FlurlClient.Request
+		/// Used internally by UrlClient.Request
 		/// </summary>
 		internal UrlRequest(IUrlClient client, params object[] urlSegments) : this(client?.BaseUrl, urlSegments) {
 			Client = client;
 		}
 
 		/// <summary>
-		/// Used internally by FlurlClient.Request and CookieSession.Request
+		/// Used internally by UrlClient.Request and CookieSession.Request
 		/// </summary>
 		internal UrlRequest(string baseUrl, params object[] urlSegments) {
 			var parts = new List<string>(urlSegments.Select(s => s.ToInvariantString()));
@@ -79,7 +79,7 @@ namespace Bb.Http
 		public Task<IUrlResponse> SendAsync(HttpMethod verb, HttpContent content = null, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default) {
 			Verb = verb;
 			Content = content;
-			Client ??= UrlHttp.GlobalSettings.FlurlClientFactory.Get(Url);
+			Client ??= UrlHttp.GlobalSettings.UrlClientFactory.Get(Url);
 			return Client.SendAsync(this, completionOption, cancellationToken);
 		}
 

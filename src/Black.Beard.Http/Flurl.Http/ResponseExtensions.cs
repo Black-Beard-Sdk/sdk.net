@@ -2,7 +2,7 @@
 namespace Bb.Http
 {
 	/// <summary>
-	/// ReceiveXXX extension methods off Task&lt;IFlurlResponse&gt; that allow chaining off methods like SendAsync
+	/// ReceiveXXX extension methods off Task&lt;IUrlResponse&gt; that allow chaining off methods like SendAsync
 	/// without the need for nested awaits.
 	/// </summary>
 	public static class ResponseExtensions

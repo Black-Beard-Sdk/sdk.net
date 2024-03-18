@@ -20,7 +20,7 @@ namespace Bb.Http
 		private bool _locked;
 
 		/// <summary>
-		/// Creates a new FlurlCookie.
+		/// Creates a new UrlCookie.
 		/// </summary>
 		/// <param name="name">Name of the cookie.</param>
 		/// <param name="value">Value of the cookie.</param>
@@ -40,7 +40,7 @@ namespace Bb.Http
 		public Url OriginUrl { get; }
 
 		/// <summary>
-		/// Date and time the cookie was received. Defaults to date/time this FlurlCookie was created.
+		/// Date and time the cookie was received. Defaults to date/time this UrlCookie was created.
 		/// Important for Max-Age to be enforced correctly.
 		/// </summary>
 		public DateTimeOffset DateReceived { get; }

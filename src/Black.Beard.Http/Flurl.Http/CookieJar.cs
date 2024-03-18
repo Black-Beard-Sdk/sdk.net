@@ -5,7 +5,7 @@ using Bb.Util;
 namespace Bb.Http
 {
     /// <summary>
-    /// A collection of FlurlCookies that can be attached to one or more FlurlRequests, either explicitly via WithCookies
+    /// A collection of UrlCookies that can be attached to one or more UrlRequests, either explicitly via WithCookies
     /// or implicitly via a CookieSession. Stores cookies received via Set-Cookie response headers.
     /// </summary>
     public class CookieJar : IReadOnlyCollection<UrlCookie>

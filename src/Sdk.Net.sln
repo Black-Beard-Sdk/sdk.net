@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Sdk.Net.Mails.S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mails", "Mails", "{240FC772-25F1-4BF4-B281-63E539B5D878}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Curl", "Curl\Curl.csproj", "{077F56C8-0161-4C9C-BF4A-B45808BF0D58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Curl.UintTests", "Curl\Curl.UintTests.csproj", "{077F56C8-0161-4C9C-BF4A-B45808BF0D58}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12A24102-F952-45A0-99AF-2577D1B0C7FB}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7A258BB6-9
 		..\Docs\use.md = ..\Docs\use.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black.Beard.Http.UnitTest", "Black.Beard.Http.UnitTest\Black.Beard.Http.UnitTest.csproj", "{1A0ABF22-1D41-490D-98DF-4B983BC6494A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Black.Beard.Http.UnitTest", "Black.Beard.Http.UnitTest\Black.Beard.Http.UnitTest.csproj", "{1A0ABF22-1D41-490D-98DF-4B983BC6494A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

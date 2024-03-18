@@ -4,19 +4,19 @@ using System.Net;
 namespace Bb.Http.Configuration
 {
 	/// <summary>
-	/// Encapsulates a creation/caching strategy for IFlurlClient instances. Custom factories looking to extend
-	/// Flurl's behavior should inherit from this class, rather than implementing IFlurlClientFactory directly.
+	/// Encapsulates a creation/caching strategy for IUrlClient instances. Custom factories looking to extend
+	/// Url's behavior should inherit from this class, rather than implementing IUrlClientFactory directly.
 	/// </summary>
 	public abstract class UrlClientFactoryBase : IUrlClientFactory
 	{
 		private readonly ConcurrentDictionary<string, IUrlClient> _clients = new ConcurrentDictionary<string, IUrlClient>();
 
 		/// <summary>
-		/// By default, uses a caching strategy of one FlurlClient per host. This maximizes reuse of
+		/// By default, uses a caching strategy of one UrlClient per host. This maximizes reuse of
 		/// underlying HttpClient/Handler while allowing things like cookies to be host-specific.
 		/// </summary>
 		/// <param name="url">The URL.</param>
-		/// <returns>The FlurlClient instance.</returns>
+		/// <returns>The UrlClient instance.</returns>
 		public virtual IUrlClient Get(Url url) {
 			if (url == null)
 				throw new ArgumentNullException(nameof(url));
@@ -30,21 +30,21 @@ namespace Bb.Http.Configuration
 		/// <summary>
 		/// Defines a strategy for getting a cache key based on a Url. Default implementation
 		/// returns the host part (i.e www.api.com) so that all calls to the same host use the
-		/// same FlurlClient (and HttpClient/HttpMessageHandler) instance.
+		/// same UrlClient (and HttpClient/HttpMessageHandler) instance.
 		/// </summary>
 		/// <param name="url">The URL.</param>
 		/// <returns>The cache key</returns>
 		protected abstract string GetCacheKey(Url url);
 
 		/// <summary>
-		/// Creates a new FlurlClient
+		/// Creates a new UrlClient
 		/// </summary>
 		/// <param name="url">The URL (not used)</param>
 		/// <returns></returns>
 		protected virtual IUrlClient Create(Url url) => new UrlClient();
 
 		/// <summary>
-		/// Disposes all cached IFlurlClient instances and clears the cache.
+		/// Disposes all cached IUrlClient instances and clears the cache.
 		/// </summary>
 		public void Dispose() {
 			foreach (var kv in _clients) {
@@ -55,27 +55,27 @@ namespace Bb.Http.Configuration
 		}
 
 		/// <summary>
-		/// Override in custom factory to customize the creation of HttpClient used in all Flurl HTTP calls
-		/// (except when one is passed explicitly to the FlurlClient constructor). In order not to lose
-		/// Flurl.Http functionality, it is recommended to call base.CreateClient and customize the result.
+		/// Override in custom factory to customize the creation of HttpClient used in all Url HTTP calls
+		/// (except when one is passed explicitly to the UrlClient constructor). In order not to lose
+		/// Url.Http functionality, it is recommended to call base.CreateClient and customize the result.
 		/// </summary>
 		public virtual HttpClient CreateHttpClient(HttpMessageHandler handler) {
 			return new HttpClient(handler) {
-				// Timeouts handled per request via FlurlHttpSettings.Timeout
+				// Timeouts handled per request via UrlHttpSettings.Timeout
 				Timeout = System.Threading.Timeout.InfiniteTimeSpan
 			};
 		}
 
 		/// <summary>
 		/// Override in custom factory to customize the creation of the top-level HttpMessageHandler used in all
-		/// Flurl HTTP calls (except when an HttpClient is passed explicitly to the FlurlClient constructor).
-		/// In order not to lose Flurl.Http functionality, it is recommended to call base.CreateMessageHandler, and
+		/// Url HTTP calls (except when an HttpClient is passed explicitly to the UrlClient constructor).
+		/// In order not to lose Url.Http functionality, it is recommended to call base.CreateMessageHandler, and
 		/// either customize the returned HttpClientHandler, or set it as the InnerHandler of a DelegatingHandler.
 		/// </summary>
 		public virtual HttpMessageHandler CreateMessageHandler() {
 			var httpClientHandler = new HttpClientHandler();
 
-			// flurl has its own mechanisms for managing cookies and redirects
+			// Url has its own mechanisms for managing cookies and redirects
 
 			try { httpClientHandler.UseCookies = false; }
 			catch (PlatformNotSupportedException) { } // look out for WASM platforms (#543)
