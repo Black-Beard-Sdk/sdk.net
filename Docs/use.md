@@ -22,7 +22,7 @@ string are implicit converted in Url
 ```
 
 
-Create a Url object with segment
+Create an Url object with segment
 ```CSHARP
     var url = new Url("https://api.com", "segment");        
 ```

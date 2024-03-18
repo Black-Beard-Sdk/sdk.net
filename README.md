@@ -16,7 +16,9 @@ By dotnet cli
 
 ```
 
-By pckage manager console
+By package manager console
+
+the http art use Flurl
 
 ```shell
 
