@@ -16,7 +16,7 @@ namespace Bb.Http
 		/// <param name="name">The cookie name.</param>
 		/// <param name="value">The cookie value.</param>
 		/// <returns>This IFlurlClient instance.</returns>
-		public static IFlurlRequest WithCookie(this IFlurlRequest request, string name, object value) {
+		public static IUrlRequest WithCookie(this IUrlRequest request, string name, object value) {
 			var cookies = new NameValueList<string>(request.Cookies, true); // cookie names are case-sensitive https://stackoverflow.com/a/11312272/62600
 			cookies.AddOrReplace(name, value.ToInvariantString());
 			return request.WithHeader("Cookie", CookieCutter.ToRequestHeader(cookies));
@@ -30,7 +30,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest.</param>
 		/// <param name="values">Names/values of HTTP cookies to set. Typically an anonymous object or IDictionary.</param>
 		/// <returns>This IFlurlClient.</returns>
-		public static IFlurlRequest WithCookies(this IFlurlRequest request, object values) {
+		public static IUrlRequest WithCookies(this IUrlRequest request, object values) {
 			var cookies = new NameValueList<string>(request.Cookies, true); // cookie names are case-sensitive https://stackoverflow.com/a/11312272/62600
 			// although rare, we need to accommodate the possibility of multiple cookies with the same name
 			foreach (var group in values.ToKeyValuePairs().GroupBy(x => x.Key)) {
@@ -50,7 +50,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest.</param>
 		/// <param name="cookieJar">The CookieJar.</param>
 		/// <returns>This IFlurlClient instance.</returns>
-		public static IFlurlRequest WithCookies(this IFlurlRequest request, CookieJar cookieJar) {
+		public static IUrlRequest WithCookies(this IUrlRequest request, CookieJar cookieJar) {
 			request.CookieJar = cookieJar;
 			return request;
 		}
@@ -62,7 +62,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest.</param>
 		/// <param name="cookieJar">The created CookieJar, which can be reused in subsequent requests.</param>
 		/// <returns>This IFlurlClient instance.</returns>
-		public static IFlurlRequest WithCookies(this IFlurlRequest request, out CookieJar cookieJar) {
+		public static IUrlRequest WithCookies(this IUrlRequest request, out CookieJar cookieJar) {
 			cookieJar = new CookieJar();
 			return request.WithCookies(cookieJar);
 		}

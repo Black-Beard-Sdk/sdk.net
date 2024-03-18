@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Bb.Http.Configuration
 {
@@ -12,12 +7,12 @@ namespace Bb.Http.Configuration
 	/// </summary>
 	public class RedirectSettings
 	{
-		private readonly FlurlHttpSettings _settings;
+		private readonly UrlHttpSettings _settings;
 
 		/// <summary>
 		/// Creates a new instance of RedirectSettings.
 		/// </summary>
-		public RedirectSettings(FlurlHttpSettings settings) {
+		public RedirectSettings(UrlHttpSettings settings) {
 			_settings = settings;
 		}
 

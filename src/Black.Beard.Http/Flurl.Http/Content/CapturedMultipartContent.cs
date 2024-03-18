@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Headers;
 using Bb.Http.Configuration;
 using Bb.Util;
 
@@ -15,7 +9,7 @@ namespace Bb.Http.Content
 	/// </summary>
 	public class CapturedMultipartContent : MultipartContent
 	{
-		private readonly FlurlHttpSettings _settings;
+		private readonly UrlHttpSettings _settings;
 		private readonly List<HttpContent> _capturedParts = new List<HttpContent>();
 
 		/// <summary>
@@ -27,8 +21,8 @@ namespace Bb.Http.Content
 		/// Initializes a new instance of the <see cref="CapturedMultipartContent"/> class.
 		/// </summary>
 		/// <param name="settings">The FlurlHttpSettings used to serialize each content part. (Defaults to FlurlHttp.GlobalSettings.)</param>
-		public CapturedMultipartContent(FlurlHttpSettings settings = null) : base("form-data") {
-			_settings = settings ?? FlurlHttp.GlobalSettings;
+		public CapturedMultipartContent(UrlHttpSettings settings = null) : base("form-data") {
+			_settings = settings ?? UrlHttp.GlobalSettings;
 		}
 
 		/// <summary>
@@ -36,8 +30,8 @@ namespace Bb.Http.Content
 		/// </summary>
 		/// <param name="subtype">The subtype of the multipart content.</param>
 		/// <param name="settings">The FlurlHttpSettings used to serialize each content part. (Defaults to FlurlHttp.GlobalSettings.)</param>
-		public CapturedMultipartContent(string subtype, FlurlHttpSettings settings = null) : base(subtype) {
-			_settings = settings ?? FlurlHttp.GlobalSettings;
+		public CapturedMultipartContent(string subtype, UrlHttpSettings settings = null) : base(subtype) {
+			_settings = settings ?? UrlHttp.GlobalSettings;
 		}
 
 		/// <summary>
@@ -46,8 +40,8 @@ namespace Bb.Http.Content
 		/// <param name="subtype">The subtype of the multipart content.</param>
 		/// <param name="boundary">The boundary string for the multipart content.</param>
 		/// <param name="settings">The FlurlHttpSettings used to serialize each content part. (Defaults to FlurlHttp.GlobalSettings.)</param>
-		public CapturedMultipartContent(string subtype, string boundary, FlurlHttpSettings settings = null) : base(subtype, boundary) {
-			_settings = settings ?? FlurlHttp.GlobalSettings;
+		public CapturedMultipartContent(string subtype, string boundary, UrlHttpSettings settings = null) : base(subtype, boundary) {
+			_settings = settings ?? UrlHttp.GlobalSettings;
 		}
 
 		/// <summary>
@@ -90,7 +84,7 @@ namespace Bb.Http.Content
 		/// <param name="data">The content of the part, which will be serialized to JSON.</param>
 		/// <returns>This CapturedMultipartContent instance (supports method chaining).</returns>
 		public CapturedMultipartContent AddJson(string name, object data) =>
-			AddInternal(name, new CapturedJsonContent(_settings.JsonSerializer.Serialize(data)), null);
+			AddInternal(name, new CapturedObjectContent(_settings.JsonSerializer.Serialize(data)), null);
 
 		/// <summary>
 		/// Add a URL-encoded part to the multipart request.

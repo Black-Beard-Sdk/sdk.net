@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Bb.Http.Configuration
 {
@@ -11,7 +7,7 @@ namespace Bb.Http.Configuration
 	/// FlurlClient per combination of scheme, host, and port. This is the default
 	/// implementation used when calls are made fluently off Urls/strings.
 	/// </summary>
-	public class DefaultFlurlClientFactory : FlurlClientFactoryBase
+	public class DefaultFlurlClientFactory : UrlClientFactoryBase
 	{
 		/// <summary>
 		/// Returns a unique cache key based on scheme, host, and port of the given URL.

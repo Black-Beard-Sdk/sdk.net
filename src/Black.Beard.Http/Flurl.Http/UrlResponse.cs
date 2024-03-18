@@ -1,79 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+
 using Bb.Http.Configuration;
 using Bb.Util;
 
 namespace Bb.Http
 {
-    /// <summary>
-    /// Represents an HTTP response.
-    /// </summary>
-    public interface IFlurlResponse : IDisposable
-    {
-        /// <summary>
-        /// Gets the collection of response headers received.
-        /// </summary>
-        IReadOnlyNameValueList<string> Headers { get; }
-
-        /// <summary>
-        /// Gets the collection of HTTP cookies received in this response via Set-Cookie headers.
-        /// </summary>
-        IReadOnlyList<FlurlCookie> Cookies { get; }
-
-        /// <summary>
-        /// Gets the raw HttpResponseMessage that this IFlurlResponse wraps.
-        /// </summary>
-        HttpResponseMessage ResponseMessage { get; }
-
-        /// <summary>
-        /// Gets the HTTP status code of the response.
-        /// </summary>
-        int StatusCode { get; }
-
-        /// <summary>
-        /// Deserializes JSON-formatted HTTP response body to object of type T.
-        /// </summary>
-        /// <typeparam name="T">A type whose structure matches the expected JSON response.</typeparam>
-        /// <returns>A Task whose result is an object containing data in the response body.</returns>
-        /// <example>x = await url.PostAsync(data).GetJson&lt;T&gt;()</example>
-        /// <exception cref="FlurlHttpException">Condition.</exception>
-        Task<T> GetJsonAsync<T>();
-
-        /// <summary>
-        /// Returns HTTP response body as a string.
-        /// </summary>
-        /// <returns>A Task whose result is the response body as a string.</returns>
-        /// <example>s = await url.PostAsync(data).GetString()</example>
-        Task<string> GetStringAsync();
-
-        /// <summary>
-        /// Returns HTTP response body as a stream.
-        /// </summary>
-        /// <returns>A Task whose result is the response body as a stream.</returns>
-        /// <example>stream = await url.PostAsync(data).GetStream()</example>
-        Task<Stream> GetStreamAsync();
-
-        /// <summary>
-        /// Returns HTTP response body as a byte array.
-        /// </summary>
-        /// <returns>A Task whose result is the response body as a byte array.</returns>
-        /// <example>bytes = await url.PostAsync(data).GetBytes()</example>
-        Task<byte[]> GetBytesAsync();
-    }
-
-
 
     /// <inheritdoc />
-    public class FlurlResponse : IFlurlResponse
+    public class UrlResponse : IUrlResponse
     {
-        private readonly FlurlCall _call;
+        private readonly UrlCall _call;
         private readonly Lazy<IReadOnlyNameValueList<string>> _headers;
-        private readonly Lazy<IReadOnlyList<FlurlCookie>> _cookies;
+        private readonly Lazy<IReadOnlyList<UrlCookie>> _cookies;
         private object _capturedBody = null;
         private bool _streamRead = false;
         private ISerializer _serializer = null;
@@ -82,7 +19,7 @@ namespace Bb.Http
         public IReadOnlyNameValueList<string> Headers => _headers.Value;
 
         /// <inheritdoc />
-        public IReadOnlyList<FlurlCookie> Cookies => _cookies.Value;
+        public IReadOnlyList<UrlCookie> Cookies => _cookies.Value;
 
         /// <inheritdoc />
         public HttpResponseMessage ResponseMessage => _call.HttpResponseMessage;
@@ -93,11 +30,11 @@ namespace Bb.Http
         /// <summary>
         /// Creates a new FlurlResponse that wraps the give HttpResponseMessage.
         /// </summary>
-        public FlurlResponse(FlurlCall call, CookieJar cookieJar = null)
+        public UrlResponse(UrlCall call, CookieJar cookieJar = null)
         {
             _call = call;
             _headers = new Lazy<IReadOnlyNameValueList<string>>(LoadHeaders);
-            _cookies = new Lazy<IReadOnlyList<FlurlCookie>>(LoadCookies);
+            _cookies = new Lazy<IReadOnlyList<UrlCookie>>(LoadCookies);
             LoadCookieJar(cookieJar);
         }
 
@@ -119,12 +56,12 @@ namespace Bb.Http
             return result;
         }
 
-        private IReadOnlyList<FlurlCookie> LoadCookies()
+        private IReadOnlyList<UrlCookie> LoadCookies()
         {
             var url = ResponseMessage.RequestMessage.RequestUri.AbsoluteUri;
             return ResponseMessage.Headers.TryGetValues("Set-Cookie", out var headerValues) ?
                 headerValues.Select(hv => CookieCutter.ParseResponseHeader(url, hv)).ToList() :
-                new List<FlurlCookie>();
+                new List<UrlCookie>();
         }
 
         private void LoadCookieJar(CookieJar jar)
@@ -154,12 +91,12 @@ namespace Bb.Http
                     // do is serialize it and then deserialize to T, and we could lose data. But that's a very
                     // uncommon scenario, hopefully. https://github.com/tmenier/Flurl/issues/571#issuecomment-881712479
                     var s = _capturedBody as string ?? _serializer.Serialize(_capturedBody);
-                    _capturedBody = _serializer.Deserialize<T>(s);
+                    _capturedBody = _serializer.Deserializes<T>(s);
                 }
                 else
                 {
                     using var stream = await ResponseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    _capturedBody = _serializer.Deserialize<T>(stream);
+                    _capturedBody = _serializer.Deserializes<T>(stream);
                 }
                 return (T)_capturedBody;
             }
@@ -168,7 +105,7 @@ namespace Bb.Http
                 _serializer = null;
                 _capturedBody = await ResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
                 _streamRead = true;
-                await FlurlClient.HandleExceptionAsync(_call, new FlurlParsingException(_call, "JSON", ex), CancellationToken.None).ConfigureAwait(false);
+                await UrlClient.HandleExceptionAsync(_call, new UrlParsingException(_call, "JSON", ex), CancellationToken.None).ConfigureAwait(false);
                 return default;
             }
             finally

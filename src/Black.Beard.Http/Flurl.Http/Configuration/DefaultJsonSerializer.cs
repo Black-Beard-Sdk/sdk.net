@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Bb.Http.Configuration
 {
@@ -15,7 +14,7 @@ namespace Bb.Http.Configuration
 		/// Initializes a new instance of the <see cref="DefaultJsonSerializer"/> class.
 		/// </summary>
 		/// <param name="options">Options to control (de)serialization behavior.</param>
-		public DefaultJsonSerializer(JsonSerializerOptions options = null) {
+		public DefaultJsonSerializer(JsonSerializerOptions? options = null) {
 			_options = options ?? new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 		}
 
@@ -28,13 +27,13 @@ namespace Bb.Http.Configuration
 		/// <summary>
 		/// Deserializes the specified JSON string to an object of type T.
 		/// </summary>
-		/// <param name="s">The JSON string to deserialize.</param>
-		public T Deserialize<T>(string s) => string.IsNullOrWhiteSpace(s) ? default : JsonSerializer.Deserialize<T>(s, _options);
+		/// <param name="s">The JSON string to deserializes.</param>
+		public T? Deserializes<T>(string s) => string.IsNullOrWhiteSpace(s) ? default : JsonSerializer.Deserialize<T>(s, _options);
 
 		/// <summary>
 		/// Deserializes the specified stream to an object of type T.
 		/// </summary>
-		/// <param name="stream">The stream to deserialize.</param>
-		public T Deserialize<T>(Stream stream) => stream.Length == 0 ? default : JsonSerializer.Deserialize<T>(stream, _options);
+		/// <param name="stream">The stream to deserializes.</param>
+		public T? Deserializes<T>(Stream stream) => stream.Length == 0 ? default : JsonSerializer.Deserialize<T>(stream, _options);
 	}
 }

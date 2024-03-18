@@ -1,0 +1,40 @@
+﻿namespace Bb.Http
+{
+    /// <summary>
+    /// Interface defining FlurlClient's contract (useful for mocking and DI)
+    /// </summary>
+    public interface IUrlClient : IHttpSettingsContainer, IDisposable
+    {
+        /// <summary>
+        /// Gets the HttpClient to be used in subsequent HTTP calls. Creation (when necessary) is delegated
+        /// to FlurlHttp.FlurlClientFactory. Reused for the life of the FlurlClient.
+        /// </summary>
+        HttpClient HttpClient { get; }
+
+        /// <summary>
+        /// Gets or sets the base URL used for all calls made with this client.
+        /// </summary>
+        string BaseUrl { get; set; }
+
+        /// <summary>
+        /// Creates a new IFlurlRequest that can be further built and sent fluently.
+        /// </summary>
+        /// <param name="urlSegments">The URL or URL segments for the request. If BaseUrl is defined, it is assumed that these are path segments off that base.</param>
+        /// <returns>A new IFlurlRequest</returns>
+        IUrlRequest Request(params object[] urlSegments);
+
+        /// <summary>
+        /// Gets a value indicating whether this instance (and its underlying HttpClient) has been disposed.
+        /// </summary>
+        bool IsDisposed { get; }
+
+        /// <summary>
+        /// Asynchronously sends an HTTP request.
+        /// </summary>
+        /// <param name="request">The IFlurlRequest to send.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
+        /// <returns>A Task whose result is the received IFlurlResponse.</returns>
+        Task<IUrlResponse> SendAsync(IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+    }
+}

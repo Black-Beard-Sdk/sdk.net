@@ -1,8 +1,8 @@
-﻿using Bb.Util;
-using System.Diagnostics;
+﻿
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+
 
 namespace Bb.Curls
 {
@@ -10,7 +10,7 @@ namespace Bb.Curls
     /// <summary>
     /// Specialized curl command parser
     /// </summary>
-    public static class CurlParserExtension
+    public static partial class CurlParserExtension
     {
 
         /// <summary>
@@ -47,6 +47,12 @@ namespace Bb.Curls
 
         }
 
+
+        /// <summary>
+        /// Pre compiles the specified line argument and build CurlInterpreter.
+        /// </summary>
+        /// <param name="lineArg"></param>
+        /// <returns></returns>
         public static CurlInterpreter Precompile(this string lineArg)
         {
             var interpreter = new CurlInterpreter(lineArg.ParseCurlLine());
@@ -104,71 +110,83 @@ namespace Bb.Curls
         {
             var e = self.CallToStringAsync(ensureSuccessStatusCode, cancellationToken);
             e.Wait();
+
             return e.Result;
         }
 
         /// <summary>
-        /// Results to string asynchronous.
+        /// Results to Json.
         /// </summary>
         /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static async Task<string?> CallToStringAsync(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
+        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
-            if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-                return responseBody;
-            }
-
-            return null;
+            var e = self.ResultToJson(false, cancellationToken, new JsonDocumentOptions());
+            return e;
         }
 
         /// <summary>
-        /// Results to json asynchronous.
+        /// Results to Json.
         /// </summary>
         /// <param name="self">The self.</param>
         /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static object? ResultToJson<T>(this CurlInterpreter self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken)
         {
-            var e = self.CallToJsonAsync<T>(ensureSuccessStatusCode, options, cancellationToken);
+            var e = self.ResultToJson(ensureSuccessStatusCode, cancellationToken, new JsonDocumentOptions());
+            return e;
+        }
+
+        /// <summary>
+        /// Results to Json.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
+        /// <param name="options"><see cref="CJsonDocumentOptions"/> </param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken, JsonDocumentOptions options)
+        {
+
+            var e = self.CallToStringAsync(ensureSuccessStatusCode, cancellationToken);
+            e.Wait();
+
+            string payload = e.Result;
+
+            if (!string.IsNullOrEmpty(payload))
+            {
+                var doc = JsonDocument.Parse(payload, options);
+                return doc.RootElement;
+            }
+
+            return null;
+
+        }
+
+
+        /// <summary>
+        /// Results to typed object asynchronous.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static object? ResultToObject<T>(this CurlInterpreter self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var e = self.CallToObjectAsync<T>(ensureSuccessStatusCode, options, cancellationToken);
             e.Wait();
             return e.Result;
         }
 
-        /// <summary>
-        /// Results to json asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<object?> CallToJsonAsync<T>(this CurlInterpreter self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            var response = await self.CallAsync();
-            if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                object? responseBody = await response.Content.ReadFromJsonAsync<T>(options, cancellationToken);
-                return responseBody;
-            }
-
-            return null;
-
-        }
 
         /// <summary>
-        /// Results to json asynchronous.
+        /// Results to typed object asynchronous.
         /// </summary>
         /// <param name="self">The self.</param>
         /// <param name="type"><see cref="Type"/> </param>
@@ -177,38 +195,13 @@ namespace Bb.Curls
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static object? CallToJson(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        public static object? CallToObject(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var e = self.CallToJsonAsync(type, ensureSuccessStatusCode, options, cancellationToken);
+            var e = self.CallToObjectAsync(type, ensureSuccessStatusCode, options, cancellationToken);
             e.Wait();
             return e.Result;
         }
 
-        /// <summary>
-        /// Results to json asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="type"><see cref="Type"/> </param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="options"><see cref="JsonSerializerOptions"/> </param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<object?> CallToJsonAsync(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            var response = await self.CallAsync();
-            if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                object? responseBody = await response.Content.ReadFromJsonAsync(type, options, cancellationToken);
-                return responseBody;
-
-            }
-
-            return null;
-
-        }
 
         /// <summary>
         /// Results to byte array.
@@ -224,6 +217,73 @@ namespace Bb.Curls
             e.Wait();
             return e.Result;
         }
+
+
+        /// <summary>
+        /// Results to stream.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static Stream? ResultToStream(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
+        {
+            var e = self.CallToStreamAsync(ensureSuccessStatusCode, cancellationToken);
+            e.Wait();
+            return e.Result;
+        }
+
+
+
+        /// <summary>
+        /// Results to string asynchronous.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static async Task<string?> CallToStringAsync(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
+        {
+            var response = await self.CallAsync();
+            if (response != null)
+            {
+
+                self.LastResponse = response;
+
+                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
+                    response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+                return responseBody;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Results to typed object asynchronous.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static async Task<object?> CallToObjectAsync<T>(this CurlInterpreter self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var response = await self.CallAsync();
+            if (response != null)
+            {
+                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
+                    response.EnsureSuccessStatusCode();
+                object? responseBody = await response.Content.ReadFromJsonAsync<T>(options, cancellationToken);
+                return responseBody;
+            }
+
+            return null;
+
+        }
+
 
         /// <summary>
         /// Results to byte array asynchronous.
@@ -248,21 +308,6 @@ namespace Bb.Curls
         }
 
         /// <summary>
-        /// Results to stream.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static Stream? ResultToStream(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            var e = self.CallToStreamAsync(ensureSuccessStatusCode, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-        /// <summary>
         /// Results to stream asynchronous.
         /// </summary>
         /// <param name="self">The self.</param>
@@ -283,77 +328,8 @@ namespace Bb.Curls
             return null;
         }
 
-
-
-
         /// <summary>
-        /// Results to string.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static string ResultToString(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            var e = self.ResultToStringAsync(ensureSuccessStatusCode, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-        /// <summary>
-        /// Results to string asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<string> ResultToStringAsync(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            self.Wait();
-            var response = self.Result;
-            if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-            return responseBody;
-        }
-
-        /// <summary>
-        /// Results to json asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static object? ResultToJson<T>(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            var e = self.ResultToJsonAsync<T>(ensureSuccessStatusCode, options, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-        /// <summary>
-        /// Results to json asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<object?> ResultToJsonAsync<T>(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            self.Wait();
-            var response = self.Result;
-            if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                response.EnsureSuccessStatusCode();
-            object? responseBody = await response.Content.ReadFromJsonAsync<T>(options, cancellationToken);
-            return responseBody;
-        }
-
-        /// <summary>
-        /// Results to json asynchronous.
+        /// Results to typed object asynchronous.
         /// </summary>
         /// <param name="self">The self.</param>
         /// <param name="type"><see cref="Type"/> </param>
@@ -362,104 +338,24 @@ namespace Bb.Curls
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static object? ResultToJson(this Task<HttpResponseMessage> self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        public static async Task<object?> CallToObjectAsync(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var e = self.ResultToJsonAsync(type, ensureSuccessStatusCode, options, cancellationToken);
-            e.Wait();
-            return e.Result;
+            var response = await self.CallAsync();
+            if (response != null)
+            {
+                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
+                    response.EnsureSuccessStatusCode();
+                object? responseBody = await response.Content.ReadFromJsonAsync(type, options, cancellationToken);
+                return responseBody;
+
+            }
+
+            return null;
+
         }
-
-        /// <summary>
-        /// Results to json asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="type"><see cref="Type"/> </param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="options"><see cref="JsonSerializerOptions"/> </param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<object?> ResultToJsonAsync(this Task<HttpResponseMessage> self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            self.Wait();
-            var response = self.Result;
-            if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                response.EnsureSuccessStatusCode();
-            object? responseBody = await response.Content.ReadFromJsonAsync(type, options, cancellationToken);
-            return responseBody;
-        }
-
-        /// <summary>
-        /// Results to byte array.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static byte[] CallToByteArray(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            var e = self.ResultToByteArrayAsync(ensureSuccessStatusCode, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-        /// <summary>
-        /// Results to byte array asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<byte[]> ResultToByteArrayAsync(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            self.Wait();
-            var response = self.Result;
-            if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                response.EnsureSuccessStatusCode();
-            byte[] responseBody = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-            return responseBody;
-        }
-
-        /// <summary>
-        /// Results to stream.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static Stream CallToStream(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            var e = self.ResultToStreamAsync(ensureSuccessStatusCode, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-        /// <summary>
-        /// Results to stream asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<Stream> ResultToStreamAsync(this Task<HttpResponseMessage> self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            self.Wait();
-            var response = self.Result;
-            if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                response.EnsureSuccessStatusCode();
-            Stream responseBody = await response.Content.ReadAsStreamAsync(cancellationToken);
-            return responseBody;
-        }
-
-
 
         private static readonly Regex _regIsUrl;
 
     }
-
 
 }

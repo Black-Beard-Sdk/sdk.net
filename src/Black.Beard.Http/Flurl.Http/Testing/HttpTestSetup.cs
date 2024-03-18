@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Bb.Http.Configuration;
 using Bb.Http.Content;
 using Bb.Util;
@@ -25,14 +19,14 @@ namespace Bb.Http.Testing
 		/// Constructs a new instance of HttpTestSetup.
 		/// </summary>
 		/// <param name="settings">FlurlHttpSettings used in fake calls.</param>
-		protected HttpTestSetup(FlurlHttpSettings settings) {
+		protected HttpTestSetup(UrlHttpSettings settings) {
 			Settings = settings;
 		}
 
 		/// <summary>
 		/// The FlurlHttpSettings used in fake calls.
 		/// </summary>
-		public FlurlHttpSettings Settings { get; }
+		public UrlHttpSettings Settings { get; }
 
 		internal HttpResponseMessage GetNextResponse() {
 			if (_allowRealHttp)
@@ -72,7 +66,7 @@ namespace Bb.Http.Testing
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
 		public HttpTestSetup RespondWithJson(object body, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
 			var s = Settings.JsonSerializer.Serialize(body);
-			return RespondWith(() => new CapturedJsonContent(s), status, headers, cookies, replaceUnderscoreWithHyphen);
+			return RespondWith(() => new CapturedObjectContent(s), status, headers, cookies, replaceUnderscoreWithHyphen);
 		}
 
 		/// <summary>

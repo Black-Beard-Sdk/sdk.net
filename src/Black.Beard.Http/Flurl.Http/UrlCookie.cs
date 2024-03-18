@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Bb.Http
 {
@@ -8,7 +6,7 @@ namespace Bb.Http
     /// <summary>
     /// Represents an HTTP cookie. Closely matches Set-Cookie response header.
     /// </summary>
-    public class FlurlCookie
+    public class UrlCookie
 	{
 		private string _value;
 		private DateTimeOffset? _expires;
@@ -28,7 +26,7 @@ namespace Bb.Http
 		/// <param name="value">Value of the cookie.</param>
 		/// <param name="originUrl">URL of request that sent the original Set-Cookie header.</param>
 		/// <param name="dateReceived">Date/time that original Set-Cookie header was received. Defaults to current date/time. Important for Max-Age to be enforced correctly.</param>
-		public FlurlCookie(string name, string value, string originUrl = null, DateTimeOffset? dateReceived = null) {
+		public UrlCookie(string name, string value, string originUrl = null, DateTimeOffset? dateReceived = null) {
 			Name = name;
 			Value = value;
 			OriginUrl = originUrl;

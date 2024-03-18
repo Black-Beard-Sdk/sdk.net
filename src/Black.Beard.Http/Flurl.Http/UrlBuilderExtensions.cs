@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace Bb.Http
 {
 	/// <summary>
@@ -16,7 +14,7 @@ namespace Bb.Http
 		/// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
 		/// <returns>This IFlurlRequest</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="segment"/> is <see langword="null" />.</exception>
-		public static IFlurlRequest AppendPathSegment(this IFlurlRequest request, object segment, bool fullyEncode = false) {
+		public static IUrlRequest AppendPathSegment(this IUrlRequest request, object segment, bool fullyEncode = false) {
 			request.Url.AppendPathSegment(segment, fullyEncode);
 			return request;
 		}
@@ -27,7 +25,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="segments">The segments to append</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest AppendPathSegments(this IFlurlRequest request, params object[] segments) {
+		public static IUrlRequest AppendPathSegments(this IUrlRequest request, params object[] segments) {
 			request.Url.AppendPathSegments(segments);
 			return request;
 		}
@@ -38,7 +36,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="segments">The segments to append</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest AppendPathSegments(this IFlurlRequest request, IEnumerable<object> segments) {
+		public static IUrlRequest AppendPathSegments(this IUrlRequest request, IEnumerable<object> segments) {
 			request.Url.AppendPathSegments(segments);
 			return request;
 		}
@@ -51,7 +49,7 @@ namespace Bb.Http
 		/// <param name="value">Value of query parameter</param>
 		/// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetQueryParam(this IFlurlRequest request, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
+		public static IUrlRequest SetQueryParam(this IUrlRequest request, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
 			request.Url.SetQueryParam(name, value, nullValueHandling);
 			return request;
 		}
@@ -66,7 +64,7 @@ namespace Bb.Http
 		/// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
 		/// <returns>This IFlurlRequest</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
-		public static IFlurlRequest SetQueryParam(this IFlurlRequest request, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
+		public static IUrlRequest SetQueryParam(this IUrlRequest request, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
 			request.Url.SetQueryParam(name, value, isEncoded, nullValueHandling);
 			return request;
 		}
@@ -77,7 +75,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="name">Name of query parameter</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetQueryParam(this IFlurlRequest request, string name) {
+		public static IUrlRequest SetQueryParam(this IUrlRequest request, string name) {
 			request.Url.SetQueryParam(name);
 			return request;
 		}
@@ -89,7 +87,7 @@ namespace Bb.Http
 		/// <param name="values">Typically an anonymous object, ie: new { x = 1, y = 2 }</param>
 		/// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetQueryParams(this IFlurlRequest request, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
+		public static IUrlRequest SetQueryParams(this IUrlRequest request, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove) {
 			request.Url.SetQueryParams(values, nullValueHandling);
 			return request;
 		}
@@ -100,7 +98,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="names">Names of query parameters.</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetQueryParams(this IFlurlRequest request, IEnumerable<string> names) {
+		public static IUrlRequest SetQueryParams(this IUrlRequest request, IEnumerable<string> names) {
 			request.Url.SetQueryParams(names);
 			return request;
 		}
@@ -111,7 +109,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="names">Names of query parameters</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetQueryParams(this IFlurlRequest request, params string[] names) {
+		public static IUrlRequest SetQueryParams(this IUrlRequest request, params string[] names) {
 			request.Url.SetQueryParams(names as IEnumerable<string>);
 			return request;
 		}
@@ -122,7 +120,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="name">Query string parameter name to remove</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest RemoveQueryParam(this IFlurlRequest request, string name) {
+		public static IUrlRequest RemoveQueryParam(this IUrlRequest request, string name) {
 			request.Url.RemoveQueryParam(name);
 			return request;
 		}
@@ -133,7 +131,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="names">Query string parameter names to remove</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest RemoveQueryParams(this IFlurlRequest request, params string[] names) {
+		public static IUrlRequest RemoveQueryParams(this IUrlRequest request, params string[] names) {
 			request.Url.RemoveQueryParams(names);
 			return request;
 		}
@@ -144,7 +142,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="names">Query string parameter names to remove</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest RemoveQueryParams(this IFlurlRequest request, IEnumerable<string> names) {
+		public static IUrlRequest RemoveQueryParams(this IUrlRequest request, IEnumerable<string> names) {
 			request.Url.RemoveQueryParams(names);
 			return request;
 		}
@@ -155,7 +153,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <param name="fragment">The part of the URL afer #</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest SetFragment(this IFlurlRequest request, string fragment) {
+		public static IUrlRequest SetFragment(this IUrlRequest request, string fragment) {
 			request.Url.SetFragment(fragment);
 			return request;
 		}
@@ -165,7 +163,7 @@ namespace Bb.Http
 		/// </summary>
 		/// <param name="request">The IFlurlRequest associated with the URL</param>
 		/// <returns>This IFlurlRequest</returns>
-		public static IFlurlRequest RemoveFragment(this IFlurlRequest request) {
+		public static IUrlRequest RemoveFragment(this IUrlRequest request) {
 			request.Url.RemoveFragment();
 			return request;
 		}

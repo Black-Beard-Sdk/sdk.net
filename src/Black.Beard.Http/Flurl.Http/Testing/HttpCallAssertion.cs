@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using System.Text;
 using Bb.Util;
 
 namespace Bb.Http.Testing
@@ -16,14 +12,14 @@ namespace Bb.Http.Testing
 		private readonly bool _negate;
 		private readonly IList<string> _expectedConditions = new List<string>();
 
-		private IList<FlurlCall> _calls;
+		private IList<UrlCall> _calls;
 
 		/// <summary>
 		/// Constructs a new instance of HttpCallAssertion.
 		/// </summary>
 		/// <param name="loggedCalls">Set of calls (usually from HttpTest.CallLog) to assert against.</param>
 		/// <param name="negate">If true, assertions pass when calls matching criteria were NOT made.</param>
-		public HttpCallAssertion(IEnumerable<FlurlCall> loggedCalls, bool negate = false) {
+		public HttpCallAssertion(IEnumerable<UrlCall> loggedCalls, bool negate = false) {
 			_calls = loggedCalls.ToList();
 			_negate = negate;
 		}
@@ -46,7 +42,7 @@ namespace Bb.Http.Testing
 		/// </summary>
 		/// <param name="match">Predicate (usually a lambda expression) that tests a FlurlCall and returns a bool.</param>
 		/// <param name="descrip">A description of what is being asserted.</param>
-		public HttpCallAssertion With(Func<FlurlCall, bool> match, string descrip = null) {
+		public HttpCallAssertion With(Func<UrlCall, bool> match, string descrip = null) {
 		    if (!string.IsNullOrEmpty(descrip))
 			    _expectedConditions.Add(descrip);
 		    _calls = _calls.Where(match).ToList();
@@ -59,7 +55,7 @@ namespace Bb.Http.Testing
 		/// </summary>
 		/// <param name="match">Predicate (usually a lambda expression) that tests a FlurlCall and returns a bool.</param>
 		/// <param name="descrip">A description of what is being asserted.</param>
-		public HttpCallAssertion Without(Func<FlurlCall, bool> match, string descrip = null) {
+		public HttpCallAssertion Without(Func<UrlCall, bool> match, string descrip = null) {
 		    return With(c => !match(c), descrip);
 	    }
 
@@ -99,7 +95,7 @@ namespace Bb.Http.Testing
 		/// Asserts whether calls were made containing given JSON-encoded request body. body may contain * wildcard.
 		/// </summary>
 		public HttpCallAssertion WithRequestJson(object body) {
-			var serializedBody = FlurlHttp.GlobalSettings.JsonSerializer.Serialize(body);
+			var serializedBody = UrlHttp.GlobalSettings.JsonSerializer.Serialize(body);
 			return WithRequestBody(serializedBody);
 		}
 
@@ -107,7 +103,7 @@ namespace Bb.Http.Testing
 		/// Asserts whether calls were made containing given URL-encoded request body. body may contain * wildcard.
 		/// </summary>
 		public HttpCallAssertion WithRequestUrlEncoded(object body) {
-			var serializedBody = FlurlHttp.GlobalSettings.UrlEncodedSerializer.Serialize(body);
+			var serializedBody = UrlHttp.GlobalSettings.UrlEncodedSerializer.Serialize(body);
 			return WithRequestBody(serializedBody);
 		}
 		#endregion

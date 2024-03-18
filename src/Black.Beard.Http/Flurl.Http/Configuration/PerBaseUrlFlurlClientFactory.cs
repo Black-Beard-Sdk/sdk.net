@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Bb.Http.Configuration
 {
@@ -12,7 +8,7 @@ namespace Bb.Http.Configuration
 	/// to that value. Ideal for use with IoC containers - register as a singleton, inject into a service
 	/// that wraps some web service, and use to set a private IFlurlClient field in the constructor.
 	/// </summary>
-	public class PerBaseUrlFlurlClientFactory : FlurlClientFactoryBase
+	public class PerBaseUrlFlurlClientFactory : UrlClientFactoryBase
 	{
 		/// <summary>
 		/// Returns the entire URL, which is assumed to be some "base" URL for a service.
@@ -26,6 +22,6 @@ namespace Bb.Http.Configuration
 		/// </summary>
 		/// <param name="url">The URL</param>
 		/// <returns></returns>
-		protected override IFlurlClient Create(Url url) => new FlurlClient(url);
+		protected override IUrlClient Create(Url url) => new UrlClient(url);
 	}
 }

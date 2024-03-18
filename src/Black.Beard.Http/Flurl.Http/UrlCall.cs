@@ -1,20 +1,18 @@
-﻿using System;
-using System.Net.Http;
-using Bb.Http.Content;
+﻿using Bb.Http.Content;
 
 namespace Bb.Http
 {
 
-	/// <summary>
-	/// Encapsulates request, response, and other details associated with an HTTP call. Useful for diagnostics and available in
-	/// global event handlers and FlurlHttpException.Call.
-	/// </summary>
-	public class FlurlCall
+    /// <summary>
+    /// Encapsulates request, response, and other details associated with an HTTP call. Useful for diagnostics and available in
+    /// global event handlers and FlurlHttpException.Call.
+    /// </summary>
+    public class UrlCall
 	{
 		/// <summary>
 		/// The IFlurlRequest associated with this call.
 		/// </summary>
-		public IFlurlRequest Request { get; set; }
+		public IUrlRequest Request { get; set; }
 
 		/// <summary>
 		/// The raw HttpRequestMessage associated with this call.
@@ -29,13 +27,13 @@ namespace Bb.Http
 		/// <summary>
 		/// The IFlurlResponse associated with this call if the call completed, otherwise null.
 		/// </summary>
-		public IFlurlResponse Response { get; set; }
+		public IUrlResponse Response { get; set; }
 
 		/// <summary>
 		/// If this call has a 3xx response and Location header, contains information about how to handle the redirect.
 		/// Otherwise null.
 		/// </summary>
-		public FlurlRedirect Redirect { get; set; }
+		public UrlRedirect Redirect { get; set; }
 
 		/// <summary>
 		/// The raw HttpResponseMessage associated with the call if the call completed, otherwise null.
@@ -89,32 +87,5 @@ namespace Bb.Http
 		public override string ToString() {
 			return $"{HttpRequestMessage.Method:U} {Request.Url}";
 		}
-	}
-
-	/// <summary>
-	/// An object containing information about if/how an automatic redirect request will be created and sent.
-	/// </summary>
-	public class FlurlRedirect
-	{
-		/// <summary>
-		/// The URL to redirect to, from the response's Location header.
-		/// </summary>
-		public Url Url { get; set; }
-
-		/// <summary>
-		/// The number of auto-redirects that have already occurred since the original call, plus 1 for this one.
-		/// </summary>
-		public int Count { get; set; }
-
-		/// <summary>
-		/// If true, Flurl will automatically send a redirect request. Set to false to prevent auto-redirect.
-		/// </summary>
-		public bool Follow { get; set; }
-
-		/// <summary>
-		/// If true, the redirect request will use the GET verb and will not forward the original request body.
-		/// Otherwise, the original verb and body will be preserved in the redirect.
-		/// </summary>
-		public bool ChangeVerbToGet { get; set; }
 	}
 }

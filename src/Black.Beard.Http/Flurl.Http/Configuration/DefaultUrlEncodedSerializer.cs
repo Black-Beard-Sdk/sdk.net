@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿
 using Bb.Util;
 
 namespace Bb.Http.Configuration
@@ -26,11 +25,11 @@ namespace Bb.Http.Configuration
 		/// <summary>
 		/// Deserializing a URL-encoded string is not supported.
 		/// </summary>
-		public T Deserialize<T>(string s) => throw new NotImplementedException("Deserializing a URL-encoded string is not supported.");
+		public T Deserializes<T>(string s) => throw new NotImplementedException("Deserializing a URL-encoded string is not supported.");
 
 		/// <summary>
 		/// Deserializing a URL-encoded string is not supported.
 		/// </summary>
-		public T Deserialize<T>(Stream stream) => throw new NotImplementedException("Deserializing a URL-encoded string is not supported.");
+		public T Deserializes<T>(Stream stream) => throw new NotImplementedException("Deserializing a URL-encoded string is not supported.");
 	}
 }

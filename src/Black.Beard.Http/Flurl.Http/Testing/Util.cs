@@ -13,12 +13,12 @@ namespace Bb.Http.Testing
 	/// </summary>
 	internal static class Util
 	{
-		internal static bool HasAnyVerb(this FlurlCall call, HttpMethod[] verbs) {
+		internal static bool HasAnyVerb(this UrlCall call, HttpMethod[] verbs) {
 			// for good measure, check both FlurlRequest.Verb and HttpRequestMessage.Method
 			return verbs.Any(verb => call.Request.Verb == verb && call.HttpRequestMessage.Method == verb);
 		}
 
-		internal static bool HasAnyVerb(this FlurlCall call, string[] verbs) {
+		internal static bool HasAnyVerb(this UrlCall call, string[] verbs) {
 			// for good measure, check both FlurlRequest.Verb and HttpRequestMessage.Method
 			return verbs.Any(verb =>
 				call.Request.Verb.Method.OrdinalEquals(verb, true) &&
@@ -28,7 +28,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// null value means just check for existence by name
 		/// </summary>
-		internal static bool HasQueryParam(this FlurlCall call, string name, object value = null) {
+		internal static bool HasQueryParam(this UrlCall call, string name, object value = null) {
 			if (value == null)
 				return call.Request.Url.QueryParams.Contains(name);
 
@@ -46,14 +46,14 @@ namespace Bb.Http.Testing
 			return paramVals.Any(v => MatchesValueOrPattern(v, value));
 		}
 
-		internal static bool HasAllQueryParams(this FlurlCall call, string[] names) {
+		internal static bool HasAllQueryParams(this UrlCall call, string[] names) {
 			return call.Request.Url.QueryParams
 			   .Select(p => p.Name)
 			   .Intersect(names)
 			   .Count() == names.Length;
 		}
 
-		internal static bool HasAnyQueryParam(this FlurlCall call, string[] names) {
+		internal static bool HasAnyQueryParam(this UrlCall call, string[] names) {
 			var qp = call.Request.Url.QueryParams;
 			return names.Any() ? qp
 			   .Select(p => p.Name)
@@ -61,14 +61,14 @@ namespace Bb.Http.Testing
 			   .Any() : qp.Any();
 		}
 
-		internal static bool HasQueryParams(this FlurlCall call, object values) {
+		internal static bool HasQueryParams(this UrlCall call, object values) {
 			return values.ToKeyValuePairs().All(kv => call.HasQueryParam(kv.Key, kv.Value));
 		}
 
 		/// <summary>
 		/// null value means just check for existence by name
 		/// </summary>
-		internal static bool HasHeader(this FlurlCall call, string name, object value = null) {
+		internal static bool HasHeader(this UrlCall call, string name, object value = null) {
 			return (value == null) ?
 				call.Request.Headers.Contains(name) :
 				call.Request.Headers.TryGetFirst(name, out var val) && MatchesValueOrPattern(val, value);
@@ -77,7 +77,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// null value means just check for existence by name
 		/// </summary>
-		internal static bool HasCookie(this FlurlCall call, string name, object value = null) {
+		internal static bool HasCookie(this UrlCall call, string name, object value = null) {
 			return (value == null) ?
 				call.Request.Cookies.Any(c => c.Name == name) :
 				MatchesValueOrPattern(call.Request.Cookies.FirstOrDefault(c => c.Name == name).Value, value);

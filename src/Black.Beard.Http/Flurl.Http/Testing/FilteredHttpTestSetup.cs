@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Bb.Http.Configuration;
+﻿using Bb.Http.Configuration;
 
 namespace Bb.Http.Testing
 {
@@ -12,14 +8,14 @@ namespace Bb.Http.Testing
 	/// </summary>
 	public class FilteredHttpTestSetup : HttpTestSetup
 	{
-		private readonly List<Func<FlurlCall, bool>> _filters = new List<Func<FlurlCall, bool>>();
+		private readonly List<Func<UrlCall, bool>> _filters = new List<Func<UrlCall, bool>>();
 
 		/// <summary>
 		/// Constructs a new instance of FilteredHttpTestSetup.
 		/// </summary>
 		/// <param name="settings">FlurlHttpSettings used in fake calls.</param>
 		/// <param name="urlPatterns">URL(s) or URL pattern(s) that this HttpTestSetup applies to. Can contain * wildcard.</param>
-		public FilteredHttpTestSetup(FlurlHttpSettings settings, params string[] urlPatterns) : base(settings) {
+		public FilteredHttpTestSetup(UrlHttpSettings settings, params string[] urlPatterns) : base(settings) {
 			if (urlPatterns.Any())
 				With(call => urlPatterns.Any(p => Util.MatchesUrlPattern(call.Request.Url, p)));
 		}
@@ -27,12 +23,12 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Returns true if the given FlurlCall matches one of the URL patterns and all other criteria defined for this HttpTestSetup.
 		/// </summary>
-		internal bool IsMatch(FlurlCall call) => _filters.All(f => f(call));
+		internal bool IsMatch(UrlCall call) => _filters.All(f => f(call));
 
 		/// <summary>
 		/// Defines a condition for which this HttpTestSetup applies.
 		/// </summary>
-		public FilteredHttpTestSetup With(Func<FlurlCall, bool> condition) {
+		public FilteredHttpTestSetup With(Func<UrlCall, bool> condition) {
 			_filters.Add(condition);
 			return this;
 		}
@@ -40,7 +36,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Defines a condition for which this HttpTestSetup does NOT apply.
 		/// </summary>
-		public FilteredHttpTestSetup Without(Func<FlurlCall, bool> condition) {
+		public FilteredHttpTestSetup Without(Func<UrlCall, bool> condition) {
 			return With(c => !condition(c));
 		}
 

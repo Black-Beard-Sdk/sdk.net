@@ -21,12 +21,12 @@ namespace Bb.Curls
 
         public HttpRequestMessage RequestMessage { get; internal set; }
 
-        public IFlurlClient Client { get; internal set; }
+        public IUrlClient Client { get; internal set; }
 
-        public FlurlRequest Request { get; internal set; }
+        public UrlRequest Request { get; internal set; }
 
-        public IFlurlClientFactory Factory { get; internal set; }
-        public IFlurlResponse Result { get; private set; }
+        public IUrlClientFactory Factory { get; internal set; }
+        public IUrlResponse Result { get; private set; }
 
         /// <summary>
         /// Send an HTTP request as an asynchronous operation.

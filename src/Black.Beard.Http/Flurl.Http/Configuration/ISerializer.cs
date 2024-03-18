@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿
 
 namespace Bb.Http.Configuration
 {
@@ -17,10 +14,10 @@ namespace Bb.Http.Configuration
 		/// <summary>
 		/// Deserializes an object from a string representation.
 		/// </summary>
-		T Deserialize<T>(string s);
+		T Deserializes<T>(string s);
 		/// <summary>
 		/// Deserializes an object from a stream representation.
 		/// </summary>
-		T Deserialize<T>(Stream stream);
+		T Deserializes<T>(Stream stream);
     }
 }

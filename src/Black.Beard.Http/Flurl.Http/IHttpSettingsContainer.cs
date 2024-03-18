@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Bb.Http.Configuration;
+﻿using Bb.Http.Configuration;
 using Bb.Util;
 
 namespace Bb.Http
@@ -13,7 +11,7 @@ namespace Bb.Http
 	    /// <summary>
 	    /// Gets the FlurlHttpSettings object used by this client or request.
 	    /// </summary>
-	    FlurlHttpSettings Settings { get; }
+	    UrlHttpSettings Settings { get; }
 
 		/// <summary>
 		/// Collection of headers sent on this request or all requests using this client.

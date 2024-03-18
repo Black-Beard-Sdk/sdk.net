@@ -1,12 +1,4 @@
-﻿using System;
-using static System.Collections.Specialized.BitVector32;
-using System.Linq;
-using Bb;
-using System.Net.Http;
-using System.IO;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using Bb.Http.Configuration;
+﻿using System.Net.Http.Headers;
 using Bb.Http;
 
 namespace Bb.Curls
@@ -20,10 +12,10 @@ namespace Bb.Curls
         /// Sets the URL.
         /// </summary>
         /// <returns></returns>
-        internal CurlInterpreterAction SetUrl()
+        internal static CurlInterpreterAction? SetUrl(ArgumentSource arguments)
         {
 
-            var arg = new Argument(_arguments[_index]);
+            var arg = arguments.GetArgument();
 
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
              {
@@ -33,7 +25,7 @@ namespace Bb.Curls
 
                  var productValue = new ProductInfoHeaderValue("black.beard.curl", "1.0");
                  var url = new Url(sender.FirstValue);
-                 
+
                  client.DefaultRequestHeaders.UserAgent.Add(productValue);
                  message.RequestUri = new Uri(url);
                  message.Headers.Host = $"{url.Host}:{url.Port}";
@@ -48,53 +40,64 @@ namespace Bb.Curls
 
         }
 
-        internal CurlInterpreterAction Header()
+        internal static CurlInterpreterAction? Header(ArgumentSource arguments)
         {
 
             bool isMultipart = false;
-            var arg = _arguments[++_index].Split(':');
 
-            var a = new Argument(arg[1].Trim(), arg[0].Trim());
-            if (a.Name == "Content-Type" && a.Value.ToLower().Trim().StartsWith("multipart"))
-                isMultipart = true;
-
-            static async Task<HttpResponseMessage> action(CurlInterpreterAction sender, Context context)
+            if (arguments.ReadNext())
             {
 
-                var message = context.RequestMessage;
+                var arg = arguments.Current.Split(':');
+                var a = new Argument(arg[1].Trim(), arg[0].Trim());
 
-                var arg = sender.First;
-                if (message.Content != null)
+
+                if (a.Name == "Content-Type" && a.Value.ToLower().Trim().StartsWith("multipart"))
+                    isMultipart = true;
+
+                static async Task<HttpResponseMessage> action(CurlInterpreterAction sender, Context context)
                 {
-                    switch (arg.Name.ToLower())
+
+                    var message = context.RequestMessage;
+
+                    var arg = sender.First;
+                    if (message.Content != null)
                     {
+                        switch (arg.Name.ToLower())
+                        {
 
-                        case "accept":
-                            message.Headers.Add("Accept", arg.Value);
-                            break;
+                            case "accept":
+                                message.Headers.Add("Accept", arg.Value);
+                                break;
 
-                        default:
-                            message.Content.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
-                            break;
+                            default:
+                                message.Content.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
+                                break;
+                        }
+
+                        message.Content.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
+
+                    }
+                    else
+                    {
+                        // context.Request.Headers.Add(arg.Name, arg.Name);
+                        message.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
                     }
 
-                    message.Content.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
+                    return await sender.CallNext(context);
+
                 }
-                else
+
+                return new CurlInterpreterAction(action, a)
                 {
-                    context.Request.Headers.Add(arg.Name, arg.Name);
-                    message.Headers.TryAddWithoutValidation(arg.Name, arg.Value);
+                    Priority = 100
                 }
-
-                return await sender.CallNext(context);
-
+                .Add("isMultipart", isMultipart ? "1" : "0");
             }
 
-            return new CurlInterpreterAction(action, a)
-            {
-                Priority = 100
-            }
-            .Add("isMultipart", isMultipart ? "1" : "0");
+            arguments.Failed($"Failed to read header");
+
+            return null;
 
         }
 
@@ -103,167 +106,189 @@ namespace Bb.Curls
         /// </summary>
         /// <param name="argument">The argument.</param>
         /// <exception cref="System.NotImplementedException"></exception>
-        internal CurlInterpreterAction Request()
+        internal static CurlInterpreterAction? Request(ArgumentSource arguments)
         {
 
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = null;
 
-            var arg = _arguments[++_index];
-            switch (arg.ToUpper())
+            if (arguments.ReadNext())
             {
-                case "POST":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Post;
-                        return await sender.CallNext(context);
-                    };
-                    break;
 
-                case "GET":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Get;
+                var argText = arguments.Current;
+                switch (argText.ToUpper())
+                {
+                    case "POST":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Post;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                        context.Request.Verb = HttpMethod.Get;
+                    case "GET":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Get;
+                            context.Request.Verb = HttpMethod.Get;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                    case "HEAD":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Head;
+                            context.Request.Verb = HttpMethod.Head;
+                            return await sender.CallNext(context);
+                        };
+                        break;
+                    case "PUT":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Put;
+                            context.Request.Verb = HttpMethod.Put;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                case "HEAD":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Head;
-                        return await sender.CallNext(context);
-                    };
-                    break;
-                case "PUT":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Put;
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                    case "DELETE":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Delete;
+                            context.Request.Verb = HttpMethod.Delete;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                case "DELETE":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Delete;
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                    case "CONNECT":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = new HttpMethod("CONNECT");
+                            context.Request.Verb = new  HttpMethod("CONNECT");
+                            return await sender.CallNext(context);
+                        };
+                        break;
+                    case "OPTIONS":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Options;
+                            context.Request.Verb = HttpMethod.Options;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                case "CONNECT":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = new HttpMethod("CONNECT");
-                        Stop();
-                        return await sender.CallNext(context);
-                    };
-                    break;
-                case "OPTIONS":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Options;
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                    case "TRACE":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = HttpMethod.Trace;
+                            context.Request.Verb = HttpMethod.Trace;
+                            return await sender.CallNext(context);
+                        };
+                        break;
 
-                case "TRACE":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = HttpMethod.Trace;
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                    case "PATCH":
+                        action = async (sender, context) =>
+                        {
+                            var message = context.RequestMessage;
+                            message.Method = new HttpMethod("PATCH");
+                            context.Request.Verb = new HttpMethod("PATCH");
+                            return await sender.CallNext(context);
+                        };
+                        break;
+                }
 
-                case "PATCH":
-                    action = async (sender, context) =>
-                    {
-                        var message = context.RequestMessage;
-                        message.Method = new HttpMethod("PATCH");
-                        Stop();
-                        return await sender.CallNext(context);
-                    };
-                    break;
+                if (action != null)
+                    return new CurlInterpreterAction(action) { Priority = 10 };
+
+                arguments.Failed($"Failed to read action {argText}");
+
             }
+            else
+                arguments.Failed($"Failed to read action");
 
-            return new CurlInterpreterAction(action) { Priority = 10 };
-
+            return null;
         }
 
-        internal CurlInterpreterAction Form()
+        internal static CurlInterpreterAction? Form(ArgumentSource arguments)
         {
 
-            var arg = _arguments[++_index].Split(';');
-            List<Argument> _args = new List<Argument>(arg.Length);
 
-            foreach (var item in arg)
-            {
-                var i = item.Split('=');
-                _args.Add(new Argument(i[1], i[0].Trim()));
-            }
-
-            Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
+            if (arguments.ReadNext())
             {
 
-                var args = sender.Arguments;
-                var client = context.HttpClient;
-                var message = context.RequestMessage;
+                var arg = arguments.Current.Split(';');
+                List<Argument> _args = new List<Argument>(arg.Length);
 
-                if (context.Has("IsMultipart", "1"))
+                foreach (var item in arg)
                 {
-
-                    MultipartFormDataContent content = new MultipartFormDataContent();
-
-                    var f = sender.Get(c => c.Value.StartsWith("@"));
-                    if (f != null)
-                        UploadFile(content, f, sender);
-                    else
-                    {
-                        Stop();
-                    }
-
-                    message.Content = content;
-                    return await sender.CallNext(context);
-
+                    var i = item.Split('=');
+                    _args.Add(new Argument(i[1], i[0].Trim()));
                 }
-                else
+
+                Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
                 {
 
-                    var formVariables = new List<KeyValuePair<string, string>>();
+                    var args = sender.Arguments;
+                    var client = context.HttpClient;
+                    var message = context.RequestMessage;
 
-                    foreach (var item in args)
+                    if (context.Has("IsMultipart", "1"))
                     {
-                        if (item.Value.StartsWith("@"))
+
+                        MultipartFormDataContent content = new MultipartFormDataContent();
+
+                        var f = sender.Get(c => c.Value.StartsWith("@"));
+                        if (f != null)
+                            UploadFile(content, f, sender);
+                        else
                         {
                             Stop();
                         }
-                        else
-                            formVariables.Add(new KeyValuePair<string, string>(item.Name.Trim(), item.Value.Trim()));
-                    }
 
-                    using (var formContent = new FormUrlEncodedContent(formVariables))
-                    {
-                        message.Content = formContent;
-
+                        message.Content = content;
                         return await sender.CallNext(context);
 
                     }
+                    else
+                    {
 
-                }
+                        var formVariables = new List<KeyValuePair<string, string>>();
 
-            };
+                        foreach (var item in args)
+                        {
+                            if (item.Value.StartsWith("@"))
+                            {
+                                Stop();
+                            }
+                            else
+                                formVariables.Add(new KeyValuePair<string, string>(item.Name.Trim(), item.Value.Trim()));
+                        }
 
-            return new CurlInterpreterAction(action, _args.ToArray());
+                        using (var formContent = new FormUrlEncodedContent(formVariables))
+                        {
+                            message.Content = formContent;
+
+                            return await sender.CallNext(context);
+
+                        }
+
+                    }
+
+                };
+
+                return new CurlInterpreterAction(action, _args.ToArray());
+
+            }
+
+            return null;
 
         }
 
@@ -299,7 +324,7 @@ namespace Bb.Curls
 
         }
 
-        internal CurlInterpreterAction Head()
+        internal static CurlInterpreterAction? Head(ArgumentSource arguments)
         {
             Stop();
 
@@ -313,7 +338,7 @@ namespace Bb.Curls
 
         }
 
-        internal CurlInterpreterAction HaproxyProtocol()
+        internal static CurlInterpreterAction? HaproxyProtocol(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -325,7 +350,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction HappyEyeballsTimeoutMs()
+        internal static CurlInterpreterAction? HappyEyeballsTimeoutMs(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -338,7 +363,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Globoff()
+        internal static CurlInterpreterAction? Globoff(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -350,7 +375,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Get()
+        internal static CurlInterpreterAction? Get(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -362,7 +387,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpSslControl()
+        internal static CurlInterpreterAction? FtpSslControl(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -374,7 +399,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpSslCccMode()
+        internal static CurlInterpreterAction? FtpSslCccMode(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -386,7 +411,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpSslCcc()
+        internal static CurlInterpreterAction? FtpSslCcc(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -398,7 +423,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpSkipPasvIp()
+        internal static CurlInterpreterAction? FtpSkipPasvIp(ArgumentSource arguments)
         {
             Stop();
 
@@ -411,7 +436,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpPret()
+        internal static CurlInterpreterAction? FtpPret(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -423,7 +448,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpPort()
+        internal static CurlInterpreterAction? FtpPort(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -435,7 +460,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpPasv()
+        internal static CurlInterpreterAction? FtpPasv(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -447,7 +472,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpMethod()
+        internal static CurlInterpreterAction? FtpMethod(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -459,7 +484,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpCreateDirs()
+        internal static CurlInterpreterAction? FtpCreateDirs(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -471,7 +496,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpAlternativeToUser()
+        internal static CurlInterpreterAction? FtpAlternativeToUser(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -483,7 +508,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FtpAccount()
+        internal static CurlInterpreterAction? FtpAccount(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -495,7 +520,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FormString()
+        internal static CurlInterpreterAction? FormString(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -507,7 +532,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FalseStart()
+        internal static CurlInterpreterAction? FalseStart(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -519,7 +544,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction FailEarly()
+        internal static CurlInterpreterAction? FailEarly(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -531,7 +556,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Fail()
+        internal static CurlInterpreterAction? Fail(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -543,7 +568,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Expect100Timeout()
+        internal static CurlInterpreterAction? Expect100Timeout(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -555,7 +580,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Engine()
+        internal static CurlInterpreterAction? Engine(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -567,7 +592,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction EgdFile()
+        internal static CurlInterpreterAction? EgdFile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -579,7 +604,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DumpHeader()
+        internal static CurlInterpreterAction? DumpHeader(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -591,7 +616,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DohUrl()
+        internal static CurlInterpreterAction? DohUrl(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -603,7 +628,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DnsServers()
+        internal static CurlInterpreterAction? DnsServers(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -615,7 +640,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DnsIpv6Addr()
+        internal static CurlInterpreterAction? DnsIpv6Addr(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -627,7 +652,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DnsIpv4Addr()
+        internal static CurlInterpreterAction? DnsIpv4Addr(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -639,7 +664,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DnsInterface()
+        internal static CurlInterpreterAction? DnsInterface(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -651,7 +676,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DisallowUsernameInUrl()
+        internal static CurlInterpreterAction? DisallowUsernameInUrl(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -663,7 +688,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DisableEpsv()
+        internal static CurlInterpreterAction? DisableEpsv(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -675,7 +700,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DisableEprt()
+        internal static CurlInterpreterAction? DisableEprt(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -687,7 +712,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Disable()
+        internal static CurlInterpreterAction? Disable(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -699,7 +724,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Digest()
+        internal static CurlInterpreterAction? Digest(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -711,7 +736,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Delegation()
+        internal static CurlInterpreterAction? Delegation(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -723,7 +748,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DataUrlencode()
+        internal static CurlInterpreterAction? DataUrlencode(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -735,7 +760,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DataRaw()
+        internal static CurlInterpreterAction? DataRaw(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -747,7 +772,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DataBinary()
+        internal static CurlInterpreterAction? DataBinary(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -759,7 +784,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction DataAscii()
+        internal static CurlInterpreterAction? DataAscii(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -771,7 +796,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Data()
+        internal static CurlInterpreterAction? Data(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -783,7 +808,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Crlfile()
+        internal static CurlInterpreterAction? Crlfile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -795,7 +820,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Crlf()
+        internal static CurlInterpreterAction? Crlf(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -807,7 +832,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CreateDirs()
+        internal static CurlInterpreterAction? CreateDirs(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -819,7 +844,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CookieJar()
+        internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -831,7 +856,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Cookie()
+        internal static CurlInterpreterAction? Cookie(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -843,7 +868,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ContinueAt()
+        internal static CurlInterpreterAction? ContinueAt(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -855,7 +880,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ConnectTo()
+        internal static CurlInterpreterAction? ConnectTo(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -867,7 +892,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ConnectTimeout()
+        internal static CurlInterpreterAction? ConnectTimeout(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -879,7 +904,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Config()
+        internal static CurlInterpreterAction? Config(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -891,7 +916,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CompressedSsh()
+        internal static CurlInterpreterAction? CompressedSsh(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -903,7 +928,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Compressed()
+        internal static CurlInterpreterAction? Compressed(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -915,7 +940,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Ciphers()
+        internal static CurlInterpreterAction? Ciphers(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -927,7 +952,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CertType()
+        internal static CurlInterpreterAction? CertType(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -939,7 +964,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CertStatus()
+        internal static CurlInterpreterAction? CertStatus(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -951,7 +976,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Cert()
+        internal static CurlInterpreterAction? Cert(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -963,7 +988,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Capath()
+        internal static CurlInterpreterAction? Capath(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -975,7 +1000,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction CaCert()
+        internal static CurlInterpreterAction? CaCert(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -987,7 +1012,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Basic()
+        internal static CurlInterpreterAction? Basic(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -999,7 +1024,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Append()
+        internal static CurlInterpreterAction? AppendMethod(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1011,7 +1036,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyNegotiate()
+        internal static CurlInterpreterAction? ProxyNegotiate(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1023,7 +1048,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyKeyType()
+        internal static CurlInterpreterAction? ProxyKeyType(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1035,7 +1060,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyKey()
+        internal static CurlInterpreterAction? ProxyKey(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1047,7 +1072,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyInsecure()
+        internal static CurlInterpreterAction? ProxyInsecure(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1059,7 +1084,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyHeader()
+        internal static CurlInterpreterAction? ProxyHeader(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1071,7 +1096,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyDigest()
+        internal static CurlInterpreterAction? ProxyDigest(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1083,7 +1108,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCrlfile()
+        internal static CurlInterpreterAction? ProxyCrlfile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1095,7 +1120,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCiphers()
+        internal static CurlInterpreterAction? ProxyCiphers(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1107,7 +1132,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCertType()
+        internal static CurlInterpreterAction? ProxyCertType(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1119,7 +1144,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCert()
+        internal static CurlInterpreterAction? ProxyCert(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1131,7 +1156,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCapath()
+        internal static CurlInterpreterAction? ProxyCapath(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1143,7 +1168,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyCacert()
+        internal static CurlInterpreterAction? ProxyCacert(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1155,7 +1180,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyBasic()
+        internal static CurlInterpreterAction? ProxyBasic(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1167,7 +1192,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyAnyauth()
+        internal static CurlInterpreterAction? ProxyAnyauth(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1179,7 +1204,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Proxy()
+        internal static CurlInterpreterAction? Proxy(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1191,7 +1216,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProtoRedir()
+        internal static CurlInterpreterAction? ProtoRedir(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1203,7 +1228,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProtoDefault()
+        internal static CurlInterpreterAction? ProtoDefault(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1215,7 +1240,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Proto()
+        internal static CurlInterpreterAction? Proto(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1227,7 +1252,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProgressBar()
+        internal static CurlInterpreterAction? ProgressBar(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1239,7 +1264,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Preproxy()
+        internal static CurlInterpreterAction? Preproxy(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1251,7 +1276,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Post303()
+        internal static CurlInterpreterAction? Post303(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1263,7 +1288,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Post302()
+        internal static CurlInterpreterAction? Post302(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1275,7 +1300,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Post301()
+        internal static CurlInterpreterAction? Post301(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1287,7 +1312,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Pinnedpubkey()
+        internal static CurlInterpreterAction? Pinnedpubkey(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1299,7 +1324,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction PathAsIs()
+        internal static CurlInterpreterAction? PathAsIs(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1311,7 +1336,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Pass()
+        internal static CurlInterpreterAction? Pass(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1323,7 +1348,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Output()
+        internal static CurlInterpreterAction? Output(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1335,7 +1360,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Oauth2Bearer()
+        internal static CurlInterpreterAction? Oauth2Bearer(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1347,7 +1372,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NtlmWb()
+        internal static CurlInterpreterAction? NtlmWb(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1359,7 +1384,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Ntlm()
+        internal static CurlInterpreterAction? Ntlm(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1371,7 +1396,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Noproxy()
+        internal static CurlInterpreterAction? Noproxy(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1383,7 +1408,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NoSessionid()
+        internal static CurlInterpreterAction? NoSessionid(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1395,7 +1420,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NoNpn()
+        internal static CurlInterpreterAction? NoNpn(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1407,7 +1432,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NoKeepalive()
+        internal static CurlInterpreterAction? NoKeepalive(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1419,7 +1444,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NoBuffer()
+        internal static CurlInterpreterAction? NoBuffer(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1431,7 +1456,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NoAlpn()
+        internal static CurlInterpreterAction? NoAlpn(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1443,7 +1468,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Next()
+        internal static CurlInterpreterAction? Next(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1455,7 +1480,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NetrcOptional()
+        internal static CurlInterpreterAction? NetrcOptional(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1467,7 +1492,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction NetrcFile()
+        internal static CurlInterpreterAction? NetrcFile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1479,7 +1504,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Netrc()
+        internal static CurlInterpreterAction? Netrc(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1491,7 +1516,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Negotiate()
+        internal static CurlInterpreterAction? Negotiate(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1503,7 +1528,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Metalink()
+        internal static CurlInterpreterAction? Metalink(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1515,7 +1540,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MaxTime()
+        internal static CurlInterpreterAction? MaxTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1527,7 +1552,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MaxRedirs()
+        internal static CurlInterpreterAction? MaxRedirs(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1539,7 +1564,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MaxFilesize()
+        internal static CurlInterpreterAction? MaxFilesize(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1551,7 +1576,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Manual()
+        internal static CurlInterpreterAction? Manual(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1563,7 +1588,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MailRcpt()
+        internal static CurlInterpreterAction? MailRcpt(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1575,7 +1600,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MailFrom()
+        internal static CurlInterpreterAction? MailFrom(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1587,7 +1612,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction MailAuth()
+        internal static CurlInterpreterAction? MailAuth(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1599,7 +1624,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction LoginOptions()
+        internal static CurlInterpreterAction? LoginOptions(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1611,7 +1636,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction LocationTrusted()
+        internal static CurlInterpreterAction? LocationTrusted(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1623,7 +1648,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Location()
+        internal static CurlInterpreterAction? Location(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1635,7 +1660,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction LocalPort()
+        internal static CurlInterpreterAction? LocalPort(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1647,7 +1672,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ListOnly()
+        internal static CurlInterpreterAction? ListOnly(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1659,7 +1684,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction LimitRate()
+        internal static CurlInterpreterAction? LimitRate(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1671,7 +1696,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Libcurl()
+        internal static CurlInterpreterAction? Libcurl(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1683,7 +1708,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Krb()
+        internal static CurlInterpreterAction? Krb(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1695,7 +1720,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction KeyType()
+        internal static CurlInterpreterAction? KeyType(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1707,7 +1732,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Key()
+        internal static CurlInterpreterAction? Key(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1719,7 +1744,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction KeepaliveTime()
+        internal static CurlInterpreterAction? KeepaliveTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1731,7 +1756,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction JunkSessionCookies()
+        internal static CurlInterpreterAction? JunkSessionCookies(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1743,7 +1768,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Ipv6()
+        internal static CurlInterpreterAction? Ipv6(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1755,7 +1780,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Ipv4()
+        internal static CurlInterpreterAction? Ipv4(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1767,7 +1792,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Interface
+        internal static CurlInterpreterAction? Interface
         {
             get
             {
@@ -1782,7 +1807,9 @@ namespace Bb.Curls
             }
         }
 
-        internal CurlInterpreterAction Insecure()
+        public HttpResponseMessage LastResponse { get; internal set; }
+
+        internal static CurlInterpreterAction? Insecure(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1794,7 +1821,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Include()
+        internal static CurlInterpreterAction? Include(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1806,7 +1833,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction IgnoreContentLength()
+        internal static CurlInterpreterAction? IgnoreContentLength(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1818,7 +1845,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Http2PriorKnowledge()
+        internal static CurlInterpreterAction? Http2PriorKnowledge(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1830,7 +1857,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Http2()
+        internal static CurlInterpreterAction? Http2(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1842,7 +1869,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Http11()
+        internal static CurlInterpreterAction? Http11(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1854,7 +1881,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Http10()
+        internal static CurlInterpreterAction? Http10(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1866,7 +1893,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Http09()
+        internal static CurlInterpreterAction? Http09(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1878,7 +1905,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Hostpubmd5()
+        internal static CurlInterpreterAction? Hostpubmd5(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1890,7 +1917,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Help()
+        internal static CurlInterpreterAction? Help(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1902,7 +1929,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RemoteHeaderName()
+        internal static CurlInterpreterAction? RemoteHeaderName(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1914,7 +1941,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Referer()
+        internal static CurlInterpreterAction? Referer(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1926,7 +1953,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Raw()
+        internal static CurlInterpreterAction? Raw(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1938,7 +1965,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Range()
+        internal static CurlInterpreterAction? Range(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1950,7 +1977,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RandomFile()
+        internal static CurlInterpreterAction? RandomFile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1962,7 +1989,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Quote()
+        internal static CurlInterpreterAction? Quote(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1974,7 +2001,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Pubkey()
+        internal static CurlInterpreterAction? Pubkey(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1986,7 +2013,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Proxytunnel()
+        internal static CurlInterpreterAction? Proxytunnel(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -1998,7 +2025,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Proxy10()
+        internal static CurlInterpreterAction? Proxy10(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2010,7 +2037,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyUser()
+        internal static CurlInterpreterAction? ProxyUser(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2022,7 +2049,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyTlsv1()
+        internal static CurlInterpreterAction? ProxyTlsv1(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2034,7 +2061,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyTlsuser()
+        internal static CurlInterpreterAction? ProxyTlsuser(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2046,7 +2073,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyTlspassword()
+        internal static CurlInterpreterAction? ProxyTlspassword(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2058,7 +2085,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyTlsauthtype()
+        internal static CurlInterpreterAction? ProxyTlsauthtype(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2070,7 +2097,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyTls13Ciphers()
+        internal static CurlInterpreterAction? ProxyTls13Ciphers(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2082,7 +2109,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxySslAllowBeast()
+        internal static CurlInterpreterAction? ProxySslAllowBeast(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2094,7 +2121,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyServiceName()
+        internal static CurlInterpreterAction? ProxyServiceName(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2106,7 +2133,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyPinnedpubkey()
+        internal static CurlInterpreterAction? ProxyPinnedpubkey(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2118,7 +2145,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyPass()
+        internal static CurlInterpreterAction? ProxyPass(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2130,7 +2157,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ProxyNtlm()
+        internal static CurlInterpreterAction? ProxyNtlm(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2143,7 +2170,7 @@ namespace Bb.Curls
         }
 
 
-        internal CurlInterpreterAction Anyauth()
+        internal static CurlInterpreterAction? Anyauth(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2155,7 +2182,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction AltSvc()
+        internal static CurlInterpreterAction? AltSvc(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2167,7 +2194,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction AbstractUnixSocket()
+        internal static CurlInterpreterAction? AbstractUnixSocket(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2179,7 +2206,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Xattr()
+        internal static CurlInterpreterAction? Xattr(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2191,7 +2218,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction WriteOut()
+        internal static CurlInterpreterAction? WriteOut(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2203,7 +2230,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Version()
+        internal static CurlInterpreterAction? Version(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2215,7 +2242,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Verbose()
+        internal static CurlInterpreterAction? Verbose(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2227,7 +2254,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction UserAgent()
+        internal static CurlInterpreterAction? UserAgent(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2239,7 +2266,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction User()
+        internal static CurlInterpreterAction? User(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2251,7 +2278,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction UseAscii()
+        internal static CurlInterpreterAction? UseAscii(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2263,7 +2290,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Url()
+        internal static CurlInterpreterAction? Url(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2275,7 +2302,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction UploadFile()
+        internal static CurlInterpreterAction? UploadFile(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2287,7 +2314,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction UnixSocket()
+        internal static CurlInterpreterAction? UnixSocket(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2299,7 +2326,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TraceTime()
+        internal static CurlInterpreterAction? TraceTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2311,7 +2338,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TraceAscii()
+        internal static CurlInterpreterAction? TraceAscii(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2323,7 +2350,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Trace()
+        internal static CurlInterpreterAction? Trace(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2335,7 +2362,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TrEncoding()
+        internal static CurlInterpreterAction? TrEncoding(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2347,7 +2374,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsv13()
+        internal static CurlInterpreterAction? Tlsv13(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2359,7 +2386,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsv12()
+        internal static CurlInterpreterAction? Tlsv12(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2371,7 +2398,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsv11()
+        internal static CurlInterpreterAction? Tlsv11(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2383,7 +2410,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsv10()
+        internal static CurlInterpreterAction? Tlsv10(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2395,7 +2422,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsv1()
+        internal static CurlInterpreterAction? Tlsv1(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2407,7 +2434,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsuser()
+        internal static CurlInterpreterAction? Tlsuser(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2419,7 +2446,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlspassword()
+        internal static CurlInterpreterAction? Tlspassword(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2431,7 +2458,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tlsauthtype()
+        internal static CurlInterpreterAction? Tlsauthtype(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2443,7 +2470,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Tls13Ciphers()
+        internal static CurlInterpreterAction? Tls13Ciphers(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2455,7 +2482,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TlsMax()
+        internal static CurlInterpreterAction? TlsMax(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2467,7 +2494,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TimeCond()
+        internal static CurlInterpreterAction? TimeCond(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2479,7 +2506,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TftpNoOptions()
+        internal static CurlInterpreterAction? TftpNoOptions(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2491,7 +2518,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TftpBlksize()
+        internal static CurlInterpreterAction? TftpBlksize(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2503,7 +2530,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TelnetOption()
+        internal static CurlInterpreterAction? TelnetOption(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2515,7 +2542,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TcpNodelay()
+        internal static CurlInterpreterAction? TcpNodelay(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2527,7 +2554,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction TcpFastopen()
+        internal static CurlInterpreterAction? TcpFastopen(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2539,7 +2566,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SuppressConnectHeaders()
+        internal static CurlInterpreterAction? SuppressConnectHeaders(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2551,7 +2578,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction StyledOutput()
+        internal static CurlInterpreterAction? StyledOutput(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2563,7 +2590,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Stderr()
+        internal static CurlInterpreterAction? Stderr(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2575,7 +2602,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Sslv3()
+        internal static CurlInterpreterAction? Sslv3(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2587,7 +2614,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Sslv2()
+        internal static CurlInterpreterAction? Sslv2(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2599,7 +2626,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SslReqd()
+        internal static CurlInterpreterAction? SslReqd(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2611,7 +2638,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SslNoRevoke()
+        internal static CurlInterpreterAction? SslNoRevoke(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2623,7 +2650,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SslAllowBeast()
+        internal static CurlInterpreterAction? SslAllowBeast(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2635,7 +2662,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Ssl()
+        internal static CurlInterpreterAction? Ssl(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2647,7 +2674,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SpeedTime()
+        internal static CurlInterpreterAction? SpeedTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2659,7 +2686,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SpeedLimit()
+        internal static CurlInterpreterAction? SpeedLimit(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2671,7 +2698,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5Hostname()
+        internal static CurlInterpreterAction? Socks5Hostname(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2683,7 +2710,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5GssapiService()
+        internal static CurlInterpreterAction? Socks5GssapiService(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2695,7 +2722,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5GssapiNec()
+        internal static CurlInterpreterAction? Socks5GssapiNec(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2707,7 +2734,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5Gssapi()
+        internal static CurlInterpreterAction? Socks5Gssapi(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2719,7 +2746,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5Basic()
+        internal static CurlInterpreterAction? Socks5Basic(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2731,7 +2758,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks5()
+        internal static CurlInterpreterAction? Socks5(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2743,7 +2770,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks4a()
+        internal static CurlInterpreterAction? Socks4a(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2755,7 +2782,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Socks4()
+        internal static CurlInterpreterAction? Socks4(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2767,7 +2794,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Silent()
+        internal static CurlInterpreterAction? Silent(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2779,7 +2806,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ShowError()
+        internal static CurlInterpreterAction? ShowError(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2791,7 +2818,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction ServiceName()
+        internal static CurlInterpreterAction? ServiceName(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2803,7 +2830,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction SaslIr()
+        internal static CurlInterpreterAction? SaslIr(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2815,7 +2842,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RetryMaxTime()
+        internal static CurlInterpreterAction? RetryMaxTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2827,7 +2854,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RetryRelay()
+        internal static CurlInterpreterAction? RetryRelay(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2839,7 +2866,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RetryConnrefused()
+        internal static CurlInterpreterAction? RetryConnrefused(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2851,7 +2878,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Retry()
+        internal static CurlInterpreterAction? Retry(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2863,7 +2890,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction Resolve()
+        internal static CurlInterpreterAction? Resolve(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2875,7 +2902,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RequestTarget()
+        internal static CurlInterpreterAction? RequestTarget(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2887,7 +2914,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RemoteTime()
+        internal static CurlInterpreterAction? RemoteTime(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2899,7 +2926,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RemoteNameAll()
+        internal static CurlInterpreterAction? RemoteNameAll(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>
@@ -2911,7 +2938,7 @@ namespace Bb.Curls
             return new CurlInterpreterAction(action) { Priority = 20 };
         }
 
-        internal CurlInterpreterAction RemoteName()
+        internal static CurlInterpreterAction? RemoteName(ArgumentSource arguments)
         {
             Stop();
             Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> action = async (sender, context) =>

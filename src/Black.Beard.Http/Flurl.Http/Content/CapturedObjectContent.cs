@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿
 
 namespace Bb.Http.Content
 {
@@ -6,12 +6,12 @@ namespace Bb.Http.Content
 	/// Provides HTTP content based on a serialized JSON object, with the JSON string captured to a property
 	/// so it can be read without affecting the read-once content stream.
 	/// </summary>
-	public class CapturedJsonContent : CapturedStringContent
+	public class CapturedObjectContent : CapturedStringContent
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="CapturedJsonContent"/> class.
+		/// Initializes a new instance of the <see cref="CapturedObjectContent"/> class.
 		/// </summary>
 		/// <param name="json">The json.</param>
-		public CapturedJsonContent(string json) : base(json, "application/json; charset=UTF-8") { }
+		public CapturedObjectContent(string json) : base(json, "application/json; charset=UTF-8") { }
 	}
 }

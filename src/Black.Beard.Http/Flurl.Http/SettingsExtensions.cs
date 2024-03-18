@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Bb.Http.Configuration;
 
 namespace Bb.Http
@@ -17,7 +14,7 @@ namespace Bb.Http
 		/// <param name="client">The IFlurlClient.</param>
 		/// <param name="action">Action defining the settings changes.</param>
 		/// <returns>The IFlurlClient with the modified Settings</returns>
-		public static IFlurlClient Configure(this IFlurlClient client, Action<FlurlHttpSettings> action) {
+		public static IUrlClient Configure(this IUrlClient client, Action<UrlHttpSettings> action) {
 			action(client.Settings);
 			return client;
 		}
@@ -28,7 +25,7 @@ namespace Bb.Http
 		/// <param name="request">The IFlurlRequest.</param>
 		/// <param name="action">Action defining the settings changes.</param>
 		/// <returns>The IFlurlRequest with the modified Settings</returns>
-		public static IFlurlRequest ConfigureRequest(this IFlurlRequest request, Action<FlurlHttpSettings> action) {
+		public static IUrlRequest ConfigureRequest(this IUrlRequest request, Action<UrlHttpSettings> action) {
 			action(request.Settings);
 			return request;
 		}
@@ -107,7 +104,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Sets a callback that is invoked immediately before every HTTP request is sent.
 		/// </summary>
-		public static T BeforeCall<T>(this T obj, Action<FlurlCall> act) where T : IHttpSettingsContainer {
+		public static T BeforeCall<T>(this T obj, Action<UrlCall> act) where T : IHttpSettingsContainer {
 			obj.Settings.BeforeCall = act;
 			return obj;
 		}
@@ -115,7 +112,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Sets a callback that is invoked asynchronously immediately before every HTTP request is sent.
 		/// </summary>
-		public static T BeforeCall<T>(this T obj, Func<FlurlCall, Task> act) where T : IHttpSettingsContainer {
+		public static T BeforeCall<T>(this T obj, Func<UrlCall, Task> act) where T : IHttpSettingsContainer {
 			obj.Settings.BeforeCallAsync = act;
 			return obj;
 		}
@@ -123,7 +120,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Sets a callback that is invoked immediately after every HTTP response is received.
 		/// </summary>
-		public static T AfterCall<T>(this T obj, Action<FlurlCall> act) where T : IHttpSettingsContainer {
+		public static T AfterCall<T>(this T obj, Action<UrlCall> act) where T : IHttpSettingsContainer {
 			obj.Settings.AfterCall = act;
 			return obj;
 		}
@@ -131,7 +128,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Sets a callback that is invoked asynchronously immediately after every HTTP response is received.
 		/// </summary>
-		public static T AfterCall<T>(this T obj, Func<FlurlCall, Task> act) where T : IHttpSettingsContainer {
+		public static T AfterCall<T>(this T obj, Func<UrlCall, Task> act) where T : IHttpSettingsContainer {
 			obj.Settings.AfterCallAsync = act;
 			return obj;
 		}
@@ -140,7 +137,7 @@ namespace Bb.Http
 		/// Sets a callback that is invoked when an error occurs during any HTTP call, including when any non-success
 		/// HTTP status code is returned in the response. Response should be null-checked if used in the event handler.
 		/// </summary>
-		public static T OnError<T>(this T obj, Action<FlurlCall> act) where T : IHttpSettingsContainer {
+		public static T OnError<T>(this T obj, Action<UrlCall> act) where T : IHttpSettingsContainer {
 			obj.Settings.OnError = act;
 			return obj;
 		}
@@ -149,7 +146,7 @@ namespace Bb.Http
 		/// Sets a callback that is invoked asynchronously when an error occurs during any HTTP call, including when any non-success
 		/// HTTP status code is returned in the response. Response should be null-checked if used in the event handler.
 		/// </summary>
-		public static T OnError<T>(this T obj, Func<FlurlCall, Task> act) where T : IHttpSettingsContainer {
+		public static T OnError<T>(this T obj, Func<UrlCall, Task> act) where T : IHttpSettingsContainer {
 			obj.Settings.OnErrorAsync = act;
 			return obj;
 		}
@@ -159,7 +156,7 @@ namespace Bb.Http
 		/// You can inspect/manipulate the call.Redirect object to determine what will happen next.
 		/// An auto-redirect will only happen if call.Redirect.Follow is true upon exiting the callback.
 		/// </summary>
-		public static T OnRedirect<T>(this T obj, Action<FlurlCall> act) where T : IHttpSettingsContainer {
+		public static T OnRedirect<T>(this T obj, Action<UrlCall> act) where T : IHttpSettingsContainer {
 			obj.Settings.OnRedirect = act;
 			return obj;
 		}
@@ -169,7 +166,7 @@ namespace Bb.Http
 		/// You can inspect/manipulate the call.Redirect object to determine what will happen next.
 		/// An auto-redirect will only happen if call.Redirect.Follow is true upon exiting the callback.
 		/// </summary>
-		public static T OnRedirect<T>(this T obj, Func<FlurlCall, Task> act) where T : IHttpSettingsContainer {
+		public static T OnRedirect<T>(this T obj, Func<UrlCall, Task> act) where T : IHttpSettingsContainer {
 			obj.Settings.OnRedirectAsync = act;
 			return obj;
 		}

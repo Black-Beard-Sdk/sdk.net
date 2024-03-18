@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Net.Http;
+﻿using System.Collections.Concurrent;
 using System.Net;
 
 namespace Bb.Http.Configuration
@@ -9,9 +7,9 @@ namespace Bb.Http.Configuration
 	/// Encapsulates a creation/caching strategy for IFlurlClient instances. Custom factories looking to extend
 	/// Flurl's behavior should inherit from this class, rather than implementing IFlurlClientFactory directly.
 	/// </summary>
-	public abstract class FlurlClientFactoryBase : IFlurlClientFactory
+	public abstract class UrlClientFactoryBase : IUrlClientFactory
 	{
-		private readonly ConcurrentDictionary<string, IFlurlClient> _clients = new ConcurrentDictionary<string, IFlurlClient>();
+		private readonly ConcurrentDictionary<string, IUrlClient> _clients = new ConcurrentDictionary<string, IUrlClient>();
 
 		/// <summary>
 		/// By default, uses a caching strategy of one FlurlClient per host. This maximizes reuse of
@@ -19,7 +17,7 @@ namespace Bb.Http.Configuration
 		/// </summary>
 		/// <param name="url">The URL.</param>
 		/// <returns>The FlurlClient instance.</returns>
-		public virtual IFlurlClient Get(Url url) {
+		public virtual IUrlClient Get(Url url) {
 			if (url == null)
 				throw new ArgumentNullException(nameof(url));
 
@@ -43,7 +41,7 @@ namespace Bb.Http.Configuration
 		/// </summary>
 		/// <param name="url">The URL (not used)</param>
 		/// <returns></returns>
-		protected virtual IFlurlClient Create(Url url) => new FlurlClient();
+		protected virtual IUrlClient Create(Url url) => new UrlClient();
 
 		/// <summary>
 		/// Disposes all cached IFlurlClient instances and clears the cache.

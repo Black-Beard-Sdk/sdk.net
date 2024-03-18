@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http;
 using Bb.Http.Configuration;
 
 namespace Bb.Http.Testing
@@ -15,18 +11,18 @@ namespace Bb.Http.Testing
 	[Serializable]
 	public class HttpTest : HttpTestSetup, IDisposable
 	{
-		private readonly ConcurrentQueue<FlurlCall> _calls = new ConcurrentQueue<FlurlCall>();
+		private readonly ConcurrentQueue<UrlCall> _calls = new ConcurrentQueue<UrlCall>();
 		private readonly List<FilteredHttpTestSetup> _filteredSetups = new List<FilteredHttpTestSetup>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="HttpTest"/> class.
 		/// </summary>
 		/// <exception cref="Exception">A delegate callback throws an exception.</exception>
-		public HttpTest() : base(new FlurlHttpSettings()) {
+		public HttpTest() : base(new UrlHttpSettings()) {
 		    SetCurrentTest(this);
 	    }
 
-		internal void LogCall(FlurlCall call) => _calls.Enqueue(call);
+		internal void LogCall(UrlCall call) => _calls.Enqueue(call);
 
 		/// <summary>
 		/// Gets the current HttpTest from the logical (async) call context
@@ -36,14 +32,14 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// List of all (fake) HTTP calls made since this HttpTest was created.
 		/// </summary>
-		public IReadOnlyList<FlurlCall> CallLog => new ReadOnlyCollection<FlurlCall>(_calls.ToList());
+		public IReadOnlyList<UrlCall> CallLog => new ReadOnlyCollection<UrlCall>(_calls.ToList());
 
 		/// <summary>
 		/// Change FlurlHttpSettings for the scope of this HttpTest.
 		/// </summary>
 		/// <param name="action">Action defining the settings changes.</param>
 		/// <returns>This HttpTest</returns>
-		public HttpTest Configure(Action<FlurlHttpSettings> action) {
+		public HttpTest Configure(Action<UrlHttpSettings> action) {
 			action(Settings);
 			return this;
 		}
@@ -57,7 +53,7 @@ namespace Bb.Http.Testing
 			return setup;
 		}
 
-		internal HttpTestSetup FindSetup(FlurlCall call) {
+		internal HttpTestSetup FindSetup(UrlCall call) {
 			return _filteredSetups.FirstOrDefault(ts => ts.IsMatch(call)) ?? (HttpTestSetup)this;
 		}
 
