@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-//[assembly: InternalsVisibleTo("Url.Http")]
 
 namespace Bb.Util
 {
@@ -39,7 +34,7 @@ namespace Bb.Util
         /// Returns a string that represents the current object, using CultureInfo.InvariantCulture where possible.
         /// Dates are represented in IS0 8601.
         /// </summary>
-        public static string ToInvariantString(this object obj)
+        public static string? ToInvariantString(this object obj)
         {
             // inspired by: http://stackoverflow.com/a/19570016/62600
             return

@@ -13,16 +13,22 @@ namespace Bb.Curls
     public static partial class CurlParserExtension
     {
 
+
+        private const string pattern = @"(https?|ftp|ssh|mailto):\/\/([a-z]+[a-z0-9.-]+|(\d{1,3}\.){3,3}\d{1,3})(:\d{0,5})?(\/[a-z]+[a-z0-9.-]+)*(\?([a-z]+[a-z0-9%&=+#]*)+)?";
+        private const RegexOptions options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture;
+
+
+        //[GeneratedRegex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture)]
+        //private static partial Regex _regIsUrl();
+        private static readonly Regex _regIsUrl;
+
+
         /// <summary>
         /// Initializes the <see cref="CurlParserExtension"/> class.
         /// </summary>
         static CurlParserExtension()
         {
-
-            string pattern = @"(https?|ftp|ssh|mailto):\/\/([a-z]+[a-z0-9.-]+|(\d{1,3}\.){3,3}\d{1,3})(:\d{0,5})?(\/[a-z]+[a-z0-9.-]+)*(\?([a-z]+[a-z0-9%&=+#]*)+)?";
-            RegexOptions options = RegexOptions.IgnoreCase;
             _regIsUrl = new Regex(pattern, options);
-
         }
 
         /// <summary>
@@ -121,7 +127,7 @@ namespace Bb.Curls
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, CancellationToken cancellationToken = default)
+        public static JsonElement? ResultToJson(this CurlInterpreter self, CancellationToken cancellationToken = default)
         {
             var e = self.ResultToJson(false, cancellationToken, new JsonDocumentOptions());
             return e;
@@ -135,7 +141,7 @@ namespace Bb.Curls
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken)
+        public static JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken)
         {
             var e = self.ResultToJson(ensureSuccessStatusCode, cancellationToken, new JsonDocumentOptions());
             return e;
@@ -150,7 +156,7 @@ namespace Bb.Curls
         /// <param name="options"><see cref="CJsonDocumentOptions"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static System.Text.Json.JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken, JsonDocumentOptions options)
+        public static JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken, JsonDocumentOptions options)
         {
 
             var e = self.CallToStringAsync(ensureSuccessStatusCode, cancellationToken);
@@ -354,7 +360,6 @@ namespace Bb.Curls
 
         }
 
-        private static readonly Regex _regIsUrl;
 
     }
 
