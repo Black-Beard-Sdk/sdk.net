@@ -54,7 +54,7 @@ namespace Bb.Http
 						msg.Content.Headers.Remove(name);
 					}
 					else if (createContentIfNecessary && value != null) {
-						msg.Content = new CapturedStringContent("");
+						msg.Content = new StringContent(string.Empty);
 						msg.Content.Headers.Clear();
 					}
 					else {

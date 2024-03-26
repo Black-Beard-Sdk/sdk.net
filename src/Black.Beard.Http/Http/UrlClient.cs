@@ -2,6 +2,7 @@
 using Bb.Http.Configuration;
 using Bb.Http.Testing;
 using Bb.Util;
+using System.Net;
 
 namespace Bb.Http
 {
@@ -51,26 +52,90 @@ namespace Bb.Http
         /// <inheritdoc />
         public IUrlRequest Request(params object[] urlSegments) => new UrlRequest(this, urlSegments);
 
+        //public async Task<IUrlResponse> SendAsync(IUrlRequest request, HttpRequestMessage reqMessage, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        //{
+
+        //    if (request == null)
+        //        throw new ArgumentNullException(nameof(request));
+
+        //    if (request.Url == null)
+        //        throw new ArgumentException("Cannot send Request. Url property was not set.");
+
+        //    if (!Url.IsValid(request.Url))
+        //        throw new ArgumentException($"Cannot send Request. {request.Url} is a not a valid URL.");
+
+        //    var settings = request.Settings;
+
+        //    var call = new UrlCall
+        //    {
+        //        Request = request,
+        //        HttpRequestMessage = reqMessage
+        //    };
+
+        //    await RaiseEventAsync(settings.BeforeCall, settings.BeforeCallAsync, call).ConfigureAwait(false);
+
+        //    // in case URL or headers were modified in the handler above
+
+        //    call.StartedUtc = DateTime.UtcNow;
+        //    var ct = GetCancellationTokenWithTimeout(cancellationToken, settings.Timeout, out var cts);
+
+        //    HttpTest.Current?.LogCall(call);
+
+        //    try
+        //    {
+        //        HttpClient.DefaultRequestVersion = reqMessage.Version;
+
+        //        call.HttpResponseMessage = HttpTest.Current?.FindSetup(call)?.GetNextResponse()
+        //            ?? await HttpClient.SendAsync(reqMessage, completionOption, ct).ConfigureAwait(false);
+
+        //        call.HttpResponseMessage.RequestMessage = reqMessage;
+        //        call.Response = new UrlResponse(call, request.CookieJar);
+
+        //        if (call.Succeeded)
+        //        {
+        //            var redirResponse = await ProcessRedirectAsync(call, completionOption, cancellationToken).ConfigureAwait(false);
+        //            return redirResponse ?? call.Response;
+        //        }
+        //        else
+        //            throw new UrlHttpException(call, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return await HandleExceptionAsync(call, ex, cancellationToken).ConfigureAwait(false);
+        //    }
+        //    finally
+        //    {
+        //        cts?.Dispose();
+        //        call.EndedUtc = DateTime.UtcNow;
+        //        await RaiseEventAsync(settings.AfterCall, settings.AfterCallAsync, call).ConfigureAwait(false);
+        //    }
+        //}
+
         /// <inheritdoc />
         public async Task<IUrlResponse> SendAsync(IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
+
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
+
             if (request.Url == null)
                 throw new ArgumentException("Cannot send Request. Url property was not set.");
+
             if (!Url.IsValid(request.Url))
                 throw new ArgumentException($"Cannot send Request. {request.Url} is a not a valid URL.");
 
-            var settings = request.Settings;
-            var reqMsg = new HttpRequestMessage(request.Verb, request.Url) { Content = request.Content };
+            HttpClient.DefaultRequestVersion = request.Version;
 
-            SyncHeaders(request, reqMsg);
-            var call = new UrlCall
+            var reqMsg = SyncHeaders(request, new HttpRequestMessage(request.Verb, request.Url)
             {
-                Request = request,
-                HttpRequestMessage = reqMsg
-            };
+                Content = request.Content,
+                Version = request.Version
+            });
 
+
+            var call = new UrlCall { Request = request, HttpRequestMessage = reqMsg };
+
+            var settings = request.Settings;
             await RaiseEventAsync(settings.BeforeCall, settings.BeforeCallAsync, call).ConfigureAwait(false);
 
             // in case URL or headers were modified in the handler above
@@ -84,10 +149,10 @@ namespace Bb.Http
 
             try
             {
-                call.HttpResponseMessage =
-                    HttpTest.Current?.FindSetup(call)?.GetNextResponse() ??
-                    await HttpClient.SendAsync(reqMsg, completionOption, ct).ConfigureAwait(false);
 
+                call.HttpResponseMessage = HttpTest.Current?.FindSetup(call)?.GetNextResponse()
+                    ?? await HttpClient.SendAsync(reqMsg, completionOption, ct).ConfigureAwait(false);
+       
                 call.HttpResponseMessage.RequestMessage = reqMsg;
                 call.Response = new UrlResponse(call, request.CookieJar);
 
@@ -112,8 +177,9 @@ namespace Bb.Http
             }
         }
 
-        private void SyncHeaders(IUrlRequest req, HttpRequestMessage reqMsg)
+        private HttpRequestMessage SyncHeaders(IUrlRequest req, HttpRequestMessage reqMsg)
         {
+
             // copy any client-level (default) headers to UrlRequest
             foreach (var header in this.Headers.Where(h => !req.Headers.Contains(h.Name)).ToList())
                 req.Headers.Add(header.Name, header.Value);
@@ -128,6 +194,9 @@ namespace Bb.Http
                 foreach (var header in reqMsg.Content.Headers)
                     req.Headers.AddOrReplace(header.Key, string.Join(",", header.Value));
             }
+
+            return reqMsg;
+
         }
 
         private async Task<IUrlResponse> ProcessRedirectAsync(UrlCall call, HttpCompletionOption completionOption, CancellationToken cancellationToken)

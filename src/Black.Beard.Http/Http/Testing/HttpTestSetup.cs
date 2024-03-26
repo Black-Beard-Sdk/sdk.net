@@ -52,7 +52,7 @@ namespace Bb.Http.Testing
 		/// <param name="replaceUnderscoreWithHyphen">If true, underscores in property names of headers will be replaced by hyphens. Default is true.</param>
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
 		public HttpTestSetup RespondWith(string body, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
-			return RespondWith(() => new CapturedStringContent(body), status, headers, cookies, replaceUnderscoreWithHyphen);
+			return RespondWith(() => new StringContent(body ?? string.Empty), status, headers, cookies, replaceUnderscoreWithHyphen);
 		}
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Bb.Http.Testing
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
 		public HttpTestSetup RespondWithJson(object body, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
 			var s = Settings.JsonSerializer.Serialize(body);
-			return RespondWith(() => new CapturedObjectContent(s), status, headers, cookies, replaceUnderscoreWithHyphen);
+			return RespondWith(() => new StringContent(s).WithContentType(ContentType.ApplicationJsonCharsetUtf8), status, headers, cookies, replaceUnderscoreWithHyphen);
 		}
 
 		/// <summary>

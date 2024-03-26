@@ -60,7 +60,7 @@ namespace Bb.Http
 		/// </summary>
 		/// <typeparam name="T">A type whose structure matches the expected JSON response.</typeparam>
 		/// <returns>A task whose result is an object containing data in the response body.</returns>
-		public Task<T> GetResponseJsonAsync<T>() => Call?.Response?.GetJsonAsync<T>() ?? Task.FromResult(default(T));
+		public Task<T> GetResponseJsonAsync<T>() => Call?.Response?.GetObjectAsync<T>() ?? Task.FromResult(default(T));
 	}
 
 	/// <summary>

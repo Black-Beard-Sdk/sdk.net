@@ -28,13 +28,23 @@ namespace Bb.Http
         int StatusCode { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the HTTP response was successful.
+        /// </summary>
+        bool IsSuccessStatusCode { get; }
+
+        /// <summary>
+        /// Throws an exception if the HTTP response status code indicates failure.
+        /// </summary>
+        void EnsureSuccessStatusCode();
+
+        /// <summary>
         /// Deserializes JSON-formatted HTTP response body to object of type T.
         /// </summary>
         /// <typeparam name="T">A type whose structure matches the expected JSON response.</typeparam>
         /// <returns>A Task whose result is an object containing data in the response body.</returns>
         /// <example>x = await url.PostAsync(data).GetJson&lt;T&gt;()</example>
         /// <exception cref="UrlHttpException">Condition.</exception>
-        Task<T> GetJsonAsync<T>();
+        Task<T> GetObjectAsync<T>();
 
         /// <summary>
         /// Returns HTTP response body as a string.

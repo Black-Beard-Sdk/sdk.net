@@ -1,4 +1,5 @@
-﻿using Bb.Http.Configuration;
+﻿using Bb.Http;
+using Bb.Http.Configuration;
 
 namespace Bb.Curls
 {
@@ -12,7 +13,7 @@ namespace Bb.Curls
         /// </summary>
         /// <param name="configureAction"></param>
         /// <param name="arguments"></param>
-        public CurlInterpreterAction(Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> configureAction, params Argument[] arguments)
+        public CurlInterpreterAction(Action<CurlInterpreterAction, CurlContext> configureAction, params Argument[] arguments)
         {
             _parameters = new List<KeyValuePair<string, string>>();
             Arguments = arguments;
@@ -26,12 +27,6 @@ namespace Bb.Curls
         public Argument First => Arguments.First();
 
         public string FirstValue => Arguments.First().Value;
-
-
-        /// <summary>
-        /// Gets or sets the client factory.
-        /// </summary>
-        public IUrlClientFactory Factory { get; internal set; }
 
         /// <summary>
         /// Get or set arguments
@@ -55,43 +50,17 @@ namespace Bb.Curls
         public bool Exists(string name) => Arguments.Any(c => c.Name.Trim() == name);
 
 
-        internal async Task<HttpResponseMessage> CallAsync(Context context)
+        internal void Configure(CurlContext context)
         {
-            return await _configureAction(this, context);
+            _configureAction(this, context);
         }
 
-        internal Context CollectParameters(Context context)
+        internal void CollectParameters(CurlContext context)
         {
-
             if (_parameters.Count > 0)
                 foreach (var item in _parameters)
-                    context.Add(item);
-
-            if (_next != null)
-                _next.CollectParameters(context);
-
-            return context;
-
-        }
-
-        internal async Task<HttpResponseMessage> CallNext(Context context)
-        {
-
-            if (_next != null)
-                return await _next._configureAction(_next, context);
-
-            return await context.CallAsync();
-
-        }
-
-        internal void Append(List<CurlInterpreterAction> list, int index)
-        {
-            _next = list[index++];
-
-            if (index < list.Count)
-                _next.Append(list, index);
-
-        }
+                    context.Add(item);                 
+        }                          
 
         internal CurlInterpreterAction Add(string key, string value)
         {
@@ -101,7 +70,7 @@ namespace Bb.Curls
 
         internal CurlInterpreterAction _next;
 
-        private Func<CurlInterpreterAction, Context, Task<HttpResponseMessage>> _configureAction;
+        private Action<CurlInterpreterAction, CurlContext> _configureAction;
         private List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
 
     }

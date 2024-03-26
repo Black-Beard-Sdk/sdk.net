@@ -36,5 +36,16 @@
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         Task<IUrlResponse> SendAsync(IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+
+        ///// <summary>
+        ///// Asynchronously sends an HTTP request.
+        ///// </summary>
+        ///// <param name="request">The IUrlRequest to send.</param>
+        ///// <param name="reqMessage">The <see cref="HttpRequestMessage"/> to send.</param>
+        ///// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        ///// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
+        ///// <returns>A Task whose result is the received IUrlResponse.</returns>
+        //Task<IUrlResponse> SendAsync(IUrlRequest request, HttpRequestMessage reqMessage, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+    
     }
 }

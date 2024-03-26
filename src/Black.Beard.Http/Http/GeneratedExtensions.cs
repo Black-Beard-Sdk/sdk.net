@@ -22,8 +22,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> SendObjectAsync(this IUrlRequest request, HttpMethod verb, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = request.Serialize(body);
-            return request.SendAsync(verb, content, completionOption, cancellationToken);
+            return request.Serialize(body).SendAsync(verb, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> SendStringAsync(this IUrlRequest request, HttpMethod verb, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedStringContent(body);
+            var content = new StringContent(body ?? string.Empty);
             return request.SendAsync(verb, content, completionOption, cancellationToken);
         }
 
@@ -52,7 +51,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> SendUrlEncodedAsync(this IUrlRequest request, HttpMethod verb, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedUrlEncodedContent(request.Settings.UrlEncodedSerializer.Serialize(body));
+            var content = new StringContent(request.Settings.UrlEncodedSerializer.Serialize(body)).WithContentType(ContentType.ApplicationxWwwFormUrlencoded);
             return request.SendAsync(verb, content, completionOption, cancellationToken);
         }
 
@@ -139,8 +138,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostObjectAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = request.Serialize(body);
-            return request.SendAsync(HttpMethod.Post, content, completionOption, cancellationToken);
+            return request.Serialize(body).SendAsync(HttpMethod.Post, completionOption, cancellationToken);
         }
                         
         /// <summary>
@@ -153,7 +151,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostStringAsync(this IUrlRequest request, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedStringContent(body);
+            var content = new StringContent(body ?? string.Empty);
             return request.SendAsync(HttpMethod.Post, content, completionOption, cancellationToken);
         }
 
@@ -167,7 +165,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostUrlEncodedAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedUrlEncodedContent(request.Settings.UrlEncodedSerializer.Serialize(body));
+            var content = new StringContent(request.Settings.UrlEncodedSerializer.Serialize(body)).WithContentType(ContentType.ApplicationxWwwFormUrlencoded);
             return request.SendAsync(HttpMethod.Post, content, completionOption, cancellationToken);
         }
 
@@ -206,8 +204,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PutObjectAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = request.Serialize(body);
-            return request.SendAsync(HttpMethod.Put, content, completionOption, cancellationToken);
+            return request.Serialize(body).SendAsync(HttpMethod.Put, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -220,7 +217,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PutStringAsync(this IUrlRequest request, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedStringContent(body);
+            var content = new StringContent(body ?? string.Empty);
             return request.SendAsync(HttpMethod.Put, content, completionOption, cancellationToken);
         }
 
@@ -259,8 +256,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PatchObjectAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = request.Serialize(body);
-            return request.SendAsync(new HttpMethod("PATCH"), content, completionOption, cancellationToken);
+            return request.Serialize(body).SendAsync(new HttpMethod("PATCH"), completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -273,7 +269,7 @@ namespace Bb.Http
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PatchStringAsync(this IUrlRequest request, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            var content = new CapturedStringContent(body);
+            var content = new StringContent(body ?? string.Empty);
             return request.SendAsync(new HttpMethod("PATCH"), content, completionOption, cancellationToken);
         }
 
@@ -604,7 +600,7 @@ namespace Bb.Http
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
-        public static Task<IUrlResponse> PostMultipartAsync(this Url url, Action<CapturedMultipartContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        public static Task<IUrlResponse> PostMultipartAsync(this Url url, Action<MultipartFormDataContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
             return new UrlRequest(url).PostMultipartAsync(buildContent, completionOption, cancellationToken);
         }
@@ -1082,7 +1078,7 @@ namespace Bb.Http
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
-        public static Task<IUrlResponse> PostMultipartAsync(this string url, Action<CapturedMultipartContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        public static Task<IUrlResponse> PostMultipartAsync(this string url, Action<MultipartFormDataContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
             return new UrlRequest(url).PostMultipartAsync(buildContent, completionOption, cancellationToken);
         }
@@ -1560,7 +1556,7 @@ namespace Bb.Http
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
-        public static Task<IUrlResponse> PostMultipartAsync(this Uri uri, Action<CapturedMultipartContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        public static Task<IUrlResponse> PostMultipartAsync(this Uri uri, Action<MultipartFormDataContent> buildContent, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
             return new UrlRequest(uri).PostMultipartAsync(buildContent, completionOption, cancellationToken);
         }
@@ -1722,6 +1718,7 @@ namespace Bb.Http
             return new UrlRequest(uri).AllowAnyHttpStatus();
         }
 
+
         /// <summary>
         /// Creates a new UrlRequest and configures whether redirects are automatically followed.
         /// </summary>
@@ -1735,16 +1732,24 @@ namespace Bb.Http
 
 
         /// <summary>
-        /// Convert object in a <see cref="CapturedObjectContent"/>
+        /// Convert object in a <see cref="StringContent"/>
         /// </summary>
         /// <param name="self">Request</param>
         /// <param name="body">object to serialize</param>
         /// <returns></returns>
-        public static CapturedObjectContent Serialize(this IUrlRequest self, object body)
+        public static IUrlRequest Serialize(this IUrlRequest self, object body)
         {
-            return new CapturedObjectContent(self.Settings.JsonSerializer.Serialize(body));
+            
+            var i = new StringContent(self.Settings.JsonSerializer.Serialize(body))
+                .WithContentType(ContentType.ApplicationJsonCharsetUtf8);
+
+            self.Content = i;
+
+            return self;
+
         }
 
+       
 
     }
 }

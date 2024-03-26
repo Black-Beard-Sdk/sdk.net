@@ -99,6 +99,8 @@ namespace Bb.Curls
         /// </value>
         public string Current => _sb.ToString();
 
+        public int CurrentPosition => _index;
+
         private readonly string _args;
         private int _index;
         private readonly int _max;

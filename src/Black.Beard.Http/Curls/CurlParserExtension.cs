@@ -1,5 +1,7 @@
 ﻿
+using Bb.Http;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -12,15 +14,6 @@ namespace Bb.Curls
     /// </summary>
     public static partial class CurlParserExtension
     {
-
-
-        private const string pattern = @"(https?|ftp|ssh|mailto):\/\/([a-z]+[a-z0-9.-]+|(\d{1,3}\.){3,3}\d{1,3})(:\d{0,5})?(\/[a-z]+[a-z0-9.-]+)*(\?([a-z]+[a-z0-9%&=+#]*)+)?";
-        private const RegexOptions options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture;
-
-
-        //[GeneratedRegex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture)]
-        //private static partial Regex _regIsUrl();
-        private static readonly Regex _regIsUrl;
 
 
         /// <summary>
@@ -44,9 +37,17 @@ namespace Bb.Curls
             List<string> result = new List<string>();
             while (_lexer.Next())
             {
+
                 var c = _lexer.Current;
+
                 if (!string.IsNullOrEmpty(c))
-                    result.Add(_lexer.Current);
+                {
+                    if ((c.StartsWith("-") && c.Length == 1) || (c.StartsWith("--") && c.Length == 2))
+                        throw new ArgumentException($"Invalid argument {c} at position {_lexer.CurrentPosition}");
+
+                    result.Add(c);
+
+                }
             }
 
             return result.ToArray();
@@ -59,10 +60,11 @@ namespace Bb.Curls
         /// </summary>
         /// <param name="lineArg"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static CurlInterpreter Precompile(this string lineArg)
         {
             var interpreter = new CurlInterpreter(lineArg.ParseCurlLine());
-            interpreter.Precompile();
+            interpreter.BuildActions();
             return interpreter;
         }
 
@@ -72,9 +74,10 @@ namespace Bb.Curls
         /// <param name="lineArg">The line argument.</param>
         /// <param name="cancellationTokenSource">The cancellation token to cancel operation.<see cref="CancellationTokenSource"/></param>
         /// <returns><see cref="T:Task<HttpResponseMessage>"/>The task object representing the asynchronous operation.</returns>
-        public static async Task<HttpResponseMessage?> CallAsync(this string lineArg, CancellationTokenSource cancellationTokenSource = null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async Task<IUrlResponse?> CallAsync(this string lineArg, CancellationTokenSource cancellationTokenSource = null)
         {
-            var interpreter = new CurlInterpreter(lineArg.ParseCurlLine());
+            var interpreter = Precompile(lineArg);
             return await interpreter.CallAsync(cancellationTokenSource);
         }
 
@@ -84,7 +87,8 @@ namespace Bb.Curls
         /// <param name="arguments">The list of argument.</param>
         /// <param name="cancellationTokenSource">The cancellation token to cancel operation.<see cref="CancellationTokenSource"/></param>
         /// <returns><see cref="T:Task<HttpResponseMessage>"/>The task object representing the asynchronous operation.</returns>
-        public static async Task<HttpResponseMessage?> CallAsync(this string[] arguments, CancellationTokenSource cancellationTokenSource = null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static async Task<IUrlResponse?> CallAsync(this string[] arguments, CancellationTokenSource cancellationTokenSource = null)
         {
             var interpreter = new CurlInterpreter(arguments);
             return await interpreter.CallAsync(cancellationTokenSource);
@@ -101,6 +105,7 @@ namespace Bb.Curls
         {
             return _regIsUrl.IsMatch(self);
         }
+
 
 
 
@@ -158,7 +163,7 @@ namespace Bb.Curls
         /// <returns></returns>
         public static JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken, JsonDocumentOptions options)
         {
-
+            
             var e = self.CallToStringAsync(ensureSuccessStatusCode, cancellationToken);
             e.Wait();
 
@@ -174,7 +179,6 @@ namespace Bb.Curls
 
         }
 
-
         /// <summary>
         /// Results to typed object asynchronous.
         /// </summary>
@@ -189,41 +193,6 @@ namespace Bb.Curls
             e.Wait();
             return e.Result;
         }
-
-
-        /// <summary>
-        /// Results to typed object asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="type"><see cref="Type"/> </param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="options"><see cref="JsonSerializerOptions"/> </param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static object? CallToObject(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            var e = self.CallToObjectAsync(type, ensureSuccessStatusCode, options, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
-
-        /// <summary>
-        /// Results to byte array.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static byte[]? CallToByteArray(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
-        {
-            var e = self.CallToByteArrayAsync(ensureSuccessStatusCode, cancellationToken);
-            e.Wait();
-            return e.Result;
-        }
-
 
         /// <summary>
         /// Results to stream.
@@ -242,6 +211,33 @@ namespace Bb.Curls
 
 
 
+
+
+        /// <summary>
+        /// Results to typed object asynchronous.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="type"><see cref="Type"/> </param>
+        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
+        /// <param name="options"><see cref="JsonSerializerOptions"/> </param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
+        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
+        /// <returns></returns>
+        public static async Task<object?> CallToObjectAsync(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var response = await self.CallAsync();
+            if (response != null)
+            {
+                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
+                    response.EnsureSuccessStatusCode();
+                object? responseBody = await response.ResponseMessage.Content.ReadFromJsonAsync(type, options, cancellationToken);
+                return responseBody;
+            }
+
+            return null;
+
+        }
+
         /// <summary>
         /// Results to string asynchronous.
         /// </summary>
@@ -255,12 +251,9 @@ namespace Bb.Curls
             var response = await self.CallAsync();
             if (response != null)
             {
-
-                self.LastResponse = response;
-
                 if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
                     response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+                string responseBody = await response.ResponseMessage.Content.ReadAsStringAsync(cancellationToken);
                 return responseBody;
             }
 
@@ -282,7 +275,7 @@ namespace Bb.Curls
             {
                 if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
                     response.EnsureSuccessStatusCode();
-                object? responseBody = await response.Content.ReadFromJsonAsync<T>(options, cancellationToken);
+                object? responseBody = await response.ResponseMessage.Content.ReadFromJsonAsync<T>(options, cancellationToken);
                 return responseBody;
             }
 
@@ -306,7 +299,7 @@ namespace Bb.Curls
             {
                 if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
                     response.EnsureSuccessStatusCode();
-                byte[] responseBody = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+                byte[] responseBody = await response.ResponseMessage.Content.ReadAsByteArrayAsync(cancellationToken);
                 return responseBody;
             }
 
@@ -328,37 +321,24 @@ namespace Bb.Curls
             {
                 if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
                     response.EnsureSuccessStatusCode();
-                Stream responseBody = await response.Content.ReadAsStreamAsync(cancellationToken);
+                Stream responseBody = await response.ResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
                 return responseBody;
             }
+
             return null;
         }
 
-        /// <summary>
-        /// Results to typed object asynchronous.
-        /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="type"><see cref="Type"/> </param>
-        /// <param name="ensureSuccessStatusCode">If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>.</param>
-        /// <param name="options"><see cref="JsonSerializerOptions"/> </param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
-        /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
-        /// <returns></returns>
-        public static async Task<object?> CallToObjectAsync(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
-        {
-            var response = await self.CallAsync();
-            if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                object? responseBody = await response.Content.ReadFromJsonAsync(type, options, cancellationToken);
-                return responseBody;
 
-            }
 
-            return null;
 
-        }
+
+
+        private const string pattern = @"(https?|ftp|ssh|mailto):\/\/([a-z]+[a-z0-9.-]+|(\d{1,3}\.){3,3}\d{1,3})(:\d{0,5})?(\/[a-z]+[a-z0-9.-]+)*(\?([a-z]+[a-z0-9%&=+#]*)+)?";
+        private const RegexOptions options = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture;
+
+        //[GeneratedRegex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline | RegexOptions.ExplicitCapture)]
+        //private static partial Regex _regIsUrl();
+        private static readonly Regex _regIsUrl;
 
 
     }

@@ -27,6 +27,9 @@
 		/// </summary>
 		HttpContent Content { get; set; }
 
+
+		Version Version { get; set; }
+
 		/// <summary>
 		/// Gets Name/Value pairs parsed from the Cookie request header.
 		/// </summary>
@@ -44,14 +47,34 @@
 		/// </summary>
 		UrlCall RedirectedFrom { get; set; }
 
-		/// <summary>
-		/// Asynchronously sends the HTTP request. Mainly used to implement higher-level extension methods (GetJsonAsync, etc).
-		/// </summary>
-		/// <param name="verb">The HTTP method used to make the request.</param>
-		/// <param name="content">Contents of the request body.</param>
-		/// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-		/// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
-		/// <returns>A Task whose result is the received IUrlResponse.</returns>
-		Task<IUrlResponse> SendAsync(HttpMethod verb, HttpContent? content = null, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
-	}
+
+        /// <summary>
+        /// Asynchronously sends the HTTP request. Mainly used to implement higher-level extension methods (GetJsonAsync, etc).
+        /// </summary>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
+        /// <returns>A Task whose result is the received IUrlResponse.</returns>
+        Task<IUrlResponse> SendAsync(HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously sends the HTTP request. Mainly used to implement higher-level extension methods (GetJsonAsync, etc).
+        /// </summary>
+        /// <param name="verb">The HTTP method used to make the request.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
+        /// <returns>A Task whose result is the received IUrlResponse.</returns>
+        Task<IUrlResponse> SendAsync(HttpMethod verb, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously sends the HTTP request. Mainly used to implement higher-level extension methods (GetJsonAsync, etc).
+        /// </summary>
+        /// <param name="verb">The HTTP method used to make the request.</param>
+        /// <param name="content">Contents of the request body.</param>
+        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+        /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
+        /// <returns>A Task whose result is the received IUrlResponse.</returns>
+        Task<IUrlResponse> SendAsync(HttpMethod verb, HttpContent? content = null, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default);
+
+    }
+
 }

@@ -3,54 +3,39 @@ using Bb.Http.Configuration;
 
 namespace Bb.Curls
 {
-    public class Context
+ 
+    public class CurlContext
     {
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Context"/> class.
+        /// Initializes a new instance of the <see cref="CurlContext"/> class.
         /// </summary>
         /// <param name="cancellationTokenSource">The cancellation token to cancel operation.</param>
-        public Context(CancellationTokenSource cancellationTokenSource = null)
+        public CurlContext(CancellationTokenSource? cancellationTokenSource)
         {
             _tokenSource = cancellationTokenSource ?? new CancellationTokenSource();
             _token = _tokenSource.Token;
             _parameters = new Dictionary<string, string>();
         }
 
-        public HttpClient HttpClient { get; internal set; }
 
-        public HttpRequestMessage RequestMessage { get; internal set; }
+        //public HttpClient HttpClient { get; internal set; }
 
-        public IUrlClient Client { get; internal set; }
+        // public HttpRequestMessage RequestMessage { get; internal set; }
 
         public UrlRequest Request { get; internal set; }
 
-        public IUrlClientFactory Factory { get; internal set; }
         public IUrlResponse Result { get; private set; }
 
         /// <summary>
         /// Send an HTTP request as an asynchronous operation.
         /// </summary>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> CallAsync()
+        internal async Task<IUrlResponse> CallAsync(IUrlClientFactory factory)
         {
-
-            var client = Factory.Get(RequestMessage.RequestUri);
-            Result = await client.SendAsync(Request, HttpCompletionOption.ResponseHeadersRead);
-
-            var result = await HttpClient.SendAsync(RequestMessage, HttpCompletionOption.ResponseHeadersRead, _token);
-            return result;
-        }
-
-        public HttpResponseMessage Call()
-        {
-            return HttpClient.Send(RequestMessage, HttpCompletionOption.ResponseHeadersRead, _token);
-        }
-
-        public void Cancel()
-        {
-            if (_token.CanBeCanceled)
-                _tokenSource.Cancel();
+            var client = factory.Get(Request.Url);
+            Result = await client.SendAsync(Request, HttpCompletionOption.ResponseContentRead, _token);
+            return Result;
         }
 
         internal void Add(KeyValuePair<string, string> item)
@@ -69,6 +54,18 @@ namespace Bb.Curls
 
             return false;
 
+        }
+
+        internal CurlContext Apply(List<CurlInterpreterAction> list)
+        {
+
+            for (int i = 0; i < list.Count; i++)
+                list[i].CollectParameters(this);
+
+            for (int i = 0; i < list.Count; i++)
+                list[i].Configure(this);
+
+            return this;
         }
 
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();

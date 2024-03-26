@@ -18,7 +18,7 @@ namespace Bb.Http
 		public static async Task<T?> ReceiveJson<T>(this Task<IUrlResponse> response) {
 			using var resp = await response.ConfigureAwait(false);
 			if (resp == null) return default;
-			return await resp.GetJsonAsync<T>().ConfigureAwait(false);
+			return await resp.GetObjectAsync<T>().ConfigureAwait(false);
 		}
 
 		/// <summary>

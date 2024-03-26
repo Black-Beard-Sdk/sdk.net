@@ -28,6 +28,13 @@ namespace Bb.Http
         public int StatusCode => (int)ResponseMessage.StatusCode;
 
         /// <summary>
+        /// <inheritdoc />
+        /// </summary>
+        public bool IsSuccessStatusCode => ResponseMessage.IsSuccessStatusCode;
+
+        public void EnsureSuccessStatusCode() => ResponseMessage.EnsureSuccessStatusCode();
+
+        /// <summary>
         /// Creates a new UrlResponse that wraps the give HttpResponseMessage.
         /// </summary>
         public UrlResponse(UrlCall call, CookieJar cookieJar = null)
@@ -72,7 +79,7 @@ namespace Bb.Http
         }
 
         /// <inheritdoc />
-        public async Task<T> GetJsonAsync<T>()
+        public async Task<T> GetObjectAsync<T>()
         {
             if (_streamRead)
             {
