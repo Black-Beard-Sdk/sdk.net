@@ -1,5 +1,4 @@
-﻿using Bb.Http.Content;
-using Bb.Util;
+﻿using Bb.Util;
 using System.Net.Http.Headers;
 
 namespace Bb.Http
@@ -25,7 +24,14 @@ namespace Bb.Http
             return request.SendAsync(HttpMethod.Post, cmc, completionOption, cancellationToken);
         }
 
-
+        /// <summary>
+        /// Add string parts to the MultipartFormDataContent.
+        /// </summary>
+        /// <param name="self">The content <see cref="MultipartFormDataContent"/></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
         public static MultipartFormDataContent AddStringParts(this MultipartFormDataContent self, string name, object data, string? contentType = null)
         {
             foreach (var kv in data.ToKeyValuePairs())
@@ -37,16 +43,31 @@ namespace Bb.Http
             return self;
         }
 
+        /// <summary>
+        /// Add json to the MultipartFormDataContent.
+        /// </summary>
+        /// <param name="self">The content <see cref="MultipartFormDataContent"/></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static MultipartFormDataContent AddJson(this MultipartFormDataContent self, string name, string data)
         {
 
             var content = new StringContent(data);
-            content.Headers.TryAddWithoutValidation("Content-Type", ContentType.ApplicationJsonCharsetUtf8.Constant);
+            content.Headers.TryAddWithoutValidation("Content-Type", ContentType.ApplicationJson.WithCharsetUtf8());
 
             self.Add(content, name);
             return self;
         }
 
+        /// <summary>
+        /// Add string to the MultipartFormDataContent.
+        /// </summary>
+        /// <param name="self">The content <see cref="MultipartFormDataContent"/></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
         public static MultipartFormDataContent AddString(this MultipartFormDataContent self, string name, string data, string? contentType = null)
         {
             var content = new StringContent(data);
@@ -58,6 +79,13 @@ namespace Bb.Http
             return self;
         }
 
+        /// <summary>
+        /// Add datas url encoded to the MultipartFormDataContent.
+        /// </summary>
+        /// <param name="self">The content <see cref="MultipartFormDataContent"/></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static MultipartFormDataContent AddUrlEncoded(this MultipartFormDataContent self, string name, List<KeyValuePair<string, string>> data)
         {
             var item = new FormUrlEncodedContent(data);
@@ -66,6 +94,14 @@ namespace Bb.Http
         }
 
 
+        /// <summary>
+        /// Add file to the MultipartFormDataContent.
+        /// </summary>
+        /// <param name="self">The content <see cref="MultipartFormDataContent"/></param>
+        /// <param name="name"></param>
+        /// <param name="filename"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
         public static MultipartFormDataContent AddFile(this MultipartFormDataContent self, string name, string filename, string? contentType = null)
         {
 
@@ -91,28 +127,25 @@ namespace Bb.Http
 
         }
 
+        /// <summary>
+        /// Append a content type to the HttpContent headers.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="self">The content <see cref="HttpContent"/></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
         public static T WithContentType<T>(this T self, ContentType contentType)
             where T : HttpContent
         {
-            self.Headers.TryAddWithoutValidation("Content-Type", contentType.Constant);
+            self.Headers.TryAddWithoutValidation(ContentType.Key, contentType.Constant);
             return self;
         }
 
-    }
-
-    public class ContentType
-    {
-
-        public ContentType(string contentType)
+        public static ContentType WithCharsetUtf8(this ContentType self)
         {
-            this.Constant = contentType;        
+            return new ContentType(self + ContentType.CharsetUtf8);
         }
 
-
-        public static ContentType ApplicationxWwwFormUrlencoded = new ContentType( "application/x-www-form-urlencoded");
-        public static ContentType ApplicationJsonCharsetUtf8 = new ContentType("application/json; charset=UTF-8");
-
-        public string Constant { get; }
 
     }
 

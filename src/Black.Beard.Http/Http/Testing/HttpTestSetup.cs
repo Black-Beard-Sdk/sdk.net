@@ -1,6 +1,5 @@
 using System.Net;
 using Bb.Http.Configuration;
-using Bb.Http.Content;
 using Bb.Util;
 
 namespace Bb.Http.Testing
@@ -28,7 +27,7 @@ namespace Bb.Http.Testing
 		/// </summary>
 		public UrlHttpSettings Settings { get; }
 
-		internal HttpResponseMessage GetNextResponse() {
+		internal HttpResponseMessage? GetNextResponse() {
 			if (_allowRealHttp)
 				return null;
 
@@ -51,7 +50,7 @@ namespace Bb.Http.Testing
 		/// <param name="cookies">The simulated response cookies (optional).</param>
 		/// <param name="replaceUnderscoreWithHyphen">If true, underscores in property names of headers will be replaced by hyphens. Default is true.</param>
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
-		public HttpTestSetup RespondWith(string body, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
+		public HttpTestSetup RespondWith(string body, int status = 200, object? headers = null, object? cookies = null, bool replaceUnderscoreWithHyphen = true) {
 			return RespondWith(() => new StringContent(body ?? string.Empty), status, headers, cookies, replaceUnderscoreWithHyphen);
 		}
 
@@ -64,9 +63,9 @@ namespace Bb.Http.Testing
 		/// <param name="cookies">The simulated response cookies (optional).</param>
 		/// <param name="replaceUnderscoreWithHyphen">If true, underscores in property names of headers will be replaced by hyphens. Default is true.</param>
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
-		public HttpTestSetup RespondWithJson(object body, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
+		public HttpTestSetup RespondWithJson(object body, int status = 200, object? headers = null, object? cookies = null, bool replaceUnderscoreWithHyphen = true) {
 			var s = Settings.JsonSerializer.Serialize(body);
-			return RespondWith(() => new StringContent(s).WithContentType(ContentType.ApplicationJsonCharsetUtf8), status, headers, cookies, replaceUnderscoreWithHyphen);
+			return RespondWith(() => new StringContent(s).WithContentType(ContentType.ApplicationJson.WithCharsetUtf8()), status, headers, cookies, replaceUnderscoreWithHyphen);
 		}
 
 		/// <summary>
@@ -78,7 +77,7 @@ namespace Bb.Http.Testing
 		/// <param name="cookies">The simulated response cookies. Optional.</param>
 		/// <param name="replaceUnderscoreWithHyphen">If true, underscores in property names of headers will be replaced by hyphens. Default is true.</param>
 		/// <returns>The current HttpTest object (so more responses can be chained).</returns>
-		public HttpTestSetup RespondWith(Func<HttpContent> buildContent = null, int status = 200, object headers = null, object cookies = null, bool replaceUnderscoreWithHyphen = true) {
+		public HttpTestSetup RespondWith(Func<HttpContent>? buildContent = null, int status = 200, object? headers = null, object? cookies = null, bool replaceUnderscoreWithHyphen = true) {
 			_responses.Add(() => {
 				var response = new HttpResponseMessage {
 					StatusCode = (HttpStatusCode)status,

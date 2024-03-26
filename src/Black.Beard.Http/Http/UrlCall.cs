@@ -1,5 +1,4 @@
-﻿using Bb.Http.Content;
-
+﻿
 namespace Bb.Http
 {
 
@@ -22,7 +21,7 @@ namespace Bb.Http
 		/// <summary>
 		/// Captured request body. Available ONLY if HttpRequestMessage.Content is a Url.Http.Content.CapturedStringContent.
 		/// </summary>
-		public string? RequestBody => (HttpRequestMessage.Content as CapturedStringContent)?.Content;
+		public string? RequestBody => (HttpRequestMessage.Content as StringContent)?.ToString(); // todo : Fix this
 
 		/// <summary>
 		/// The IUrlResponse associated with this call if the call completed, otherwise null.

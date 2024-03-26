@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using Bb.Http.Content;
+﻿using System.Net.Http.Headers;
 using Bb.Util;
 
 namespace Bb.Http

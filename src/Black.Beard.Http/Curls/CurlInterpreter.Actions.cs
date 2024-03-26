@@ -197,7 +197,6 @@ namespace Bb.Curls
 
         }
 
-
         internal static CurlInterpreterAction? Data(ArgumentSource arguments)
         {
 
@@ -208,7 +207,7 @@ namespace Bb.Curls
                  {
 
                      if (!context.Request.Headers.TryGetFirst("Content-Type", out var contentType))
-                         contentType = "application/json";
+                         contentType = ContentType.ApplicationJson;
 
                      var datas = sender.Arguments.First().Value?.ToString() ?? string.Empty;
                      context.Request.Content = new StringContent(datas, null, contentType);

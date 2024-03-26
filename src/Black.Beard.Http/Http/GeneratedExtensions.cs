@@ -1,6 +1,5 @@
 using System.Net;
 using Bb.Http.Configuration;
-using Bb.Http.Content;
 
 namespace Bb.Http
 {
@@ -1741,7 +1740,7 @@ namespace Bb.Http
         {
             
             var i = new StringContent(self.Settings.JsonSerializer.Serialize(body))
-                .WithContentType(ContentType.ApplicationJsonCharsetUtf8);
+                .WithContentType(ContentType.ApplicationJson.WithCharsetUtf8());
 
             self.Content = i;
 
