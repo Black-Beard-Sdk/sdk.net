@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 namespace Bb.Http
 {
 
@@ -8,10 +10,16 @@ namespace Bb.Http
     /// </summary>
     public class UrlCall
 	{
-		/// <summary>
-		/// The IUrlRequest associated with this call.
-		/// </summary>
-		public IUrlRequest Request { get; set; }
+
+        public UrlCall()
+        {
+			this._time = new Stopwatch();
+        }
+
+        /// <summary>
+        /// The IUrlRequest associated with this call.
+        /// </summary>
+        public IUrlRequest Request { get; set; }
 
 		/// <summary>
 		/// The raw HttpRequestMessage associated with this call.
@@ -53,22 +61,17 @@ namespace Bb.Http
 		/// <summary>
 		/// DateTime the moment the request was sent.
 		/// </summary>
-		public DateTime StartedUtc { get; set; }
+		public DateTime StartedUtc { get; private set; }
 
 		/// <summary>
-		/// DateTime the moment a response was received.
+		/// Elapsed time
 		/// </summary>
-		public DateTime? EndedUtc { get; set; }
+        public TimeSpan Time => _time.Elapsed;
 
-		/// <summary>
-		/// Total duration of the call if it completed, otherwise null.
-		/// </summary>
-		public TimeSpan? Duration => EndedUtc - StartedUtc;
-
-		/// <summary>
-		/// True if a response was received, regardless of whether it is an error status.
-		/// </summary>
-		public bool Completed => HttpResponseMessage != null;
+        /// <summary>
+        /// True if a response was received, regardless of whether it is an error status.
+        /// </summary>
+        public bool Completed => HttpResponseMessage != null;
 
 		/// <summary>
 		/// True if response was received with any success status or a match with AllowedHttpStatusRange setting.
@@ -79,12 +82,35 @@ namespace Bb.Http
 			string.IsNullOrEmpty(Request?.Settings?.AllowedHttpStatusRange) ? false :
 			HttpStatusRangeParser.IsMatch(Request.Settings.AllowedHttpStatusRange, HttpResponseMessage.StatusCode);
 
-		/// <summary>
-		/// Returns the verb and absolute URI associated with this call.
-		/// </summary>
-		/// <returns></returns>
-		public override string ToString() {
+
+        /// <summary>
+        /// Returns the verb and absolute URI associated with this call.
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() {
 			return $"{HttpRequestMessage.Method:U} {Request.Url}";
 		}
-	}
+
+
+
+        /// <summary>
+        /// Total duration of the call if it completed, otherwise null.
+        /// </summary>
+        private Stopwatch _time;
+
+
+        internal void Start()
+        {
+            StartedUtc = DateTime.UtcNow;
+			_time.Start();
+        }
+
+        internal void Stop()
+        {
+			if (_time.IsRunning)
+	            _time.Stop();
+        }
+
+
+    }
 }

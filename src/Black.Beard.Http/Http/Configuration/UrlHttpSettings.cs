@@ -15,10 +15,10 @@ namespace Bb.Http.Configuration
 
 		private UrlHttpSettings _defaults;
 
-		/// <summary>
-		/// Creates a new UrlHttpSettings object.
-		/// </summary>
-		public UrlHttpSettings() {
+        /// <summary>
+        /// Creates a new UrlHttpSettings object.
+        /// </summary>
+        public UrlHttpSettings() {
 			Redirects = new RedirectSettings(this);
 			ResetDefaults();
 		}

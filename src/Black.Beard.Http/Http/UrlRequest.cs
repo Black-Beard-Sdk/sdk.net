@@ -86,7 +86,10 @@ namespace Bb.Http
             set => ApplyCookieJar(value);
         }
 
-
+        /// <summary>
+        /// If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>
+        /// </summary>
+        public bool EnsureSuccessStatusCode { get; set; }
 
         public Task<IUrlResponse> SendAsync(HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {

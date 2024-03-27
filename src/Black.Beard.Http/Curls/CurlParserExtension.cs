@@ -75,24 +75,27 @@ namespace Bb.Curls
         /// <param name="cancellationTokenSource">The cancellation token to cancel operation.<see cref="CancellationTokenSource"/></param>
         /// <returns><see cref="T:Task<HttpResponseMessage>"/>The task object representing the asynchronous operation.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task<IUrlResponse?> CallAsync(this string lineArg, CancellationTokenSource cancellationTokenSource = null)
+        public static async Task<IUrlResponse?> CallAsync(this string lineArg, CancellationTokenSource cancellationTokenSource = null, bool ensureSuccessStatusCode = false)
         {
             var interpreter = Precompile(lineArg);
-            return await interpreter.CallAsync(cancellationTokenSource);
+            return await interpreter.CallAsync(ensureSuccessStatusCode, cancellationTokenSource);
         }
+
 
         /// <summary>
         /// makes asynchronous curl Calls
         /// </summary>
         /// <param name="arguments">The list of argument.</param>
         /// <param name="cancellationTokenSource">The cancellation token to cancel operation.<see cref="CancellationTokenSource"/></param>
+        /// <param name="ensureSuccessStatusCode">thrown an exception if the reesponse is not 2xx</param>
         /// <returns><see cref="T:Task<HttpResponseMessage>"/>The task object representing the asynchronous operation.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task<IUrlResponse?> CallAsync(this string[] arguments, CancellationTokenSource cancellationTokenSource = null)
+        public static async Task<IUrlResponse?> CallAsync(this string[] arguments, CancellationTokenSource cancellationTokenSource = null, bool ensureSuccessStatusCode = false)
         {
             var interpreter = new CurlInterpreter(arguments);
-            return await interpreter.CallAsync(cancellationTokenSource);
+            return await interpreter.CallAsync(ensureSuccessStatusCode, cancellationTokenSource);
         }
+
 
         /// <summary>
         /// Determines whether this instance is an URL.
@@ -105,8 +108,6 @@ namespace Bb.Curls
         {
             return _regIsUrl.IsMatch(self);
         }
-
-
 
 
         /// <summary>
@@ -225,17 +226,11 @@ namespace Bb.Curls
         /// <returns></returns>
         public static async Task<object?> CallToObjectAsync(this CurlInterpreter self, Type type, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
+            var response = await self.CallAsync(ensureSuccessStatusCode);
             if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                object? responseBody = await response.ResponseMessage.Content.ReadFromJsonAsync(type, options, cancellationToken);
-                return responseBody;
-            }
+                return await response.ResponseMessage.Content.ReadFromJsonAsync(type, options, cancellationToken);
 
             return null;
-
         }
 
         /// <summary>
@@ -248,14 +243,9 @@ namespace Bb.Curls
         /// <returns></returns>
         public static async Task<string?> CallToStringAsync(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
+            var response = await self.CallAsync(ensureSuccessStatusCode);
             if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                string responseBody = await response.ResponseMessage.Content.ReadAsStringAsync(cancellationToken);
-                return responseBody;
-            }
+                return await response.ResponseMessage.Content.ReadAsStringAsync(cancellationToken);
 
             return null;
         }
@@ -270,17 +260,11 @@ namespace Bb.Curls
         /// <returns></returns>
         public static async Task<object?> CallToObjectAsync<T>(this CurlInterpreter self, bool ensureSuccessStatusCode = false, JsonSerializerOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
+            var response = await self.CallAsync(ensureSuccessStatusCode);
             if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                object? responseBody = await response.ResponseMessage.Content.ReadFromJsonAsync<T>(options, cancellationToken);
-                return responseBody;
-            }
+                return await response.ResponseMessage.Content.ReadFromJsonAsync<T>(options, cancellationToken);
 
             return null;
-
         }
 
 
@@ -294,14 +278,9 @@ namespace Bb.Curls
         /// <returns></returns>
         public static async Task<byte[]?> CallToByteArrayAsync(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
+            var response = await self.CallAsync(ensureSuccessStatusCode);
             if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                byte[] responseBody = await response.ResponseMessage.Content.ReadAsByteArrayAsync(cancellationToken);
-                return responseBody;
-            }
+                return await response.ResponseMessage.Content.ReadAsByteArrayAsync(cancellationToken);
 
             return null;
         }
@@ -316,14 +295,9 @@ namespace Bb.Curls
         /// <returns></returns>
         public static async Task<Stream?> CallToStreamAsync(this CurlInterpreter self, bool ensureSuccessStatusCode = false, CancellationToken cancellationToken = default)
         {
-            var response = await self.CallAsync();
+            var response = await self.CallAsync(ensureSuccessStatusCode);
             if (response != null)
-            {
-                if (ensureSuccessStatusCode && !response.IsSuccessStatusCode)
-                    response.EnsureSuccessStatusCode();
-                Stream responseBody = await response.ResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
-                return responseBody;
-            }
+                return await response.ResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
 
             return null;
         }

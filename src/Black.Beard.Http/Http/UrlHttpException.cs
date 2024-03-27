@@ -18,7 +18,7 @@ namespace Bb.Http
 		/// <param name="call">The call.</param>
 		/// <param name="message">The message.</param>
 		/// <param name="inner">The inner.</param>
-		public UrlHttpException(UrlCall call, string message, Exception inner) : base(message, inner) {
+		public UrlHttpException(UrlCall call, string message, Exception? inner) : base(message, inner) {
 			Call = call;
 		}
 
@@ -27,7 +27,7 @@ namespace Bb.Http
 		/// </summary>
 		/// <param name="call">The call.</param>
 		/// <param name="inner">The inner.</param>
-		public UrlHttpException(UrlCall call, Exception inner) : this(call, BuildMessage(call, inner), inner) { }
+		public UrlHttpException(UrlCall call, Exception? inner) : this(call, BuildMessage(call, inner), inner) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="UrlHttpException"/> class.
@@ -35,13 +35,16 @@ namespace Bb.Http
 		/// <param name="call">The call.</param>
 		public UrlHttpException(UrlCall call) : this(call, BuildMessage(call, null), null) { }
 
-		private static string BuildMessage(UrlCall call, Exception inner) {
+		private static string BuildMessage(UrlCall call, Exception? inner) {
 			if (call?.Response != null && !call.Succeeded)
 				return $"Call failed with status code {call.Response.StatusCode} ({call.HttpResponseMessage.ReasonPhrase}): {call}";
 
 			var msg = "Call failed";
-			if (inner != null) msg += ". " + inner.Message.TrimEnd('.');
+			if (inner != null) 
+				msg += ". " + inner.Message.TrimEnd('.');
+
 			return msg + ((call == null) ? "." : $": {call}");
+
 		}
 
 		/// <summary>

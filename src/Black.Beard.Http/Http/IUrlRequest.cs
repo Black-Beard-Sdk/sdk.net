@@ -27,8 +27,13 @@
 		/// </summary>
 		HttpContent Content { get; set; }
 
+        /// <summary>
+        /// If true and the http result code is not between 200 and 299, throw <see cref="HttpRequestException"/>
+        /// </summary>
+        bool EnsureSuccessStatusCode { get; set; }
 
-		Version Version { get; set; }
+
+        Version Version { get; set; }
 
 		/// <summary>
 		/// Gets Name/Value pairs parsed from the Cookie request header.

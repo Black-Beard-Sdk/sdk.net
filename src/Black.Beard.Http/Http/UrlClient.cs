@@ -52,65 +52,6 @@ namespace Bb.Http
         /// <inheritdoc />
         public IUrlRequest Request(params object[] urlSegments) => new UrlRequest(this, urlSegments);
 
-        //public async Task<IUrlResponse> SendAsync(IUrlRequest request, HttpRequestMessage reqMessage, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
-        //{
-
-        //    if (request == null)
-        //        throw new ArgumentNullException(nameof(request));
-
-        //    if (request.Url == null)
-        //        throw new ArgumentException("Cannot send Request. Url property was not set.");
-
-        //    if (!Url.IsValid(request.Url))
-        //        throw new ArgumentException($"Cannot send Request. {request.Url} is a not a valid URL.");
-
-        //    var settings = request.Settings;
-
-        //    var call = new UrlCall
-        //    {
-        //        Request = request,
-        //        HttpRequestMessage = reqMessage
-        //    };
-
-        //    await RaiseEventAsync(settings.BeforeCall, settings.BeforeCallAsync, call).ConfigureAwait(false);
-
-        //    // in case URL or headers were modified in the handler above
-
-        //    call.StartedUtc = DateTime.UtcNow;
-        //    var ct = GetCancellationTokenWithTimeout(cancellationToken, settings.Timeout, out var cts);
-
-        //    HttpTest.Current?.LogCall(call);
-
-        //    try
-        //    {
-        //        HttpClient.DefaultRequestVersion = reqMessage.Version;
-
-        //        call.HttpResponseMessage = HttpTest.Current?.FindSetup(call)?.GetNextResponse()
-        //            ?? await HttpClient.SendAsync(reqMessage, completionOption, ct).ConfigureAwait(false);
-
-        //        call.HttpResponseMessage.RequestMessage = reqMessage;
-        //        call.Response = new UrlResponse(call, request.CookieJar);
-
-        //        if (call.Succeeded)
-        //        {
-        //            var redirResponse = await ProcessRedirectAsync(call, completionOption, cancellationToken).ConfigureAwait(false);
-        //            return redirResponse ?? call.Response;
-        //        }
-        //        else
-        //            throw new UrlHttpException(call, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return await HandleExceptionAsync(call, ex, cancellationToken).ConfigureAwait(false);
-        //    }
-        //    finally
-        //    {
-        //        cts?.Dispose();
-        //        call.EndedUtc = DateTime.UtcNow;
-        //        await RaiseEventAsync(settings.AfterCall, settings.AfterCallAsync, call).ConfigureAwait(false);
-        //    }
-        //}
-
         /// <inheritdoc />
         public async Task<IUrlResponse> SendAsync(IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
@@ -127,11 +68,9 @@ namespace Bb.Http
             HttpClient.DefaultRequestVersion = request.Version;
 
             var reqMsg = SyncHeaders(request, new HttpRequestMessage(request.Verb, request.Url)
-            {
-                Content = request.Content,
-                Version = request.Version
-            });
-
+                                                { 
+                                                    Content = request.Content, Version = request.Version 
+                                                });
 
             var call = new UrlCall { Request = request, HttpRequestMessage = reqMsg };
 
@@ -142,7 +81,6 @@ namespace Bb.Http
             reqMsg.RequestUri = request.Url.ToUri();
             SyncHeaders(request, reqMsg);
 
-            call.StartedUtc = DateTime.UtcNow;
             var ct = GetCancellationTokenWithTimeout(cancellationToken, settings.Timeout, out var cts);
 
             HttpTest.Current?.LogCall(call);
@@ -150,9 +88,12 @@ namespace Bb.Http
             try
             {
 
+                call.Start();
                 call.HttpResponseMessage = HttpTest.Current?.FindSetup(call)?.GetNextResponse()
-                    ?? await HttpClient.SendAsync(reqMsg, completionOption, ct).ConfigureAwait(false);
-       
+                                        ?? await HttpClient.SendAsync(reqMsg, completionOption, ct).ConfigureAwait(false);
+
+                call.Stop();
+
                 call.HttpResponseMessage.RequestMessage = reqMsg;
                 call.Response = new UrlResponse(call, request.CookieJar);
 
@@ -161,8 +102,12 @@ namespace Bb.Http
                     var redirResponse = await ProcessRedirectAsync(call, completionOption, cancellationToken).ConfigureAwait(false);
                     return redirResponse ?? call.Response;
                 }
-                else
+
+                else if (request.EnsureSuccessStatusCode)
                     throw new UrlHttpException(call, null);
+
+                return call.Response;
+
             }
             catch (Exception ex)
             {
@@ -172,7 +117,7 @@ namespace Bb.Http
             {
                 reqMsg.Dispose();
                 cts?.Dispose();
-                call.EndedUtc = DateTime.UtcNow;
+                call.Stop();
                 await RaiseEventAsync(settings.AfterCall, settings.AfterCallAsync, call).ConfigureAwait(false);
             }
         }

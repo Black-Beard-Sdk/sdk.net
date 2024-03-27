@@ -257,14 +257,18 @@ namespace Bb.Curls
         /// Calls asynchronously.
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="ensureSuccessStatusCode">if true thrown an exception if the result of the call is not 2xx</param>
         /// <returns></returns>
-        public async Task<IUrlResponse?> CallAsync(CancellationTokenSource source = null)
+        public async Task<IUrlResponse?> CallAsync(bool ensureSuccessStatusCode, CancellationTokenSource ? source = null)
         {
 
             if (BuildActions())
             {
                 var context = new CurlContext(source) // { RequestMessage = message, }
                     .Apply(_list);
+
+                context.Request.EnsureSuccessStatusCode = ensureSuccessStatusCode;
+
                 this.LastResponse = await context.CallAsync(UrlHttp.GlobalSettings.UrlClientFactory);
                 return this.LastResponse;
             }
