@@ -147,7 +147,7 @@ namespace Bb.Curls
         /// <param name="cancellationToken"><see cref="CancellationToken"/> </param>
         /// <exception cref="HttpRequestException">if the result is not between 200 and 299</exception>
         /// <returns></returns>
-        public static JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken)
+        public static JsonElement? ResultToJson(this CurlInterpreter self, bool ensureSuccessStatusCode, CancellationToken cancellationToken = default)
         {
             var e = self.ResultToJson(ensureSuccessStatusCode, cancellationToken, new JsonDocumentOptions());
             return e;
