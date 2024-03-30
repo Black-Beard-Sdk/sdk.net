@@ -1,13 +1,14 @@
 using System.Net;
+using Bb.Http;
 using Bb.Http.Configuration;
 
-namespace Bb.Http
+namespace Bb.Extensions
 {
 
     /// <summary>
     /// Fluent extension methods on String, Url, Uri, and IUrlRequest.
     /// </summary>
-    public static class GeneratedExtensions
+    public static class IUrlRequestExtensions
     {
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace Bb.Http
         {
             return request.Serialize(body).SendAsync(HttpMethod.Post, completionOption, cancellationToken);
         }
-                        
+
         /// <summary>
         /// Sends an asynchronous POST request.
         /// </summary>
@@ -293,7 +294,7 @@ namespace Bb.Http
         {
             return new UrlRequest(url);
         }
-     
+
         /// <summary>
         /// Creates a UrlRequest and sends an asynchronous request.
         /// </summary>
@@ -1738,7 +1739,7 @@ namespace Bb.Http
         /// <returns></returns>
         public static IUrlRequest Serialize(this IUrlRequest self, object body)
         {
-            
+
             var i = new StringContent(self.Settings.JsonSerializer.Serialize(body))
                 .WithContentType(ContentType.ApplicationJson.WithCharsetUtf8());
 
@@ -1748,7 +1749,7 @@ namespace Bb.Http
 
         }
 
-       
+
 
     }
 }

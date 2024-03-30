@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Globalization;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Bb.Extensions;
 using Bb.Http;
 
 namespace Bb.Curls
@@ -107,8 +109,12 @@ namespace Bb.Curls
                 static void action(CurlInterpreterAction sender, CurlContext context)
                 {
                     var arg = sender.First;
-                    if (context.Request.Headers.Contains(arg.Name))
+                    if (!context.Request.Headers.Contains(arg.Name))
                         context.Request.Headers.AddOrReplace(arg.Name, arg.Value);
+                    else
+                    {
+                        Stop();
+                    }
                 }
 
                 var r = new CurlInterpreterAction(action, a) { Priority = 2 };
@@ -219,6 +225,68 @@ namespace Bb.Curls
                     Priority = 60
                 };
             }
+
+            return null;
+
+        }
+
+        internal static CurlInterpreterAction? Cookie(ArgumentSource arguments)
+        {
+
+            if (arguments.ReadNext())
+            {
+
+                var arg = arguments.Current.Split(':');
+                var a = new Argument(arg[1].Trim(), arg[0].Trim());                       
+
+                static void action(CurlInterpreterAction sender, CurlContext context)
+                {
+
+                    var arg = sender.First;
+                    context.Request.WithCookie(arg.Name, arg.Value);
+                }
+
+                var r = new CurlInterpreterAction(action, a) { Priority = 2 };
+
+                return r;
+
+            }
+
+            arguments.Failed($"Failed to read header");
+
+            return null;
+
+
+        }
+
+        internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
+        {
+            if (arguments.ReadNext())
+            {
+
+                var arg = arguments.Current.Split(':');
+                var a = new Argument(arg[1].Trim(), arg[0].Trim());
+
+                static void action(CurlInterpreterAction sender, CurlContext context)
+                {
+
+                    CookieJar jar = null;
+                    if (context.Request.CookieJar == null)
+                        context.Request.WithCookies(jar = new CookieJar());
+                                        
+                    var arg = sender.First;
+                    
+                    jar.AddOrReplace(arg.Name, arg.Value, context.Request.Url.Root);
+
+                }
+
+                var r = new CurlInterpreterAction(action, a) { Priority = 2 };
+
+                return r;
+
+            }
+
+            arguments.Failed($"Failed to read header");
 
             return null;
 
@@ -721,30 +789,6 @@ namespace Bb.Curls
         //}
 
         //internal static CurlInterpreterAction? CreateDirs(ArgumentSource arguments)
-        //{
-        //    Stop();
-        //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-        //     {
-        //         Stop();
-
-        //     };
-
-        //    return new CurlInterpreterAction(action) { Priority = 20 };
-        //}
-
-        //internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
-        //{
-        //    Stop();
-        //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-        //     {
-        //         Stop();
-
-        //     };
-
-        //    return new CurlInterpreterAction(action) { Priority = 20 };
-        //}
-
-        //internal static CurlInterpreterAction? Cookie(ArgumentSource arguments)
         //{
         //    Stop();
         //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>

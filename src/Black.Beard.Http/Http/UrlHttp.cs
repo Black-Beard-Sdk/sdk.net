@@ -1,11 +1,12 @@
-﻿using Bb.Http.Configuration;
+﻿using Bb.Extensions;
+using Bb.Http.Configuration;
 
 namespace Bb.Http
 {
-	/// <summary>
-	/// A static container for global configuration settings affecting Url.Http behavior.
-	/// </summary>
-	public static class UrlHttp
+    /// <summary>
+    /// A static container for global configuration settings affecting Url.Http behavior.
+    /// </summary>
+    public static class UrlHttp
 	{
 		private static readonly object _configLock = new object();
 

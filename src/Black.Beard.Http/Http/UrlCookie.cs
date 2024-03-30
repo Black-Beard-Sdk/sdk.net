@@ -8,16 +8,6 @@ namespace Bb.Http
     /// </summary>
     public class UrlCookie
 	{
-		private string _value;
-		private DateTimeOffset? _expires;
-		private int? _maxAge;
-		private string _domain;
-		private string _path;
-		private bool _secure;
-		private bool _httpOnly;
-		private SameSite? _sameSite;
-
-		private bool _locked;
 
 		/// <summary>
 		/// Creates a new UrlCookie.
@@ -143,5 +133,16 @@ namespace Bb.Http
 
 			field = newVal;
 		}
-	}
+
+        private string _value;
+        private DateTimeOffset? _expires;
+        private int? _maxAge;
+        private string _domain;
+        private string _path;
+        private bool _secure;
+        private bool _httpOnly;
+        private SameSite? _sameSite;
+        private bool _locked;
+
+    }
 }

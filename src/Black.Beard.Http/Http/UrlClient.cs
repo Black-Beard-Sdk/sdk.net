@@ -1,4 +1,5 @@
 ﻿
+using Bb.Extensions;
 using Bb.Http.Configuration;
 using Bb.Http.Testing;
 using Bb.Util;
@@ -65,7 +66,7 @@ namespace Bb.Http
             if (!Url.IsValid(request.Url))
                 throw new ArgumentException($"Cannot send Request. {request.Url} is a not a valid URL.");
 
-            HttpClient.DefaultRequestVersion = request.Version;
+            //HttpClient.DefaultRequestVersion = request.Version;
 
             var reqMsg = SyncHeaders(request, new HttpRequestMessage(request.Verb, request.Url)
                                                 { 

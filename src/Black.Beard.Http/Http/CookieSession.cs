@@ -1,10 +1,12 @@
 ﻿
+using Bb.Extensions;
+
 namespace Bb.Http
 {
-	/// <summary>
-	/// A context where multiple requests use a common CookieJar.
-	/// </summary>
-	public class CookieSession : IDisposable
+    /// <summary>
+    /// A context where multiple requests use a common CookieJar.
+    /// </summary>
+    public class CookieSession : IDisposable
 	{
 		private readonly string _baseUrl;
 		private readonly IUrlClient _client;

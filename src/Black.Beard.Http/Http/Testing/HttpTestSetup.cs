@@ -1,13 +1,14 @@
 using System.Net;
+using Bb.Extensions;
 using Bb.Http.Configuration;
 using Bb.Util;
 
 namespace Bb.Http.Testing
 {
-	/// <summary>
-	/// Abstract base class class for HttpTest and FilteredHttpTestSetup. Provides fluent methods for building queue of fake responses.
-	/// </summary>
-	public abstract class HttpTestSetup
+    /// <summary>
+    /// Abstract base class class for HttpTest and FilteredHttpTestSetup. Provides fluent methods for building queue of fake responses.
+    /// </summary>
+    public abstract class HttpTestSetup
 	{
 		private readonly List<Func<HttpResponseMessage>> _responses = new List<Func<HttpResponseMessage>>();
 

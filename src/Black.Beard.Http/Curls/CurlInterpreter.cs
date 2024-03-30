@@ -21,6 +21,8 @@ namespace Bb.Curls
             Append(Header, "--header", "-H");                               // <header/@file> Pass custom header(s) to server
             Append(Form, "--form", "-F");                                   // <name=content> Specify multipart MIME data
             Append(Data, "--data", "-d");                                 // <data>   HTTP POST data
+            Append(Cookie, "--cookie", "-b");                               // <data|filename> Send cookies from string/file
+            Append(CookieJar, "--cookie-jar","-c");                       // <filename> Write cookies to <filename> after operation
             //Append(AppendMethod, "--append", "-a");                         // Append to target file when uploading
             //Append(Basic, "--basic");                                       // Use HTTP Basic Authentication
             //Append(CaCert, "--cacert");                                     // <file> CA certificate to verify peer against
@@ -35,9 +37,7 @@ namespace Bb.Curls
             //Append(Config, "--config", "-K");                               // <file> Read config from a file
             //Append(ConnectTimeout, "--connect-timeout");                    // <seconds> Maximum time allowed for connection
             //Append(ConnectTo, "--connect-to");                              // <HOST1:PORT1:HOST2:PORT2> Connect to host
-            //Append(ContinueAt, "--continue-at", "-C");                      // <offset> Resumed transfer offset
-            //Append(Cookie, "--cookie", "-b");                               // <data|filename> Send cookies from string/file
-            //Append(CookieJar, "--cookie-jar","-c");                       // <filename> Write cookies to <filename> after operation
+            //Append(ContinueAt, "--continue-at", "-C");                      // <offset> Resumed transfer offset            
             //Append(CreateDirs, "--create-dirs");                            // Create necessary local directory hierarchy
             //Append(Crlf, "--crlf");                                         // Convert LF to CRLF in upload
             //Append(Crlfile, "--crlfile");                                   // <file> Get a CRL list in PEM format from the given file

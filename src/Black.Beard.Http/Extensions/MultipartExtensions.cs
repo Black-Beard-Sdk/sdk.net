@@ -1,7 +1,8 @@
-﻿using Bb.Util;
+﻿using Bb.Http;
+using Bb.Util;
 using System.Net.Http.Headers;
 
-namespace Bb.Http
+namespace Bb.Extensions
 {
     /// <summary>
     /// Fluent extension methods for sending multipart/form-data requests.

@@ -1,4 +1,5 @@
 
+using Bb.Extensions;
 using Bb.Http.Configuration;
 using Bb.Util;
 using System.Net;
