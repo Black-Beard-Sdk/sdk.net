@@ -12,6 +12,7 @@ namespace Bb.Curls
     public partial class CurlInterpreter
     {
 
+        // https://reqbin.com/req/c-bjcj04uw/curl-send-cookies-example
 
         static CurlInterpreter()
         {
@@ -23,6 +24,9 @@ namespace Bb.Curls
             Append(Data, "--data", "-d");                                 // <data>   HTTP POST data
             Append(Cookie, "--cookie", "-b");                               // <data|filename> Send cookies from string/file
             Append(CookieJar, "--cookie-jar","-c");                       // <filename> Write cookies to <filename> after operation
+            Append(User, "--user", "-u");                                   // <user:password> Server user and password
+            //Append(Oauth2Bearer, "--oauth2-bearer");                        // <token> OAuth 2 Bearer Token
+            
             //Append(AppendMethod, "--append", "-a");                         // Append to target file when uploading
             //Append(Basic, "--basic");                                       // Use HTTP Basic Authentication
             //Append(CaCert, "--cacert");                                     // <file> CA certificate to verify peer against
@@ -126,7 +130,6 @@ namespace Bb.Curls
             //Append(Noproxy, "--noproxy");                                   // <no-proxy-list> List of hosts which do not use proxy
             //Append(Ntlm, "--ntlm");                                         // Use HTTP NTLM authentication
             //Append(NtlmWb, "--ntlm-wb");                                    // Use HTTP NTLM authentication with winbind
-            //Append(Oauth2Bearer, "--oauth2-bearer");                        // <token> OAuth 2 Bearer Token
             //Append(Output, "--output", "-o");                               // <file> Write to file instead of stdout
             //Append(Pass, "--pass");                                         // <phrase> Pass phrase for the private key
             //Append(PathAsIs, "--path-as-is");                               // Do not squash .. sequences in URL path
@@ -230,7 +233,6 @@ namespace Bb.Curls
             //Append(UploadFile, "--upload-file", "-T");                      // <file> Transfer local FILE to destination
             //Append(Url, "--url");                                           // <url> URL to work with
             //Append(UseAscii, "--use-ascii", "-B");                          // Use ASCII/text transfer
-            //Append(User, "--user", "-u");                                   // <user:password> Server user and password
             //Append(UserAgent, "--user-agent", "-A");                        // <name> Send User-Agent <name> to server
             //Append(Verbose, "--verbose", "-v");                             // Make the operation more talkative
             //Append(Version, "--version", "-V");                             // Show version number and quit

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Globalization;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Bb.Extensions;
+﻿using Bb.Extensions;
 using Bb.Http;
+using System.Reflection;
 
 namespace Bb.Curls
 {
@@ -188,7 +182,7 @@ namespace Bb.Curls
                         }
                         else
                         {
-                            
+
 
 
                         }
@@ -237,7 +231,7 @@ namespace Bb.Curls
             {
 
                 var arg = arguments.Current.Split(':');
-                var a = new Argument(arg[1].Trim(), arg[0].Trim());                       
+                var a = new Argument(arg[1].Trim(), arg[0].Trim());
 
                 static void action(CurlInterpreterAction sender, CurlContext context)
                 {
@@ -273,9 +267,9 @@ namespace Bb.Curls
                     CookieJar jar = null;
                     if (context.Request.CookieJar == null)
                         context.Request.WithCookies(jar = new CookieJar());
-                                        
+
                     var arg = sender.First;
-                    
+
                     jar.AddOrReplace(arg.Name, arg.Value, context.Request.Url.Root);
 
                 }
@@ -291,6 +285,32 @@ namespace Bb.Curls
             return null;
 
         }
+
+
+        internal static CurlInterpreterAction? User(ArgumentSource arguments)
+        {
+
+            if (arguments.ReadNext())
+            {
+
+                string security = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(arguments.Current));
+                var headerValue = $"Authorization: Basic {security}";
+                var a = new Argument(headerValue);
+
+                Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
+                 {
+                     string name = "Authorization";
+                     context.Request.Headers.AddOrReplace(name, sender.First.Value);
+                 };
+
+                return new CurlInterpreterAction(action, a) { Priority = 20 };
+
+            }
+
+            return null;
+
+        }
+
 
         //internal static CurlInterpreterAction? Head(ArgumentSource arguments)
         //{
@@ -2186,18 +2206,6 @@ namespace Bb.Curls
         //}
 
         //internal static CurlInterpreterAction? UserAgent(ArgumentSource arguments)
-        //{
-        //    Stop();
-        //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-        //     {
-        //         Stop();
-
-        //     };
-
-        //    return new CurlInterpreterAction(action) { Priority = 20 };
-        //}
-
-        //internal static CurlInterpreterAction? User(ArgumentSource arguments)
         //{
         //    Stop();
         //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
