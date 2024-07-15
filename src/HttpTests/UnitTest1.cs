@@ -11,40 +11,48 @@ namespace HttpTests
     {
 
 
-        [TestMethod]
-        public void TestMethod1()
+        public UnitTest1()
         {
 
-            var adfsUrl = "https://sts.google.fr";          
-
-            var token = adfsUrl.AppendPathSegment("adfs/oauth2/token")
-            .PostUrlEncodedAsync(new
-            {
-                grant_type = "password",
-                username = "@{username}",
-                password = "@{password}",
-                client_id = "@{client_id}",
-                client_secret = "@{client_secret}",
-                scope="email"
-            })
-            .MapJson<Oauth2Token>()
-            .Result;
+        }
 
 
+        [TestMethod]
+        public void TestUrl()
+        {
+
+            Url url1 = new Url("https://api.fr");
+            Url url2 = "https://api.fr";
+
+            Assert.AreEqual(url1.ToString(), url2.ToString());
+
+            Url url3 = url2.AppendPathSegment("adfs/oauth2/token");
+            Url url4 = new Url(new Uri("https://api.fr:80"), "adfs", "oauth2", "token");
+            Assert.AreEqual(url2.ToString(), url3.ToString());
+
+        }
+
+
+        [TestMethod]
+        public void TestMethodPost1()
+        {
+
+            var adfsUrl = "https://sts.pickup.fr";
             var url = "https://sts.pickup.fr";
 
-
-            var response = url    //.AppendPathSegment("")
-                .WithOAuthBearerToken(token.access_token)
-                .GetAsync()
-                //.WithRefreshToken(token.refresh_token, ref token.access_token)
-                ;
-
-            //var result = response.Result;
-
-
-
-
+            var token = adfsUrl.AppendPathSegment("adfs/oauth2/token")
+                
+                .PostAsync(new
+                {
+                    grant_type = "password",
+                    username = "@{username}",
+                    password = "@{password}",
+                    client_id = "@{client_id}",
+                    client_secret = "@{client_secret}",
+                    scope = "email"
+                })
+                
+            .Result;
 
         }
 

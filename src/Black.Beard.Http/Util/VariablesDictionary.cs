@@ -1,5 +1,6 @@
-﻿namespace Bb
+﻿namespace Bb.Util
 {
+
     public class VariablesDictionary : Variables
     {
 

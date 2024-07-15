@@ -226,8 +226,8 @@
   - [AllowHttpStatus(url,statusCodes)](#M-Bb-Extensions-IUrlExtensions-AllowHttpStatus-Bb-Url,System-Net-HttpStatusCode[]- 'Bb.Extensions.IUrlExtensions.AllowHttpStatus(Bb.Url,System.Net.HttpStatusCode[])')
   - [AllowHttpStatus(url,pattern)](#M-Bb-Extensions-IUrlExtensions-AllowHttpStatus-System-String,System-String- 'Bb.Extensions.IUrlExtensions.AllowHttpStatus(System.String,System.String)')
   - [AllowHttpStatus(url,statusCodes)](#M-Bb-Extensions-IUrlExtensions-AllowHttpStatus-System-String,System-Net-HttpStatusCode[]- 'Bb.Extensions.IUrlExtensions.AllowHttpStatus(System.String,System.Net.HttpStatusCode[])')
-  - [ConfigureRequest(url,action)](#M-Bb-Extensions-IUrlExtensions-ConfigureRequest-Bb-Url,System-Action{Bb-Http-Configuration-UrlHttpSettings}- 'Bb.Extensions.IUrlExtensions.ConfigureRequest(Bb.Url,System.Action{Bb.Http.Configuration.UrlHttpSettings})')
-  - [ConfigureRequest(url,action)](#M-Bb-Extensions-IUrlExtensions-ConfigureRequest-System-String,System-Action{Bb-Http-Configuration-UrlHttpSettings}- 'Bb.Extensions.IUrlExtensions.ConfigureRequest(System.String,System.Action{Bb.Http.Configuration.UrlHttpSettings})')
+  - [ConfigureRequest(url,action)](#M-Bb-Extensions-IUrlExtensions-ConfigureRequest-Bb-Url,System-Action{Bb-Http-IUrlRequest}- 'Bb.Extensions.IUrlExtensions.ConfigureRequest(Bb.Url,System.Action{Bb.Http.IUrlRequest})')
+  - [ConfigureRequest(url,action)](#M-Bb-Extensions-IUrlExtensions-ConfigureRequest-System-String,System-Action{Bb-Http-IUrlRequest}- 'Bb.Extensions.IUrlExtensions.ConfigureRequest(System.String,System.Action{Bb.Http.IUrlRequest})')
   - [DeleteAsync(url,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlExtensions-DeleteAsync-Bb-Url,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlExtensions.DeleteAsync(Bb.Url,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [DeleteAsync(url,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlExtensions-DeleteAsync-System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlExtensions.DeleteAsync(System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [DownloadFileAsync(url,localFolderPath,localFileName,bufferSize,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlExtensions-DownloadFileAsync-Bb-Url,System-String,System-String,System-Int32,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlExtensions.DownloadFileAsync(Bb.Url,System.String,System.String,System.Int32,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
@@ -295,7 +295,7 @@
   - [AllowAnyHttpStatus(uri)](#M-Bb-Extensions-IUrlRequestExtensions-AllowAnyHttpStatus-System-Uri- 'Bb.Extensions.IUrlRequestExtensions.AllowAnyHttpStatus(System.Uri)')
   - [AllowHttpStatus(uri,pattern)](#M-Bb-Extensions-IUrlRequestExtensions-AllowHttpStatus-System-Uri,System-String- 'Bb.Extensions.IUrlRequestExtensions.AllowHttpStatus(System.Uri,System.String)')
   - [AllowHttpStatus(uri,statusCodes)](#M-Bb-Extensions-IUrlRequestExtensions-AllowHttpStatus-System-Uri,System-Net-HttpStatusCode[]- 'Bb.Extensions.IUrlRequestExtensions.AllowHttpStatus(System.Uri,System.Net.HttpStatusCode[])')
-  - [ConfigureRequest(uri,action)](#M-Bb-Extensions-IUrlRequestExtensions-ConfigureRequest-System-Uri,System-Action{Bb-Http-Configuration-UrlHttpSettings}- 'Bb.Extensions.IUrlRequestExtensions.ConfigureRequest(System.Uri,System.Action{Bb.Http.Configuration.UrlHttpSettings})')
+  - [ConfigureRequest(uri,action)](#M-Bb-Extensions-IUrlRequestExtensions-ConfigureRequest-System-Uri,System-Action{Bb-Http-IUrlRequest}- 'Bb.Extensions.IUrlRequestExtensions.ConfigureRequest(System.Uri,System.Action{Bb.Http.IUrlRequest})')
   - [DeleteAsync(request,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-DeleteAsync-Bb-Http-IUrlRequest,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.DeleteAsync(Bb.Http.IUrlRequest,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [DeleteAsync(uri,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-DeleteAsync-System-Uri,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.DeleteAsync(System.Uri,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [DownloadFileAsync(uri,localFolderPath,localFileName,bufferSize,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-DownloadFileAsync-System-Uri,System-String,System-String,System-Int32,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.DownloadFileAsync(System.Uri,System.String,System.String,System.Int32,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
@@ -328,15 +328,15 @@
   - [PatchStringAsync(uri,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PatchStringAsync-System-Uri,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PatchStringAsync(System.Uri,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PatchStringAsync(url,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PatchStringAsync-Bb-Url,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PatchStringAsync(Bb.Url,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostAsync(request,content,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Http-IUrlRequest,System-Net-Http-HttpContent,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Http.IUrlRequest,System.Net.Http.HttpContent,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
+  - [PostAsync(request,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Http-IUrlRequest,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Http.IUrlRequest,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
+  - [PostAsync(request,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Http-IUrlRequest,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Http.IUrlRequest,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostAsync(uri,content,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-System-Uri,System-Net-Http-HttpContent,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(System.Uri,System.Net.Http.HttpContent,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostAsync(url,content,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,System-Net-Http-HttpContent,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Url,System.Net.Http.HttpContent,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostAsync(url,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Url,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
-  - [PostAsync(url,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,Bb-QueryParamCollection,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Url,Bb.QueryParamCollection,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
+  - [PostAsync(url,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,Bb-Util-QueryParamCollection,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Url,Bb.Util.QueryParamCollection,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostAsync(url,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostAsync(Bb.Url,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostMultipartAsync(uri,buildContent,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostMultipartAsync-System-Uri,System-Action{System-Net-Http-MultipartFormDataContent},System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostMultipartAsync(System.Uri,System.Action{System.Net.Http.MultipartFormDataContent},System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
-  - [PostObjectAsync(request,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostObjectAsync-Bb-Http-IUrlRequest,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostObjectAsync(Bb.Http.IUrlRequest,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostObjectAsync(uri,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostObjectAsync-System-Uri,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostObjectAsync(System.Uri,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
-  - [PostStringAsync(request,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostStringAsync-Bb-Http-IUrlRequest,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostStringAsync(Bb.Http.IUrlRequest,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostStringAsync(uri,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostStringAsync-System-Uri,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostStringAsync(System.Uri,System.String,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostUrlEncodedAsync(request,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostUrlEncodedAsync-Bb-Http-IUrlRequest,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostUrlEncodedAsync(Bb.Http.IUrlRequest,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
   - [PostUrlEncodedAsync(uri,body,completionOption,cancellationToken)](#M-Bb-Extensions-IUrlRequestExtensions-PostUrlEncodedAsync-System-Uri,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken- 'Bb.Extensions.IUrlRequestExtensions.PostUrlEncodedAsync(System.Uri,System.Object,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken)')
@@ -414,24 +414,24 @@
 - [PerBaseUrlClientFactory](#T-Bb-Http-Configuration-PerBaseUrlClientFactory 'Bb.Http.Configuration.PerBaseUrlClientFactory')
   - [Create(url)](#M-Bb-Http-Configuration-PerBaseUrlClientFactory-Create-Bb-Url- 'Bb.Http.Configuration.PerBaseUrlClientFactory.Create(Bb.Url)')
   - [GetCacheKey(url)](#M-Bb-Http-Configuration-PerBaseUrlClientFactory-GetCacheKey-Bb-Url- 'Bb.Http.Configuration.PerBaseUrlClientFactory.GetCacheKey(Bb.Url)')
-- [QueryParamCollection](#T-Bb-QueryParamCollection 'Bb.QueryParamCollection')
-  - [#ctor(query)](#M-Bb-QueryParamCollection-#ctor-System-String- 'Bb.QueryParamCollection.#ctor(System.String)')
-  - [Count](#P-Bb-QueryParamCollection-Count 'Bb.QueryParamCollection.Count')
-  - [Item](#P-Bb-QueryParamCollection-Item-System-Int32- 'Bb.QueryParamCollection.Item(System.Int32)')
-  - [Add(name,value,isEncoded,nullValueHandling)](#M-Bb-QueryParamCollection-Add-System-String,System-Object,System-Boolean,Bb-NullValueHandling- 'Bb.QueryParamCollection.Add(System.String,System.Object,System.Boolean,Bb.NullValueHandling)')
-  - [AddOrReplace(name,value,isEncoded,nullValueHandling)](#M-Bb-QueryParamCollection-AddOrReplace-System-String,System-Object,System-Boolean,Bb-NullValueHandling- 'Bb.QueryParamCollection.AddOrReplace(System.String,System.Object,System.Boolean,Bb.NullValueHandling)')
-  - [Clear()](#M-Bb-QueryParamCollection-Clear 'Bb.QueryParamCollection.Clear')
-  - [Contains()](#M-Bb-QueryParamCollection-Contains-System-String- 'Bb.QueryParamCollection.Contains(System.String)')
-  - [Contains()](#M-Bb-QueryParamCollection-Contains-System-String,System-Object- 'Bb.QueryParamCollection.Contains(System.String,System.Object)')
-  - [FirstOrDefault()](#M-Bb-QueryParamCollection-FirstOrDefault-System-String- 'Bb.QueryParamCollection.FirstOrDefault(System.String)')
-  - [GetAll()](#M-Bb-QueryParamCollection-GetAll-System-String- 'Bb.QueryParamCollection.GetAll(System.String)')
-  - [GetEnumerator()](#M-Bb-QueryParamCollection-GetEnumerator 'Bb.QueryParamCollection.GetEnumerator')
-  - [Remove()](#M-Bb-QueryParamCollection-Remove-System-String- 'Bb.QueryParamCollection.Remove(System.String)')
-  - [ToString()](#M-Bb-QueryParamCollection-ToString 'Bb.QueryParamCollection.ToString')
-  - [ToString()](#M-Bb-QueryParamCollection-ToString-System-Boolean- 'Bb.QueryParamCollection.ToString(System.Boolean)')
-  - [TryGetFirst()](#M-Bb-QueryParamCollection-TryGetFirst-System-String,System-Object@- 'Bb.QueryParamCollection.TryGetFirst(System.String,System.Object@)')
-  - [op_Implicit(query)](#M-Bb-QueryParamCollection-op_Implicit-Bb-QueryParamCollection-~System-String 'Bb.QueryParamCollection.op_Implicit(Bb.QueryParamCollection)~System.String')
-- [QueryParamValue](#T-Bb-QueryParamValue 'Bb.QueryParamValue')
+- [QueryParamCollection](#T-Bb-Util-QueryParamCollection 'Bb.Util.QueryParamCollection')
+  - [#ctor(query)](#M-Bb-Util-QueryParamCollection-#ctor-System-String- 'Bb.Util.QueryParamCollection.#ctor(System.String)')
+  - [Count](#P-Bb-Util-QueryParamCollection-Count 'Bb.Util.QueryParamCollection.Count')
+  - [Item](#P-Bb-Util-QueryParamCollection-Item-System-Int32- 'Bb.Util.QueryParamCollection.Item(System.Int32)')
+  - [Add(name,value,isEncoded,nullValueHandling)](#M-Bb-Util-QueryParamCollection-Add-System-String,System-Object,System-Boolean,Bb-NullValueHandling- 'Bb.Util.QueryParamCollection.Add(System.String,System.Object,System.Boolean,Bb.NullValueHandling)')
+  - [AddOrReplace(name,value,isEncoded,nullValueHandling)](#M-Bb-Util-QueryParamCollection-AddOrReplace-System-String,System-Object,System-Boolean,Bb-NullValueHandling- 'Bb.Util.QueryParamCollection.AddOrReplace(System.String,System.Object,System.Boolean,Bb.NullValueHandling)')
+  - [Clear()](#M-Bb-Util-QueryParamCollection-Clear 'Bb.Util.QueryParamCollection.Clear')
+  - [Contains()](#M-Bb-Util-QueryParamCollection-Contains-System-String- 'Bb.Util.QueryParamCollection.Contains(System.String)')
+  - [Contains()](#M-Bb-Util-QueryParamCollection-Contains-System-String,System-Object- 'Bb.Util.QueryParamCollection.Contains(System.String,System.Object)')
+  - [FirstOrDefault()](#M-Bb-Util-QueryParamCollection-FirstOrDefault-System-String- 'Bb.Util.QueryParamCollection.FirstOrDefault(System.String)')
+  - [GetAll()](#M-Bb-Util-QueryParamCollection-GetAll-System-String- 'Bb.Util.QueryParamCollection.GetAll(System.String)')
+  - [GetEnumerator()](#M-Bb-Util-QueryParamCollection-GetEnumerator 'Bb.Util.QueryParamCollection.GetEnumerator')
+  - [Remove()](#M-Bb-Util-QueryParamCollection-Remove-System-String- 'Bb.Util.QueryParamCollection.Remove(System.String)')
+  - [ToString()](#M-Bb-Util-QueryParamCollection-ToString 'Bb.Util.QueryParamCollection.ToString')
+  - [ToString()](#M-Bb-Util-QueryParamCollection-ToString-System-Boolean- 'Bb.Util.QueryParamCollection.ToString(System.Boolean)')
+  - [TryGetFirst()](#M-Bb-Util-QueryParamCollection-TryGetFirst-System-String,System-Object@- 'Bb.Util.QueryParamCollection.TryGetFirst(System.String,System.Object@)')
+  - [op_Implicit(query)](#M-Bb-Util-QueryParamCollection-op_Implicit-Bb-Util-QueryParamCollection-~System-String 'Bb.Util.QueryParamCollection.op_Implicit(Bb.Util.QueryParamCollection)~System.String')
+- [QueryParamValue](#T-Bb-Util-QueryParamValue 'Bb.Util.QueryParamValue')
 - [RedirectSettings](#T-Bb-Http-Configuration-RedirectSettings 'Bb.Http.Configuration.RedirectSettings')
   - [#ctor()](#M-Bb-Http-Configuration-RedirectSettings-#ctor-Bb-Http-Configuration-UrlHttpSettings- 'Bb.Http.Configuration.RedirectSettings.#ctor(Bb.Http.Configuration.UrlHttpSettings)')
   - [AllowSecureToInsecure](#P-Bb-Http-Configuration-RedirectSettings-AllowSecureToInsecure 'Bb.Http.Configuration.RedirectSettings.AllowSecureToInsecure')
@@ -457,7 +457,7 @@
   - [BeforeCall\`\`1()](#M-Bb-Extensions-SettingsExtensions-BeforeCall``1-``0,System-Action{Bb-Http-UrlCall}- 'Bb.Extensions.SettingsExtensions.BeforeCall``1(``0,System.Action{Bb.Http.UrlCall})')
   - [BeforeCall\`\`1()](#M-Bb-Extensions-SettingsExtensions-BeforeCall``1-``0,System-Func{Bb-Http-UrlCall,System-Threading-Tasks-Task}- 'Bb.Extensions.SettingsExtensions.BeforeCall``1(``0,System.Func{Bb.Http.UrlCall,System.Threading.Tasks.Task})')
   - [Configure(client,action)](#M-Bb-Extensions-SettingsExtensions-Configure-Bb-Http-IUrlClient,System-Action{Bb-Http-Configuration-UrlHttpSettings}- 'Bb.Extensions.SettingsExtensions.Configure(Bb.Http.IUrlClient,System.Action{Bb.Http.Configuration.UrlHttpSettings})')
-  - [ConfigureRequest(request,action)](#M-Bb-Extensions-SettingsExtensions-ConfigureRequest-Bb-Http-IUrlRequest,System-Action{Bb-Http-Configuration-UrlHttpSettings}- 'Bb.Extensions.SettingsExtensions.ConfigureRequest(Bb.Http.IUrlRequest,System.Action{Bb.Http.Configuration.UrlHttpSettings})')
+  - [ConfigureRequest(request,action)](#M-Bb-Extensions-SettingsExtensions-ConfigureRequest-Bb-Http-IUrlRequest,System-Action{Bb-Http-IUrlRequest}- 'Bb.Extensions.SettingsExtensions.ConfigureRequest(Bb.Http.IUrlRequest,System.Action{Bb.Http.IUrlRequest})')
   - [OnError\`\`1()](#M-Bb-Extensions-SettingsExtensions-OnError``1-``0,System-Action{Bb-Http-UrlCall}- 'Bb.Extensions.SettingsExtensions.OnError``1(``0,System.Action{Bb.Http.UrlCall})')
   - [OnError\`\`1()](#M-Bb-Extensions-SettingsExtensions-OnError``1-``0,System-Func{Bb-Http-UrlCall,System-Threading-Tasks-Task}- 'Bb.Extensions.SettingsExtensions.OnError``1(``0,System.Func{Bb.Http.UrlCall,System.Threading.Tasks.Task})')
   - [OnRedirect\`\`1()](#M-Bb-Extensions-SettingsExtensions-OnRedirect``1-``0,System-Action{Bb-Http-UrlCall}- 'Bb.Extensions.SettingsExtensions.OnRedirect``1(``0,System.Action{Bb.Http.UrlCall})')
@@ -466,6 +466,7 @@
   - [WithTimeout\`\`1(obj,timespan)](#M-Bb-Extensions-SettingsExtensions-WithTimeout``1-``0,System-TimeSpan- 'Bb.Extensions.SettingsExtensions.WithTimeout``1(``0,System.TimeSpan)')
   - [WithTimeout\`\`1(obj,seconds)](#M-Bb-Extensions-SettingsExtensions-WithTimeout``1-``0,System-Int32- 'Bb.Extensions.SettingsExtensions.WithTimeout``1(``0,System.Int32)')
 - [Url](#T-Bb-Url 'Bb.Url')
+  - [#ctor(scheme,host,port,segments)](#M-Bb-Url-#ctor-System-String,System-String,System-Int32,System-String[]- 'Bb.Url.#ctor(System.String,System.String,System.Int32,System.String[])')
   - [#ctor(baseUrl)](#M-Bb-Url-#ctor-System-String- 'Bb.Url.#ctor(System.String)')
   - [#ctor(uri)](#M-Bb-Url-#ctor-System-Uri,System-String[]- 'Bb.Url.#ctor(System.Uri,System.String[])')
   - [Authority](#P-Bb-Url-Authority 'Bb.Url.Authority')
@@ -698,17 +699,17 @@
   - [HasQueryParam()](#M-Bb-Http-Testing-Util-HasQueryParam-Bb-Http-UrlCall,System-String,System-Object- 'Bb.Http.Testing.Util.HasQueryParam(Bb.Http.UrlCall,System.String,System.Object)')
   - [MatchesPattern()](#M-Bb-Http-Testing-Util-MatchesPattern-System-String,System-String- 'Bb.Http.Testing.Util.MatchesPattern(System.String,System.String)')
   - [MatchesUrlPattern()](#M-Bb-Http-Testing-Util-MatchesUrlPattern-System-String,System-String- 'Bb.Http.Testing.Util.MatchesUrlPattern(System.String,System.String)')
-- [VariableReplacer](#T-Bb-VariableReplacer 'Bb.VariableReplacer')
-  - [ReplaceVariables(input)](#M-Bb-VariableReplacer-ReplaceVariables-System-String- 'Bb.VariableReplacer.ReplaceVariables(System.String)')
-- [Variables](#T-Bb-Variables 'Bb.Variables')
-  - [Root](#P-Bb-Variables-Root 'Bb.Variables.Root')
-  - [#cctor()](#M-Bb-Variables-#cctor 'Bb.Variables.#cctor')
-  - [AppendFirst(variables)](#M-Bb-Variables-AppendFirst-Bb-Variables- 'Bb.Variables.AppendFirst(Bb.Variables)')
-  - [Resolve(name,resultValue)](#M-Bb-Variables-Resolve-System-String,System-String@- 'Bb.Variables.Resolve(System.String,System.String@)')
-  - [TryGet(name,resultValue)](#M-Bb-Variables-TryGet-System-String,System-String@- 'Bb.Variables.TryGet(System.String,System.String@)')
-- [VariablesDictionary](#T-Bb-VariablesDictionary 'Bb.VariablesDictionary')
-  - [Add(name,value)](#M-Bb-VariablesDictionary-Add-System-String,System-String- 'Bb.VariablesDictionary.Add(System.String,System.String)')
-  - [TryGet(name,resultValue)](#M-Bb-VariablesDictionary-TryGet-System-String,System-String@- 'Bb.VariablesDictionary.TryGet(System.String,System.String@)')
+- [VariableReplacer](#T-Bb-Util-VariableReplacer 'Bb.Util.VariableReplacer')
+  - [ReplaceVariables(input)](#M-Bb-Util-VariableReplacer-ReplaceVariables-System-String- 'Bb.Util.VariableReplacer.ReplaceVariables(System.String)')
+- [Variables](#T-Bb-Util-Variables 'Bb.Util.Variables')
+  - [Root](#P-Bb-Util-Variables-Root 'Bb.Util.Variables.Root')
+  - [#cctor()](#M-Bb-Util-Variables-#cctor 'Bb.Util.Variables.#cctor')
+  - [AppendFirst(variables)](#M-Bb-Util-Variables-AppendFirst-Bb-Util-Variables- 'Bb.Util.Variables.AppendFirst(Bb.Util.Variables)')
+  - [Resolve(name,resultValue)](#M-Bb-Util-Variables-Resolve-System-String,System-String@- 'Bb.Util.Variables.Resolve(System.String,System.String@)')
+  - [TryGet(name,resultValue)](#M-Bb-Util-Variables-TryGet-System-String,System-String@- 'Bb.Util.Variables.TryGet(System.String,System.String@)')
+- [VariablesDictionary](#T-Bb-Util-VariablesDictionary 'Bb.Util.VariablesDictionary')
+  - [Add(name,value)](#M-Bb-Util-VariablesDictionary-Add-System-String,System-String- 'Bb.Util.VariablesDictionary.Add(System.String,System.String)')
+  - [TryGet(name,resultValue)](#M-Bb-Util-VariablesDictionary-TryGet-System-String,System-String@- 'Bb.Util.VariablesDictionary.TryGet(System.String,System.String@)')
 
 <a name='T-Bb-Util-CommonExtensions'></a>
 ## CommonExtensions `type`
@@ -3819,7 +3820,7 @@ A new IUrlRequest.
 | url | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | This URL. |
 | statusCodes | [System.Net.HttpStatusCode[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.HttpStatusCode[] 'System.Net.HttpStatusCode[]') | The HttpStatusCode(s) to allow. |
 
-<a name='M-Bb-Extensions-IUrlExtensions-ConfigureRequest-Bb-Url,System-Action{Bb-Http-Configuration-UrlHttpSettings}-'></a>
+<a name='M-Bb-Extensions-IUrlExtensions-ConfigureRequest-Bb-Url,System-Action{Bb-Http-IUrlRequest}-'></a>
 ### ConfigureRequest(url,action) `method`
 
 ##### Summary
@@ -3835,9 +3836,9 @@ A new IUrlRequest.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | url | [Bb.Url](#T-Bb-Url 'Bb.Url') | This Url. |
-| action | [System.Action{Bb.Http.Configuration.UrlHttpSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.Configuration.UrlHttpSettings}') | A delegate defining the Settings changes. |
+| action | [System.Action{Bb.Http.IUrlRequest}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.IUrlRequest}') | A delegate defining the Settings changes. |
 
-<a name='M-Bb-Extensions-IUrlExtensions-ConfigureRequest-System-String,System-Action{Bb-Http-Configuration-UrlHttpSettings}-'></a>
+<a name='M-Bb-Extensions-IUrlExtensions-ConfigureRequest-System-String,System-Action{Bb-Http-IUrlRequest}-'></a>
 ### ConfigureRequest(url,action) `method`
 
 ##### Summary
@@ -3853,7 +3854,7 @@ A new IUrlRequest.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | url | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | This URL. |
-| action | [System.Action{Bb.Http.Configuration.UrlHttpSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.Configuration.UrlHttpSettings}') | A delegate defining the Settings changes. |
+| action | [System.Action{Bb.Http.IUrlRequest}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.IUrlRequest}') | A delegate defining the Settings changes. |
 
 <a name='M-Bb-Extensions-IUrlExtensions-DeleteAsync-Bb-Url,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
 ### DeleteAsync(url,completionOption,cancellationToken) `method`
@@ -5026,7 +5027,7 @@ A new IUrlRequest.
 | uri | [System.Uri](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Uri 'System.Uri') | This System.Uri. |
 | statusCodes | [System.Net.HttpStatusCode[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.HttpStatusCode[] 'System.Net.HttpStatusCode[]') | The HttpStatusCode(s) to allow. |
 
-<a name='M-Bb-Extensions-IUrlRequestExtensions-ConfigureRequest-System-Uri,System-Action{Bb-Http-Configuration-UrlHttpSettings}-'></a>
+<a name='M-Bb-Extensions-IUrlRequestExtensions-ConfigureRequest-System-Uri,System-Action{Bb-Http-IUrlRequest}-'></a>
 ### ConfigureRequest(uri,action) `method`
 
 ##### Summary
@@ -5042,7 +5043,7 @@ A new IUrlRequest.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | uri | [System.Uri](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Uri 'System.Uri') | This System.Uri. |
-| action | [System.Action{Bb.Http.Configuration.UrlHttpSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.Configuration.UrlHttpSettings}') | A delegate defining the Settings changes. |
+| action | [System.Action{Bb.Http.IUrlRequest}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.IUrlRequest}') | A delegate defining the Settings changes. |
 
 <a name='M-Bb-Extensions-IUrlRequestExtensions-DeleteAsync-Bb-Http-IUrlRequest,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
 ### DeleteAsync(request,completionOption,cancellationToken) `method`
@@ -5665,6 +5666,46 @@ A Task whose result is the received IUrlResponse.
 | completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
 | cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
 
+<a name='M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Http-IUrlRequest,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
+### PostAsync(request,body,completionOption,cancellationToken) `method`
+
+##### Summary
+
+Sends an asynchronous POST request.
+
+##### Returns
+
+A Task whose result is the received IUrlResponse.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| request | [Bb.Http.IUrlRequest](#T-Bb-Http-IUrlRequest 'Bb.Http.IUrlRequest') | This IUrlRequest |
+| body | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | An object representing the request body, which will be serialized to object. |
+| completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
+| cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
+
+<a name='M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Http-IUrlRequest,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
+### PostAsync(request,body,completionOption,cancellationToken) `method`
+
+##### Summary
+
+Sends an asynchronous POST request.
+
+##### Returns
+
+A Task whose result is the received IUrlResponse.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| request | [Bb.Http.IUrlRequest](#T-Bb-Http-IUrlRequest 'Bb.Http.IUrlRequest') | This IUrlRequest |
+| body | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The request body. |
+| completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
+| cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
+
 <a name='M-Bb-Extensions-IUrlRequestExtensions-PostAsync-System-Uri,System-Net-Http-HttpContent,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
 ### PostAsync(uri,content,completionOption,cancellationToken) `method`
 
@@ -5725,7 +5766,7 @@ A Task whose result is the received IUrlResponse.
 | completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
 | cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
 
-<a name='M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,Bb-QueryParamCollection,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
+<a name='M-Bb-Extensions-IUrlRequestExtensions-PostAsync-Bb-Url,Bb-Util-QueryParamCollection,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
 ### PostAsync(url,body,completionOption,cancellationToken) `method`
 
 ##### Summary
@@ -5741,7 +5782,7 @@ A Task whose result is the received IUrlResponse.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | url | [Bb.Url](#T-Bb-Url 'Bb.Url') | This Url. |
-| body | [Bb.QueryParamCollection](#T-Bb-QueryParamCollection 'Bb.QueryParamCollection') | An object representing the request body, which will be serialized to JSON. |
+| body | [Bb.Util.QueryParamCollection](#T-Bb-Util-QueryParamCollection 'Bb.Util.QueryParamCollection') | An object representing the request body, which will be serialized to JSON. |
 | completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
 | cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
 
@@ -5785,26 +5826,6 @@ A Task whose result is the received IUrlResponse.
 | completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
 | cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
 
-<a name='M-Bb-Extensions-IUrlRequestExtensions-PostObjectAsync-Bb-Http-IUrlRequest,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
-### PostObjectAsync(request,body,completionOption,cancellationToken) `method`
-
-##### Summary
-
-Sends an asynchronous POST request.
-
-##### Returns
-
-A Task whose result is the received IUrlResponse.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| request | [Bb.Http.IUrlRequest](#T-Bb-Http-IUrlRequest 'Bb.Http.IUrlRequest') | This IUrlRequest |
-| body | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | An object representing the request body, which will be serialized to object. |
-| completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
-| cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
-
 <a name='M-Bb-Extensions-IUrlRequestExtensions-PostObjectAsync-System-Uri,System-Object,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
 ### PostObjectAsync(uri,body,completionOption,cancellationToken) `method`
 
@@ -5822,26 +5843,6 @@ A Task whose result is the received IUrlResponse.
 | ---- | ---- | ----------- |
 | uri | [System.Uri](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Uri 'System.Uri') | This System.Uri. |
 | body | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | An object representing the request body, which will be serialized to JSON. |
-| completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
-| cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
-
-<a name='M-Bb-Extensions-IUrlRequestExtensions-PostStringAsync-Bb-Http-IUrlRequest,System-String,System-Net-Http-HttpCompletionOption,System-Threading-CancellationToken-'></a>
-### PostStringAsync(request,body,completionOption,cancellationToken) `method`
-
-##### Summary
-
-Sends an asynchronous POST request.
-
-##### Returns
-
-A Task whose result is the received IUrlResponse.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| request | [Bb.Http.IUrlRequest](#T-Bb-Http-IUrlRequest 'Bb.Http.IUrlRequest') | This IUrlRequest |
-| body | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The request body. |
 | completionOption | [System.Net.Http.HttpCompletionOption](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Net.Http.HttpCompletionOption 'System.Net.Http.HttpCompletionOption') | The HttpCompletionOption used in the request. Optional. |
 | cancellationToken | [System.Threading.CancellationToken](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationToken 'System.Threading.CancellationToken') | The token to monitor for cancellation requests. |
 
@@ -7118,18 +7119,18 @@ The cache key
 | ---- | ---- | ----------- |
 | url | [Bb.Url](#T-Bb-Url 'Bb.Url') | The URL. |
 
-<a name='T-Bb-QueryParamCollection'></a>
+<a name='T-Bb-Util-QueryParamCollection'></a>
 ## QueryParamCollection `type`
 
 ##### Namespace
 
-Bb
+Bb.Util
 
 ##### Summary
 
 Represents a URL query as a collection of name/value pairs. Insertion order is preserved.
 
-<a name='M-Bb-QueryParamCollection-#ctor-System-String-'></a>
+<a name='M-Bb-Util-QueryParamCollection-#ctor-System-String-'></a>
 ### #ctor(query) `constructor`
 
 ##### Summary
@@ -7142,21 +7143,21 @@ Returns a new instance of QueryParamCollection
 | ---- | ---- | ----------- |
 | query | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | Optional query string to parse. |
 
-<a name='P-Bb-QueryParamCollection-Count'></a>
+<a name='P-Bb-Util-QueryParamCollection-Count'></a>
 ### Count `property`
 
 ##### Summary
 
 *Inherit from parent.*
 
-<a name='P-Bb-QueryParamCollection-Item-System-Int32-'></a>
+<a name='P-Bb-Util-QueryParamCollection-Item-System-Int32-'></a>
 ### Item `property`
 
 ##### Summary
 
 *Inherit from parent.*
 
-<a name='M-Bb-QueryParamCollection-Add-System-String,System-Object,System-Boolean,Bb-NullValueHandling-'></a>
+<a name='M-Bb-Util-QueryParamCollection-Add-System-String,System-Object,System-Boolean,Bb-NullValueHandling-'></a>
 ### Add(name,value,isEncoded,nullValueHandling) `method`
 
 ##### Summary
@@ -7173,7 +7174,7 @@ To overwrite existing parameters of the same name, use AddOrReplace instead.
 | isEncoded | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | If true, assume value(s) already URL-encoded. |
 | nullValueHandling | [Bb.NullValueHandling](#T-Bb-NullValueHandling 'Bb.NullValueHandling') | Describes how to handle null values. |
 
-<a name='M-Bb-QueryParamCollection-AddOrReplace-System-String,System-Object,System-Boolean,Bb-NullValueHandling-'></a>
+<a name='M-Bb-Util-QueryParamCollection-AddOrReplace-System-String,System-Object,System-Boolean,Bb-NullValueHandling-'></a>
 ### AddOrReplace(name,value,isEncoded,nullValueHandling) `method`
 
 ##### Summary
@@ -7192,7 +7193,7 @@ remaining existing values are removed.
 | isEncoded | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | If true, assume value(s) already URL-encoded. |
 | nullValueHandling | [Bb.NullValueHandling](#T-Bb-NullValueHandling 'Bb.NullValueHandling') | Describes how to handle null values. |
 
-<a name='M-Bb-QueryParamCollection-Clear'></a>
+<a name='M-Bb-Util-QueryParamCollection-Clear'></a>
 ### Clear() `method`
 
 ##### Summary
@@ -7203,7 +7204,7 @@ Clears all query parameters from this collection.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-Contains-System-String-'></a>
+<a name='M-Bb-Util-QueryParamCollection-Contains-System-String-'></a>
 ### Contains() `method`
 
 ##### Summary
@@ -7214,7 +7215,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-Contains-System-String,System-Object-'></a>
+<a name='M-Bb-Util-QueryParamCollection-Contains-System-String,System-Object-'></a>
 ### Contains() `method`
 
 ##### Summary
@@ -7225,7 +7226,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-FirstOrDefault-System-String-'></a>
+<a name='M-Bb-Util-QueryParamCollection-FirstOrDefault-System-String-'></a>
 ### FirstOrDefault() `method`
 
 ##### Summary
@@ -7236,7 +7237,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-GetAll-System-String-'></a>
+<a name='M-Bb-Util-QueryParamCollection-GetAll-System-String-'></a>
 ### GetAll() `method`
 
 ##### Summary
@@ -7247,7 +7248,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-GetEnumerator'></a>
+<a name='M-Bb-Util-QueryParamCollection-GetEnumerator'></a>
 ### GetEnumerator() `method`
 
 ##### Summary
@@ -7258,7 +7259,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-Remove-System-String-'></a>
+<a name='M-Bb-Util-QueryParamCollection-Remove-System-String-'></a>
 ### Remove() `method`
 
 ##### Summary
@@ -7269,7 +7270,7 @@ Removes all query parameters of the given name.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-ToString'></a>
+<a name='M-Bb-Util-QueryParamCollection-ToString'></a>
 ### ToString() `method`
 
 ##### Summary
@@ -7284,7 +7285,7 @@ Returns serialized, encoded query string. Insertion order is preserved.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-ToString-System-Boolean-'></a>
+<a name='M-Bb-Util-QueryParamCollection-ToString-System-Boolean-'></a>
 ### ToString() `method`
 
 ##### Summary
@@ -7299,7 +7300,7 @@ Returns serialized, encoded query string. Insertion order is preserved.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-TryGetFirst-System-String,System-Object@-'></a>
+<a name='M-Bb-Util-QueryParamCollection-TryGetFirst-System-String,System-Object@-'></a>
 ### TryGetFirst() `method`
 
 ##### Summary
@@ -7310,7 +7311,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-Bb-QueryParamCollection-op_Implicit-Bb-QueryParamCollection-~System-String'></a>
+<a name='M-Bb-Util-QueryParamCollection-op_Implicit-Bb-Util-QueryParamCollection-~System-String'></a>
 ### op_Implicit(query) `method`
 
 ##### Summary
@@ -7321,14 +7322,14 @@ implicit conversion from QueryParamCollection to string
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| query | [Bb.QueryParamCollection)~System.String](#T-Bb-QueryParamCollection-~System-String 'Bb.QueryParamCollection)~System.String') |  |
+| query | [Bb.Util.QueryParamCollection)~System.String](#T-Bb-Util-QueryParamCollection-~System-String 'Bb.Util.QueryParamCollection)~System.String') |  |
 
-<a name='T-Bb-QueryParamValue'></a>
+<a name='T-Bb-Util-QueryParamValue'></a>
 ## QueryParamValue `type`
 
 ##### Namespace
 
-Bb
+Bb.Util
 
 ##### Summary
 
@@ -7656,7 +7657,7 @@ The IUrlClient with the modified Settings
 | client | [Bb.Http.IUrlClient](#T-Bb-Http-IUrlClient 'Bb.Http.IUrlClient') | The IUrlClient. |
 | action | [System.Action{Bb.Http.Configuration.UrlHttpSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.Configuration.UrlHttpSettings}') | Action defining the settings changes. |
 
-<a name='M-Bb-Extensions-SettingsExtensions-ConfigureRequest-Bb-Http-IUrlRequest,System-Action{Bb-Http-Configuration-UrlHttpSettings}-'></a>
+<a name='M-Bb-Extensions-SettingsExtensions-ConfigureRequest-Bb-Http-IUrlRequest,System-Action{Bb-Http-IUrlRequest}-'></a>
 ### ConfigureRequest(request,action) `method`
 
 ##### Summary
@@ -7672,7 +7673,7 @@ The IUrlRequest with the modified Settings
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | request | [Bb.Http.IUrlRequest](#T-Bb-Http-IUrlRequest 'Bb.Http.IUrlRequest') | The IUrlRequest. |
-| action | [System.Action{Bb.Http.Configuration.UrlHttpSettings}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.Configuration.UrlHttpSettings}') | Action defining the settings changes. |
+| action | [System.Action{Bb.Http.IUrlRequest}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Bb.Http.IUrlRequest}') | Action defining the settings changes. |
 
 <a name='M-Bb-Extensions-SettingsExtensions-OnError``1-``0,System-Action{Bb-Http-UrlCall}-'></a>
 ### OnError\`\`1() `method`
@@ -7789,6 +7790,28 @@ Bb
 
 A mutable object for fluently building and parsing URLs.
 
+<a name='M-Bb-Url-#ctor-System-String,System-String,System-Int32,System-String[]-'></a>
+### #ctor(scheme,host,port,segments) `constructor`
+
+##### Summary
+
+Constructs a Url object from another Url object.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| scheme | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
+| host | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
+| port | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') |  |
+| segments | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') |  |
+
+##### Example
+
+```csharp
+    var url = new Url("api.example.com", 80, "api", "v1");
+```
+
 <a name='M-Bb-Url-#ctor-System-String-'></a>
 ### #ctor(baseUrl) `constructor`
 
@@ -7801,6 +7824,12 @@ Constructs a Url object from a string.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | baseUrl | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The URL to use as a starting point. |
+
+##### Example
+
+```csharp
+    var url = new Url("https://api.example.com:80");
+```
 
 <a name='M-Bb-Url-#ctor-System-Uri,System-String[]-'></a>
 ### #ctor(uri) `constructor`
@@ -7820,6 +7849,12 @@ Constructs a Url object from a System.Uri.
 | Name | Description |
 | ---- | ----------- |
 | [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | `uri` is `null`. |
+
+##### Example
+
+```csharp
+    var url = new Url(new Uri("http://api.example.com:80"), "api", "v1");
+```
 
 <a name='P-Bb-Url-Authority'></a>
 ### Authority `property`
@@ -10714,18 +10749,18 @@ same as MatchesPattern, but doesn't require trailing * to ignore query string
 
 This method has no parameters.
 
-<a name='T-Bb-VariableReplacer'></a>
+<a name='T-Bb-Util-VariableReplacer'></a>
 ## VariableReplacer `type`
 
 ##### Namespace
 
-Bb
+Bb.Util
 
 ##### Summary
 
 Variable replacer
 
-<a name='M-Bb-VariableReplacer-ReplaceVariables-System-String-'></a>
+<a name='M-Bb-Util-VariableReplacer-ReplaceVariables-System-String-'></a>
 ### ReplaceVariables(input) `method`
 
 ##### Summary
@@ -10742,21 +10777,21 @@ the computed value
 | ---- | ---- | ----------- |
 | input | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | Input text |
 
-<a name='T-Bb-Variables'></a>
+<a name='T-Bb-Util-Variables'></a>
 ## Variables `type`
 
 ##### Namespace
 
-Bb
+Bb.Util
 
-<a name='P-Bb-Variables-Root'></a>
+<a name='P-Bb-Util-Variables-Root'></a>
 ### Root `property`
 
 ##### Summary
 
 Singleton instance of Variables
 
-<a name='M-Bb-Variables-#cctor'></a>
+<a name='M-Bb-Util-Variables-#cctor'></a>
 ### #cctor() `method`
 
 ##### Summary
@@ -10767,7 +10802,7 @@ Initializes the Variables class.
 
 This method has no parameters.
 
-<a name='M-Bb-Variables-AppendFirst-Bb-Variables-'></a>
+<a name='M-Bb-Util-Variables-AppendFirst-Bb-Util-Variables-'></a>
 ### AppendFirst(variables) `method`
 
 ##### Summary
@@ -10778,7 +10813,7 @@ Append a new Variables instance to the end of the chain.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| variables | [Bb.Variables](#T-Bb-Variables 'Bb.Variables') |  |
+| variables | [Bb.Util.Variables](#T-Bb-Util-Variables 'Bb.Util.Variables') |  |
 
 ##### Exceptions
 
@@ -10786,7 +10821,7 @@ Append a new Variables instance to the end of the chain.
 | ---- | ----------- |
 | [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') |  |
 
-<a name='M-Bb-Variables-Resolve-System-String,System-String@-'></a>
+<a name='M-Bb-Util-Variables-Resolve-System-String,System-String@-'></a>
 ### Resolve(name,resultValue) `method`
 
 ##### Summary
@@ -10804,7 +10839,7 @@ Resolve a variable by name.
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
 | resultValue | [System.String@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String@ 'System.String@') |  |
 
-<a name='M-Bb-Variables-TryGet-System-String,System-String@-'></a>
+<a name='M-Bb-Util-Variables-TryGet-System-String,System-String@-'></a>
 ### TryGet(name,resultValue) `method`
 
 ##### Summary
@@ -10822,14 +10857,14 @@ Resolve a variable by name.
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
 | resultValue | [System.String@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String@ 'System.String@') |  |
 
-<a name='T-Bb-VariablesDictionary'></a>
+<a name='T-Bb-Util-VariablesDictionary'></a>
 ## VariablesDictionary `type`
 
 ##### Namespace
 
-Bb
+Bb.Util
 
-<a name='M-Bb-VariablesDictionary-Add-System-String,System-String-'></a>
+<a name='M-Bb-Util-VariablesDictionary-Add-System-String,System-String-'></a>
 ### Add(name,value) `method`
 
 ##### Summary
@@ -10843,7 +10878,7 @@ Add a variable by name and value.
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
 | value | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
 
-<a name='M-Bb-VariablesDictionary-TryGet-System-String,System-String@-'></a>
+<a name='M-Bb-Util-VariablesDictionary-TryGet-System-String,System-String@-'></a>
 ### TryGet(name,resultValue) `method`
 
 ##### Summary

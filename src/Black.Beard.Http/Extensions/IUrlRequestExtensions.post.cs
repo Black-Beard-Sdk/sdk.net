@@ -1,4 +1,5 @@
 ﻿using Bb.Http;
+using Bb.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostAsync(this Url url, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(url).PostObjectAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(url).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostAsync(this Url url, QueryParamCollection body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(url).PostStringAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(url).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostAsync(this Url url, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(url).PostStringAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(url).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>

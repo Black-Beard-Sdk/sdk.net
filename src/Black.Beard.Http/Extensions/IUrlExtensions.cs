@@ -171,7 +171,7 @@ namespace Bb.Extensions
         /// <param name="url">This Url.</param>
         /// <param name="action">A delegate defining the Settings changes.</param>
         /// <returns>A new IUrlRequest.</returns>
-        public static IUrlRequest ConfigureRequest(this Url url, Action<UrlHttpSettings> action)
+        public static IUrlRequest ConfigureRequest(this Url url, Action<IUrlRequest> action)
         {
             return new UrlRequest(url).ConfigureRequest(action);
         }
@@ -384,7 +384,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostJsonAsync(this string url, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(url).PostObjectAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(url).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -397,7 +397,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostStringAsync(this string url, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(url).PostStringAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(url).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="action">A delegate defining the Settings changes.</param>
         /// <returns>A new IUrlRequest.</returns>
-        public static IUrlRequest ConfigureRequest(this string url, Action<UrlHttpSettings> action)
+        public static IUrlRequest ConfigureRequest(this string url, Action<IUrlRequest> action)
         {
             return new UrlRequest(url).ConfigureRequest(action);
         }

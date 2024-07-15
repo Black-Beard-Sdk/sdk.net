@@ -136,7 +136,7 @@ namespace Bb.Extensions
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
-        public static Task<IUrlResponse> PostObjectAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        public static Task<IUrlResponse> PostAsync(this IUrlRequest request, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
             return request.Serialize(body)
                 .SendAsync(HttpMethod.Post, completionOption, cancellationToken);
@@ -150,7 +150,7 @@ namespace Bb.Extensions
         /// <param name="completionOption">The HttpCompletionOption used in the request. Optional.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
-        public static Task<IUrlResponse> PostStringAsync(this IUrlRequest request, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
+        public static Task<IUrlResponse> PostAsync(this IUrlRequest request, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
             var content = new StringContent(body ?? string.Empty);
             return request.SendAsync(HttpMethod.Post, content, completionOption, cancellationToken);
@@ -443,7 +443,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostObjectAsync(this Uri uri, object body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(uri).PostObjectAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(uri).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -456,7 +456,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the received IUrlResponse.</returns>
         public static Task<IUrlResponse> PostStringAsync(this Uri uri, string body, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return new UrlRequest(uri).PostStringAsync(body, completionOption, cancellationToken);
+            return new UrlRequest(uri).PostAsync(body, completionOption, cancellationToken);
         }
 
         /// <summary>
@@ -712,7 +712,7 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="action">A delegate defining the Settings changes.</param>
         /// <returns>A new IUrlRequest.</returns>
-        public static IUrlRequest ConfigureRequest(this Uri uri, Action<UrlHttpSettings> action)
+        public static IUrlRequest ConfigureRequest(this Uri uri, Action<IUrlRequest> action)
         {
             return new UrlRequest(uri).ConfigureRequest(action);
         }

@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 
 namespace Bb
 {
+
+
     /// <summary>
     /// A mutable object for fluently building and parsing URLs.
     /// </summary>
@@ -135,6 +137,18 @@ namespace Bb
 
         #region constructors and parsing methods
 
+        /// <summary>
+        /// Constructs a Url object from another Url object.
+        /// </summary>
+        /// <param name="scheme"></param>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
+        /// <param name="segments"></param>
+        /// <example>
+        /// <code lang="csharp">
+        ///     var url = new Url("api.example.com", 80, "api", "v1");
+        /// </code>
+        /// </example>
         public Url(string scheme, string host, int port, params string[] segments)
             : this()
         {
@@ -151,6 +165,11 @@ namespace Bb
         /// Constructs a Url object from a string.
         /// </summary>
         /// <param name="baseUrl">The URL to use as a starting point.</param>
+        /// <example>
+        /// <code lang="csharp">
+        ///     var url = new Url("https://api.example.com:80");
+        /// </code>
+        /// </example>
         public Url(string baseUrl = null)
         {
             _originalString = baseUrl?.Trim();
@@ -161,6 +180,11 @@ namespace Bb
         /// </summary>
         /// <param name="uri">The System.Uri (required)</param>
         /// <exception cref="ArgumentNullException"><paramref name="uri"/> is <see langword="null" />.</exception>
+        /// <example>
+        /// <code lang="csharp">
+        ///     var url = new Url(new Uri("http://api.example.com:80"), "api", "v1");
+        /// </code>
+        /// </example>
         public Url(Uri uri, params string[] segments)
         {
             _originalString = (uri ?? throw new ArgumentNullException(nameof(uri))).OriginalString;
@@ -252,7 +276,7 @@ namespace Bb
         /// <returns></returns>
         public static IEnumerable<string> ParsePathSegments(string path)
         {
-            var segments = EncodeIllegalCharacters(path)
+            var segments = EncodeIllegalCharacters(path.ReplaceVariables())
                 .Replace("?", "%3F")
                 .Replace("#", "%23")
                 .Split('/');

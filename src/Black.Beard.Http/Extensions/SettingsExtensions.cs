@@ -27,9 +27,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest.</param>
         /// <param name="action">Action defining the settings changes.</param>
         /// <returns>The IUrlRequest with the modified Settings</returns>
-        public static IUrlRequest ConfigureRequest(this IUrlRequest request, Action<UrlHttpSettings> action)
+        public static IUrlRequest ConfigureRequest(this IUrlRequest request, Action<IUrlRequest> action)
         {
-            action(request.Settings);
+            action(request);
             return request;
         }
 

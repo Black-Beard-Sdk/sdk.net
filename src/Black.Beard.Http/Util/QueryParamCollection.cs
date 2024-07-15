@@ -1,10 +1,6 @@
 using System.Collections;
-using System.Text.Json;
-using System.Threading.Channels;
-using System.Xml.Linq;
-using Bb.Util;
 
-namespace Bb
+namespace Bb.Util
 {
 
 
@@ -42,7 +38,7 @@ namespace Bb
             from p in _values
             let name = Url.EncodeIllegalCharacters(p.Name.ReplaceVariables(), encodeSpaceAsPlus)
             let value = p.Value.Encode(encodeSpaceAsPlus)
-            select (value == null) ? name : $"{name}={value}");
+            select value == null ? name : $"{name}={value}");
 
         /// <summary>
         /// Appends a query parameter. If value is a collection type (array, IEnumerable, etc.), multiple parameters are added, i.e. x=1&amp;x=2.

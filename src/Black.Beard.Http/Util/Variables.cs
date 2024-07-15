@@ -1,4 +1,4 @@
-﻿namespace Bb
+﻿namespace Bb.Util
 {
     public class Variables
     {
@@ -54,12 +54,12 @@
         /// Append a new Variables instance to the end of the chain.
         /// </summary>
         /// <param name="variables"></param>
-        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         public static void AppendFirst(Variables variables)
         {
 
             if (variables == null)
-                throw new System.ArgumentNullException(nameof(variables));
+                throw new ArgumentNullException(nameof(variables));
 
             if (Root != null)
             {
@@ -76,7 +76,7 @@
         {
 
             if (variables == null)
-                throw new System.ArgumentNullException(nameof(variables));
+                throw new ArgumentNullException(nameof(variables));
 
             if (_next == null)
                 _next = variables;

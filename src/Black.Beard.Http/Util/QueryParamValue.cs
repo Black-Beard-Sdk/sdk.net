@@ -1,6 +1,4 @@
-﻿using Bb.Util;
-
-namespace Bb
+﻿namespace Bb.Util
 {
     /// <summary>
     /// Represents a query parameter value with the ability to track whether it was already encoded when created.
@@ -26,12 +24,12 @@ namespace Bb
         public object Value { get; }
 
         public string Encode(bool encodeSpaceAsPlus) =>
-            (Value == null) 
-                ? null 
-                : (_encodedValue != null) 
+            Value == null
+                ? null
+                : _encodedValue != null
                     ? _encodedValue.ReplaceVariables()
-                    : (Value is string s) 
-                        ? Url.Encode(s.ReplaceVariables(), encodeSpaceAsPlus) 
+                    : Value is string s
+                        ? Url.Encode(s.ReplaceVariables(), encodeSpaceAsPlus)
                         : Url.Encode(Value.ToInvariantString().ReplaceVariables(), encodeSpaceAsPlus);
     }
 }
