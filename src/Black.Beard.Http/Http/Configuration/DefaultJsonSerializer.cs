@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Bb.Http.Configuration
 {
+
 	/// <summary>
 	/// ISerializer implementation based on System.Text.Json.
 	/// Default serializer used in calls to GetJsonAsync, PostJsonAsync, etc.
@@ -22,13 +24,13 @@ namespace Bb.Http.Configuration
 		/// Serializes the specified object to a JSON string.
 		/// </summary>
 		/// <param name="obj">The object to serialize.</param>
-		public string Serialize(object obj) => JsonSerializer.Serialize(obj, _options);
+		public string Serialize(object obj) => JsonSerializer.Serialize(obj, _options);    
 
-		/// <summary>
-		/// Deserializes the specified JSON string to an object of type T.
-		/// </summary>
-		/// <param name="s">The JSON string to deserializes.</param>
-		public T? Deserializes<T>(string s) => string.IsNullOrWhiteSpace(s) ? default : JsonSerializer.Deserialize<T>(s, _options);
+        /// <summary>
+        /// Deserializes the specified JSON string to an object of type T.
+        /// </summary>
+        /// <param name="s">The JSON string to deserializes.</param>
+        public T? Deserializes<T>(string s) => string.IsNullOrWhiteSpace(s) ? default : JsonSerializer.Deserialize<T>(s, _options);
 
 		/// <summary>
 		/// Deserializes the specified stream to an object of type T.
@@ -36,4 +38,6 @@ namespace Bb.Http.Configuration
 		/// <param name="stream">The stream to deserializes.</param>
 		public T? Deserializes<T>(Stream stream) => stream.Length == 0 ? default : JsonSerializer.Deserialize<T>(stream, _options);
 	}
+
+	   
 }

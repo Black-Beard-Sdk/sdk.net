@@ -4,7 +4,7 @@ provide features (http, ftp, mails)
 
 ## Http
 
-[![NuGet](https://img.shields.io/nuget/v/Black.Beard.Http.svg)](https://www.nuget.org/packages/Black.Beard.Http/)]
+[![NuGet](https://img.shields.io/nuget/v/Black.Beard.Http.svg)](https://www.nuget.org/packages/Black.Beard.Http/)
 
 
 ### Install
@@ -17,16 +17,13 @@ By dotnet cli
 ```
 
 By package manager console
-
-the http art use Flurl
-
 ```shell
 
     NuGet\Install-Package Black.Beard.Http -Version 1.0.11   
 
 ```
 
-[How to use http](https://github.com/Black-Beard-Sdk/sdk.net/tree/main/docs/use.md)
+[How to use http](https://github.com/Black-Beard-Sdk/sdk.net/wiki)
 
 
 

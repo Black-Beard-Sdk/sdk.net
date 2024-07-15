@@ -1,0 +1,1 @@
+xcopy .\..\Docs\*.md ..\..\sdk.net.wiki\Docs\

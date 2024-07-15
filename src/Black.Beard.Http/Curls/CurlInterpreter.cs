@@ -21,9 +21,9 @@ namespace Bb.Curls
             Append(Request, "--request", "-X");                             // <command> Specify request command to use
             Append(Header, "--header", "-H");                               // <header/@file> Pass custom header(s) to server
             Append(Form, "--form", "-F");                                   // <name=content> Specify multipart MIME data
-            Append(Data, "--data", "-d");                                 // <data>   HTTP POST data
+            Append(Data, "--data", "-d");                                   // <data>   HTTP POST data
             Append(Cookie, "--cookie", "-b");                               // <data|filename> Send cookies from string/file
-            Append(CookieJar, "--cookie-jar","-c");                       // <filename> Write cookies to <filename> after operation
+            Append(CookieJar, "--cookie-jar","-c");                         // <filename> Write cookies to <filename> after operation
             Append(User, "--user", "-u");                                   // <user:password> Server user and password
             //Append(Oauth2Bearer, "--oauth2-bearer");                        // <token> OAuth 2 Bearer Token
             
