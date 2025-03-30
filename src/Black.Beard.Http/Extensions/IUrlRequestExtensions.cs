@@ -76,7 +76,7 @@ namespace Bb.Extensions
         /// <returns>A Task whose result is the object response body deserialized to an object of type T.</returns>
         public static Task<T?> GetObjectAsync<T>(this IUrlRequest request, HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead, CancellationToken cancellationToken = default)
         {
-            return request.SendAsync(HttpMethod.Get, null, completionOption, cancellationToken).MapJson<T>();
+            return request.SendAsync(HttpMethod.Get, null, completionOption, cancellationToken).As<T>();
         }
 
         /// <summary>

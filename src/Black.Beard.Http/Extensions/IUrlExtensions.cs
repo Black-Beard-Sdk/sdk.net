@@ -98,6 +98,28 @@ namespace Bb.Extensions
         }
 
         /// <summary>
+        /// Creates a new UrlRequest and sets request headers based on property names/values of the provided object, or keys/values if object is a dictionary, to be sent.
+        /// </summary>
+        /// <param name="url">This Url.</param>
+        /// <param name="contentType">Content type value</param>        
+        /// <returns>A new IUrlRequest.</returns>
+        public static IUrlRequest WithContentType(this Url url, ContentType contentType)
+        {
+            return new UrlRequest(url).WithHeader(ContentType.Key, contentType);
+        }
+
+        /// <summary>
+        /// Creates a new UrlRequest and sets request headers based on property names/values of the provided object, or keys/values if object is a dictionary, to be sent.
+        /// </summary>
+        /// <param name="url">This Url.</param>
+        /// <param name="contentType">Content type value</param>        
+        /// <returns>A new IUrlRequest.</returns>
+        public static IUrlRequest WithContentType(this Url url, string contentType)
+        {
+            return new UrlRequest(url).WithHeader(ContentType.Key, contentType);
+        }
+
+        /// <summary>
         /// Creates a new UrlRequest and sets the Authorization header according to Basic Authentication protocol.
         /// </summary>
         /// <param name="url">This Url.</param>

@@ -8,6 +8,7 @@ namespace Bb.Extensions
     /// </summary>
     public static class DownloadExtensions
     {
+
         /// <summary>
         /// Asynchronously downloads a file at the specified URL.
         /// </summary>

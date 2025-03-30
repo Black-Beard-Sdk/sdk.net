@@ -13,9 +13,9 @@ namespace Bb.Extensions
         /// <param name="segment">The segment to append</param>
         /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegment(this string url, object segment, bool fullyEncode = false)
+        public static Url WithPathSegment(this string url, object segment, bool fullyEncode = false)
         {
-            return new Url(url).AppendPathSegment(segment, fullyEncode);
+            return new Url(url).WithPathSegment(segment, fullyEncode);
         }
 
         /// <summary>
@@ -24,9 +24,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegments(this string url, params object[] segments)
+        public static Url WithPathSegment(this string url, params object[] segments)
         {
-            return new Url(url).AppendPathSegments(segments);
+            return new Url(url).WithPathSegment(segments);
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegments(this string url, IEnumerable<object> segments)
+        public static Url WithPathSegment(this string url, IEnumerable<object> segments)
         {
-            return new Url(url).AppendPathSegments(segments);
+            return new Url(url).WithPathSegment(segments);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Bb.Extensions
         /// <returns>A new Url object.</returns>
         public static Url SetQueryParam(this string url, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(url).SetQueryParam(name, value, nullValueHandling);
+            return new Url(url).WithQueryParam(name, value, nullValueHandling);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Bb.Extensions
         /// <returns>A new Url object.</returns>
         public static Url SetQueryParam(this string url, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(url).SetQueryParam(name, value, isEncoded, nullValueHandling);
+            return new Url(url).WithQueryParam(name, value, isEncoded, nullValueHandling);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Bb.Extensions
         /// <returns>A new Url object.</returns>
         public static Url SetQueryParam(this string url, string name)
         {
-            return new Url(url).SetQueryParam(name);
+            return new Url(url).WithQueryParam(name);
         }
 
         /// <summary>
@@ -105,9 +105,9 @@ namespace Bb.Extensions
         /// <param name="values">Typically an anonymous object, ie: new { x = 1, y = 2 }</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this string url, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static Url SetQueryParam(this string url, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(url).SetQueryParams(values, nullValueHandling);
+            return new Url(url).WithQueryParam(values, nullValueHandling);
         }
 
         /// <summary>
@@ -116,9 +116,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="names">Names of query parameters.</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this string url, IEnumerable<string> names)
+        public static Url SetQueryParam(this string url, IEnumerable<string> names)
         {
-            return new Url(url).SetQueryParams(names);
+            return new Url(url).WithQueryParam(names);
         }
 
         /// <summary>
@@ -127,9 +127,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="names">Names of query parameters</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this string url, params string[] names)
+        public static Url SetQueryParam(this string url, params string[] names)
         {
-            return new Url(url).SetQueryParams(names);
+            return new Url(url).WithQueryParam(names);
         }
 
         /// <summary>
@@ -149,9 +149,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQueryParams(this string url, params string[] names)
+        public static Url RemoveQueryParam(this string url, params string[] names)
         {
-            return new Url(url).RemoveQueryParams(names);
+            return new Url(url).RemoveQueryParam(names);
         }
 
         /// <summary>
@@ -160,9 +160,9 @@ namespace Bb.Extensions
         /// <param name="url">This URL.</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQueryParams(this string url, IEnumerable<string> names)
+        public static Url RemoveQueryParam(this string url, IEnumerable<string> names)
         {
-            return new Url(url).RemoveQueryParams(names);
+            return new Url(url).RemoveQueryParam(names);
         }
 
         /// <summary>
@@ -213,9 +213,9 @@ namespace Bb.Extensions
         /// <param name="segment">The segment to append</param>
         /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegment(this Uri uri, object segment, bool fullyEncode = false)
+        public static Url WithPathSegment(this Uri uri, object segment, bool fullyEncode = false)
         {
-            return new Url(uri).AppendPathSegment(segment, fullyEncode);
+            return new Url(uri).WithPathSegment(segment, fullyEncode);
         }
 
         /// <summary>
@@ -224,9 +224,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegments(this Uri uri, params object[] segments)
+        public static Url WithPathSegment(this Uri uri, params object[] segments)
         {
-            return new Url(uri).AppendPathSegments(segments);
+            return new Url(uri).WithPathSegment(segments);
         }
 
         /// <summary>
@@ -235,9 +235,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url AppendPathSegments(this Uri uri, IEnumerable<object> segments)
+        public static Url WithPathSegment(this Uri uri, IEnumerable<object> segments)
         {
-            return new Url(uri).AppendPathSegments(segments);
+            return new Url(uri).WithPathSegment(segments);
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace Bb.Extensions
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemovePathSegment(this Uri uri)
+        public static Url WithRemovePathSegment(this Uri uri)
         {
             return new Url(uri).RemovePathSegment();
         }
@@ -255,7 +255,7 @@ namespace Bb.Extensions
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemovePath(this Uri uri)
+        public static Url WithRemovePath(this Uri uri)
         {
             return new Url(uri).RemovePath();
         }
@@ -268,9 +268,9 @@ namespace Bb.Extensions
         /// <param name="value">Value of query parameter</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParam(this Uri uri, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static Url WithQueryParam(this Uri uri, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(uri).SetQueryParam(name, value, nullValueHandling);
+            return new Url(uri).WithQueryParam(name, value, nullValueHandling);
         }
 
         /// <summary>
@@ -282,9 +282,9 @@ namespace Bb.Extensions
         /// <param name="isEncoded">Set to true to indicate the value is already URL-encoded. Defaults to false.</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing).</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParam(this Uri uri, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static Url WithQueryParam(this Uri uri, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(uri).SetQueryParam(name, value, isEncoded, nullValueHandling);
+            return new Url(uri).WithQueryParam(name, value, isEncoded, nullValueHandling);
         }
 
         /// <summary>
@@ -293,9 +293,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="name">Name of query parameter</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParam(this Uri uri, string name)
+        public static Url WithQueryParam(this Uri uri, string name)
         {
-            return new Url(uri).SetQueryParam(name);
+            return new Url(uri).WithQueryParam(name);
         }
 
         /// <summary>
@@ -305,9 +305,9 @@ namespace Bb.Extensions
         /// <param name="values">Typically an anonymous object, ie: new { x = 1, y = 2 }</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this Uri uri, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static Url WithQueryParam(this Uri uri, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            return new Url(uri).SetQueryParams(values, nullValueHandling);
+            return new Url(uri).WithQueryParam(values, nullValueHandling);
         }
 
         /// <summary>
@@ -316,9 +316,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="names">Names of query parameters.</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this Uri uri, IEnumerable<string> names)
+        public static Url WithQueryParam(this Uri uri, IEnumerable<string> names)
         {
-            return new Url(uri).SetQueryParams(names);
+            return new Url(uri).WithQueryParam(names);
         }
 
         /// <summary>
@@ -327,9 +327,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="names">Names of query parameters</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetQueryParams(this Uri uri, params string[] names)
+        public static Url WithQueryParam(this Uri uri, params string[] names)
         {
-            return new Url(uri).SetQueryParams(names);
+            return new Url(uri).WithQueryParam(names);
         }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="name">Query string parameter name to remove</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQueryParam(this Uri uri, string name)
+        public static Url WithRemoveQueryParam(this Uri uri, string name)
         {
             return new Url(uri).RemoveQueryParam(name);
         }
@@ -349,9 +349,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQueryParams(this Uri uri, params string[] names)
+        public static Url WithRemoveQueryParam(this Uri uri, params string[] names)
         {
-            return new Url(uri).RemoveQueryParams(names);
+            return new Url(uri).RemoveQueryParam(names);
         }
 
         /// <summary>
@@ -360,9 +360,9 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQueryParams(this Uri uri, IEnumerable<string> names)
+        public static Url WithRemoveQueryParam(this Uri uri, IEnumerable<string> names)
         {
-            return new Url(uri).RemoveQueryParams(names);
+            return new Url(uri).RemoveQueryParam(names);
         }
 
         /// <summary>
@@ -370,7 +370,7 @@ namespace Bb.Extensions
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveQuery(this Uri uri)
+        public static Url WithRemoveQuery(this Uri uri)
         {
             return new Url(uri).RemoveQuery();
         }
@@ -381,7 +381,7 @@ namespace Bb.Extensions
         /// <param name="uri">This System.Uri.</param>
         /// <param name="fragment">The part of the URL after #</param>
         /// <returns>A new Url object.</returns>
-        public static Url SetFragment(this Uri uri, string fragment)
+        public static Url WithFragment(this Uri uri, string fragment)
         {
             return new Url(uri).SetFragment(fragment);
         }
@@ -391,7 +391,7 @@ namespace Bb.Extensions
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemoveFragment(this Uri uri)
+        public static Url WithRemoveFragment(this Uri uri)
         {
             return new Url(uri).RemoveFragment();
         }
@@ -401,7 +401,7 @@ namespace Bb.Extensions
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <returns>A new Url object.</returns>
-        public static Url ResetToRoot(this Uri uri)
+        public static Url WithResetToRoot(this Uri uri)
         {
             return new Url(uri).ResetToRoot();
         }

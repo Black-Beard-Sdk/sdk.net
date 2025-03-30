@@ -126,7 +126,7 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Asserts whether calls were made containing ALL the given query parameters (regardless of their values).
 		/// </summary>
-		public HttpCallAssertion WithQueryParams(params string[] names) {
+		public HttpCallAssertion WithQueryParam(params string[] names) {
 			return names.Select(n => WithQueryParam(n)).LastOrDefault() ?? this;
 		}
 
@@ -134,7 +134,7 @@ namespace Bb.Http.Testing
 		/// Asserts whether calls were made NOT containing any of the given query parameters.
 		/// If no names are provided, asserts no calls were made with any query parameters.
 		/// </summary>
-		public HttpCallAssertion WithoutQueryParams(params string[] names) {
+		public HttpCallAssertion WithoutQueryParam(params string[] names) {
 			if (!names.Any())
 				return With(c => !c.Request.Url.QueryParams.Any(), "no query parameters");
 			return names.Select(n => WithoutQueryParam(n)).LastOrDefault() ?? this;
@@ -153,7 +153,7 @@ namespace Bb.Http.Testing
 		/// Asserts whether calls were made containing all of the given query parameter values.
 		/// </summary>
 		/// <param name="values">Object (usually anonymous) or dictionary that is parsed to name/value query parameters to check for. Values may contain * wildcard.</param>
-		public HttpCallAssertion WithQueryParams(object values) {
+		public HttpCallAssertion WithQueryParam(object values) {
 			return values.ToKeyValuePairs().Select(kv => WithQueryParam(kv.Key, kv.Value)).LastOrDefault() ?? this;
 		}
 
@@ -161,7 +161,7 @@ namespace Bb.Http.Testing
 		/// Asserts whether calls were made NOT containing any of the given query parameter values.
 		/// </summary>
 		/// <param name="values">Object (usually anonymous) or dictionary that is parsed to name/value query parameters to check for. Values may contain * wildcard.</param>
-		public HttpCallAssertion WithoutQueryParams(object values) {
+		public HttpCallAssertion WithoutQueryParam(object values) {
 			return values.ToKeyValuePairs().Select(kv => WithoutQueryParam(kv.Key, kv.Value)).LastOrDefault() ?? this;
 		}
 		#endregion

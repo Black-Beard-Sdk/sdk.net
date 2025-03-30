@@ -1,5 +1,6 @@
 using Bb;
 using Bb.Extensions;
+using Bb.Http;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.Json;
@@ -13,7 +14,10 @@ namespace HttpTests
 
         public UnitTest1()
         {
-
+            Environment.SetEnvironmentVariable("client_id", "urn:oauth:itl:prod:itlivemaps");
+            Environment.SetEnvironmentVariable("client_secret", "ugiVZjSEeFTDsJg9H_C9atoEhzLG1dz1XN9eWaXy");
+            Environment.SetEnvironmentVariable("username", "g.beard@pickup-services.com");
+            Environment.SetEnvironmentVariable("password", null);
         }
 
 
@@ -26,7 +30,7 @@ namespace HttpTests
 
             Assert.AreEqual(url1.ToString(), url2.ToString());
 
-            Url url3 = url2.AppendPathSegment("adfs/oauth2/token");
+            Url url3 = url2.WithPathSegment("adfs/oauth2/token");
             Url url4 = new Url(new Uri("https://api.fr:80"), "adfs", "oauth2", "token");
             Assert.AreEqual(url2.ToString(), url3.ToString());
 
@@ -37,12 +41,9 @@ namespace HttpTests
         public void TestMethodPost1()
         {
 
-            var adfsUrl = "https://sts.pickup.fr";
-            var url = "https://sts.pickup.fr";
-
-            var token = adfsUrl.AppendPathSegment("adfs/oauth2/token")
-                
-                .PostAsync(new
+            var token = "https://sts.pickup.fr"
+                .WithPathSegment("adfs", "oauth2", "token")
+                .PostUrlEncodedAsync(new
                 {
                     grant_type = "password",
                     username = "@{username}",
@@ -51,8 +52,26 @@ namespace HttpTests
                     client_secret = "@{client_secret}",
                     scope = "email"
                 })
-                
-            .Result;
+                .As<Oauth2Token>(messageFailed =>
+                {
+
+                })
+                .Result;
+
+            var datas = "https://pickup.itlivemaps.com"
+                .WithPathSegment("oidc", "api", "graphql")
+                .WithQueryParam("Instance", "CartographiePickup")
+                .WithContentType(ContentType.ApplicationJson)
+                .WithOAuthBearerToken(token.access_token)
+                .PostAsync(new
+                {
+                    query = "{ objects( filter: { className:\"Application\", description:\"/(?i).*pudo.*/\" }) { ... on\r\nApplication { id name description } } }"
+                })
+                .AsString(messageFailed =>
+                {
+
+                })
+                .Result;
 
         }
 

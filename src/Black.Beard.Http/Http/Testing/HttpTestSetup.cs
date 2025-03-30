@@ -38,7 +38,7 @@ namespace Bb.Http.Testing
 
 			return new HttpResponseMessage {
 				StatusCode = HttpStatusCode.OK,
-				Content = new StringContent("")
+				Content = new StringContent(string.Empty)
 			};
 		}
 

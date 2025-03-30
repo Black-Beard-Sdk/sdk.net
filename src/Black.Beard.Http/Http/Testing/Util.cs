@@ -42,7 +42,7 @@ namespace Bb.Http.Testing
 			return paramVals.Any(v => MatchesValueOrPattern(v, value));
 		}
 
-		internal static bool HasAllQueryParams(this UrlCall call, string[] names) {
+		internal static bool HasAllQueryParam(this UrlCall call, string[] names) {
 			return call.Request.Url.QueryParams
 			   .Select(p => p.Name)
 			   .Intersect(names)
@@ -57,7 +57,7 @@ namespace Bb.Http.Testing
 			   .Any() : qp.Any();
 		}
 
-		internal static bool HasQueryParams(this UrlCall call, object values) {
+		internal static bool HasQueryParam(this UrlCall call, object values) {
 			return values.ToKeyValuePairs().All(kv => call.HasQueryParam(kv.Key, kv.Value));
 		}
 
@@ -110,7 +110,7 @@ namespace Bb.Http.Testing
 			if (!pattern.OrdinalContains("*")) return textToCheck == pattern;
 
 			var regex = "^" + Regex.Escape(pattern).Replace("\\*", "(.*)") + "$";
-			return Regex.IsMatch(textToCheck ?? "", regex);
+			return Regex.IsMatch(textToCheck ?? string.Empty, regex);
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace Bb.Extensions
     /// </summary>
     public static class HeaderExtensions
     {
+
         /// <summary>
         /// Sets an HTTP header to be sent with this IUrlRequest or all requests made with this IUrlClient.
         /// </summary>
@@ -23,6 +24,23 @@ namespace Bb.Extensions
                 clientOrRequest.Headers.Remove(name);
             else
                 clientOrRequest.Headers.AddOrReplace(name, value.ToInvariantString().Trim());
+            return clientOrRequest;
+        }
+
+        /// <summary>
+        /// Sets an HTTP header to be sent with this IUrlRequest or all requests made with this IUrlClient.
+        /// </summary>
+        /// <param name="clientOrRequest">The IUrlClient or IUrlRequest.</param>
+        /// <param name="name">HTTP header name.</param>
+        /// <param name="value">HTTP header value.</param>
+        /// <returns>This IUrlClient or IUrlRequest.</returns>
+        public static T WithHeader<T>(this T clientOrRequest, string name, ContentType value) where T : IHttpSettingsContainer
+        {
+            if (value == null)
+                throw new System.ArgumentNullException(nameof(value));
+
+            clientOrRequest.Headers.AddOrReplace(name, value.ToString());
+
             return clientOrRequest;
         }
 

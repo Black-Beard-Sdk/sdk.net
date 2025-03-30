@@ -17,7 +17,7 @@ namespace Bb.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="segment"/> is <see langword="null" />.</exception>
         public static IUrlRequest AppendPathSegment(this IUrlRequest request, object segment, bool fullyEncode = false)
         {
-            request.Url.AppendPathSegment(segment, fullyEncode);
+            request.Url.WithPathSegment(segment, fullyEncode);
             return request;
         }
 
@@ -27,9 +27,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest AppendPathSegments(this IUrlRequest request, params object[] segments)
+        public static IUrlRequest AppendPathSegment(this IUrlRequest request, params object[] segments)
         {
-            request.Url.AppendPathSegments(segments);
+            request.Url.WithPathSegment(segments);
             return request;
         }
 
@@ -39,9 +39,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest AppendPathSegments(this IUrlRequest request, IEnumerable<object> segments)
+        public static IUrlRequest AppendPathSegment(this IUrlRequest request, IEnumerable<object> segments)
         {
-            request.Url.AppendPathSegments(segments);
+            request.Url.WithPathSegment(segments);
             return request;
         }
 
@@ -53,9 +53,9 @@ namespace Bb.Extensions
         /// <param name="value">Value of query parameter</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest SetQueryParam(this IUrlRequest request, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static IUrlRequest QueryParam(this IUrlRequest request, string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            request.Url.SetQueryParam(name, value, nullValueHandling);
+            request.Url.WithQueryParam(name, value, nullValueHandling);
             return request;
         }
 
@@ -69,9 +69,9 @@ namespace Bb.Extensions
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>This IUrlRequest</returns>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
-        public static IUrlRequest SetQueryParam(this IUrlRequest request, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static IUrlRequest QueryParam(this IUrlRequest request, string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            request.Url.SetQueryParam(name, value, isEncoded, nullValueHandling);
+            request.Url.WithQueryParam(name, value, isEncoded, nullValueHandling);
             return request;
         }
 
@@ -81,9 +81,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="name">Name of query parameter</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest SetQueryParam(this IUrlRequest request, string name)
+        public static IUrlRequest QueryParam(this IUrlRequest request, string name)
         {
-            request.Url.SetQueryParam(name);
+            request.Url.WithQueryParam(name);
             return request;
         }
 
@@ -94,9 +94,9 @@ namespace Bb.Extensions
         /// <param name="values">Typically an anonymous object, ie: new { x = 1, y = 2 }</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest SetQueryParams(this IUrlRequest request, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public static IUrlRequest QueryParam(this IUrlRequest request, object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
-            request.Url.SetQueryParams(values, nullValueHandling);
+            request.Url.WithQueryParam(values, nullValueHandling);
             return request;
         }
 
@@ -106,9 +106,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="names">Names of query parameters.</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest SetQueryParams(this IUrlRequest request, IEnumerable<string> names)
+        public static IUrlRequest QueryParam(this IUrlRequest request, IEnumerable<string> names)
         {
-            request.Url.SetQueryParams(names);
+            request.Url.WithQueryParam(names);
             return request;
         }
 
@@ -118,9 +118,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="names">Names of query parameters</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest SetQueryParams(this IUrlRequest request, params string[] names)
+        public static IUrlRequest QueryParam(this IUrlRequest request, params string[] names)
         {
-            request.Url.SetQueryParams(names as IEnumerable<string>);
+            request.Url.WithQueryParam(names as IEnumerable<string>);
             return request;
         }
 
@@ -142,9 +142,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest RemoveQueryParams(this IUrlRequest request, params string[] names)
+        public static IUrlRequest RemoveQueryParam(this IUrlRequest request, params string[] names)
         {
-            request.Url.RemoveQueryParams(names);
+            request.Url.RemoveQueryParam(names);
             return request;
         }
 
@@ -154,9 +154,9 @@ namespace Bb.Extensions
         /// <param name="request">The IUrlRequest associated with the URL</param>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>This IUrlRequest</returns>
-        public static IUrlRequest RemoveQueryParams(this IUrlRequest request, IEnumerable<string> names)
+        public static IUrlRequest RemoveQueryParam(this IUrlRequest request, IEnumerable<string> names)
         {
-            request.Url.RemoveQueryParams(names);
+            request.Url.RemoveQueryParam(names);
             return request;
         }
 

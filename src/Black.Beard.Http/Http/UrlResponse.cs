@@ -136,7 +136,7 @@ namespace Bb.Http
 
             // fixes #606. also verified that HttpClient.GetStringAsync returns empty string when Content is null.
             if (ResponseMessage.Content == null)
-                return "";
+                return string.Empty;
 
 #if NETSTANDARD2_0
 			// https://stackoverflow.com/questions/46119872/encoding-issues-with-net-core-2 (#86)

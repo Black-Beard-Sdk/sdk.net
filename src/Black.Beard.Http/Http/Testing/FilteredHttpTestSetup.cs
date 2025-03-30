@@ -71,15 +71,15 @@ namespace Bb.Http.Testing
 		/// <summary>
 		/// Defines query parameter names, ALL of which a call must contain in order for this HttpTestSetup to apply.
 		/// </summary>
-		public FilteredHttpTestSetup WithQueryParams(params string[] names) {
-			return With(c => c.HasAllQueryParams(names));
+		public FilteredHttpTestSetup WithQueryParam(params string[] names) {
+			return With(c => c.HasAllQueryParam(names));
 		}
 
 		/// <summary>
 		/// Defines query parameter names, NONE of which a call must contain in order for this HttpTestSetup to apply.
 		/// If no names are provided, call must not contain any query parameters.
 		/// </summary>
-		public FilteredHttpTestSetup WithoutQueryParams(params string[] names) {
+		public FilteredHttpTestSetup WithoutQueryParam(params string[] names) {
 			return Without(c => c.HasAnyQueryParam(names));
 		}
 
@@ -87,16 +87,16 @@ namespace Bb.Http.Testing
 		/// Defines query parameters, ALL of which a call must contain in order for this HttpTestSetup to apply.
 		/// </summary>
 		/// <param name="values">Object (usually anonymous) or dictionary that is parsed to name/value query parameters to check for. Values may contain * wildcard.</param>
-		public FilteredHttpTestSetup WithQueryParams(object values) {
-			return With(c => c.HasQueryParams(values));
+		public FilteredHttpTestSetup WithQueryParam(object values) {
+			return With(c => c.HasQueryParam(values));
 		}
 
 		/// <summary>
 		/// Defines query parameters, NONE of which a call must contain in order for this HttpTestSetup to apply.
 		/// </summary>
 		/// <param name="values">Object (usually anonymous) or dictionary that is parsed to name/value query parameters to check for. Values may contain * wildcard.</param>
-		public FilteredHttpTestSetup WithoutQueryParams(object values) {
-			return Without(c => c.HasQueryParams(values));
+		public FilteredHttpTestSetup WithoutQueryParam(object values) {
+			return Without(c => c.HasQueryParam(values));
 		}
 
 		/// <summary>

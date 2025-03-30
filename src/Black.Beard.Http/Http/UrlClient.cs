@@ -68,7 +68,7 @@ namespace Bb.Http
 
             //HttpClient.DefaultRequestVersion = request.Version;
 
-            var reqMsg = SyncHeaders(request, new HttpRequestMessage(request.Verb, request.Url)
+            var reqMsg = SyncHeaders(request, new HttpRequestMessage(request.Verb, request.Url.ToUri())
                                                 { 
                                                     Content = request.Content, Version = request.Version 
                                                 });
@@ -205,7 +205,7 @@ namespace Bb.Http
                 redir.Url = new Url(location);
             else if (location.OrdinalStartsWith("//"))
                 redir.Url = new Url(call.Request.Url.Scheme + ":" + location);
-            else if (location.OrdinalStartsWith("/"))
+            else if (location.OrdinalStartsWith(Url.Slash))
                 redir.Url = Url.Combine(call.Request.Url.Root, location);
             else
                 redir.Url = Url.Combine(call.Request.Url.Root, call.Request.Url.Path, location);

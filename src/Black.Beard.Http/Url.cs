@@ -54,9 +54,9 @@ namespace Bb
         /// </summary>
         public string Authority => string.Concat(
             UserInfo,
-            UserInfo?.Length > 0 ? "@" : "",
+            UserInfo?.Length > 0 ? "@" : String.Empty,
             Host,
-            Port.HasValue ? ":" : "",
+            Port.HasValue ? ":" : String.Empty,
             Port);
 
         /// <summary>
@@ -64,8 +64,8 @@ namespace Bb
         /// </summary>
         public string Root => string.Concat(
             Scheme,
-            Scheme?.Length > 0 ? ":" : "",
-            Authority?.Length > 0 ? "//" : "",
+            Scheme?.Length > 0 ? ":" : String.Empty,
+            Authority?.Length > 0 ? "//" : String.Empty,
             Authority);
 
         public Uri BaseAddress => new Uri(this.Root);
@@ -79,9 +79,9 @@ namespace Bb
             {
                 EnsureParsed();
                 return string.Concat(
-                    _leadingSlash ? "/" : "",
-                    string.Join("/", PathSegments),
-                    _trailingSlash && PathSegments.Any() ? "/" : "");
+                    _leadingSlash ? Slash : String.Empty,
+                    string.Join(Slash, PathSegments),
+                    _trailingSlash && PathSegments.Any() ? Slash : String.Empty);
             }
             set
             {
@@ -89,10 +89,10 @@ namespace Bb
                 _trailingSlash = false;
                 if (string.IsNullOrEmpty(value))
                     _leadingSlash = false;
-                else if (value == "/")
+                else if (value == Slash)
                     _leadingSlash = true;
                 else
-                    AppendPathSegment(value ?? "");
+                    WithPathSegment(value ?? String.Empty);
             }
         }
 
@@ -116,7 +116,7 @@ namespace Bb
         public QueryParamCollection QueryParams => EnsureParsed()._queryParams;
 
         /// <summary>
-        /// i.e. "frag" in "https://www.site.com/path?x=y#frag". Does not include "#".
+        /// i.e. "fragment" in "https://www.site.com/path?x=y#frag". Does not include "#".
         /// </summary>
         public string Fragment
         {
@@ -157,7 +157,7 @@ namespace Bb
             this.Host = host;
             this.Port = port;
 
-            this.AppendPathSegments(segments);
+            this.WithPathSegment(segments);
 
         }
 
@@ -189,7 +189,7 @@ namespace Bb
         {
             _originalString = (uri ?? throw new ArgumentNullException(nameof(uri))).OriginalString;
             ParseInternal(uri); // parse eagerly, taking advantage of the fact that we already have a parsed Uri
-            AppendPathSegments(segments);
+            WithPathSegment(segments);
         }
 
         /// <summary>
@@ -203,18 +203,18 @@ namespace Bb
         {
             _parsed = true;
 
-            uri = uri ?? new Uri(_originalString ?? "", UriKind.RelativeOrAbsolute);
+            uri = uri ?? new Uri(_originalString ?? String.Empty, UriKind.RelativeOrAbsolute);
 
             if (uri.OriginalString.OrdinalStartsWith("//"))
             {
                 ParseInternal(new Uri("http:" + uri.OriginalString));
-                _scheme = "";
+                _scheme = string.Empty;
             }
-            else if (uri.OriginalString.OrdinalStartsWith("/"))
+            else if (uri.OriginalString.OrdinalStartsWith(Slash))
             {
                 ParseInternal(new Uri("http://temp.com" + uri.OriginalString));
-                _scheme = "";
-                _host = "";
+                _scheme = string.Empty;
+                _host = string.Empty;
                 _leadingSlash = true;
             }
             else if (uri.IsAbsoluteUri)
@@ -222,15 +222,16 @@ namespace Bb
                 _scheme = uri.Scheme;
                 _userInfo = uri.UserInfo;
                 _host = uri.Host;
-                _port = _originalString?.OrdinalStartsWith($"{Root}:{uri.Port}", ignoreCase: true) == true ? uri.Port : (int?)null; // don't default Port if not included explicitly
+                _port = _originalString?.OrdinalStartsWith($"{Root}:{uri.Port}", ignoreCase: true) == true ? uri.Port : (int?)null; 
+                // don't default Port if not included explicitly
                 _pathSegments = new List<string>();
-                if (uri.AbsolutePath.Length > 0 && uri.AbsolutePath != "/")
-                    AppendPathSegment(uri.AbsolutePath);
+                if (uri.AbsolutePath.Length > 0 && uri.AbsolutePath != Slash)
+                    WithPathSegment(uri.AbsolutePath);
                 _queryParams = new QueryParamCollection(uri.Query);
                 _fragment = uri.Fragment.TrimStart('#'); // quirk - formal def of fragment does not include the #
 
-                _leadingSlash = uri.OriginalString.OrdinalStartsWith(Root + "/", ignoreCase: true);
-                _trailingSlash = _pathSegments.Any() && uri.AbsolutePath.OrdinalEndsWith("/");
+                _leadingSlash = uri.OriginalString.OrdinalStartsWith(Root + Slash, ignoreCase: true);
+                _trailingSlash = _pathSegments.Any() && uri.AbsolutePath.OrdinalEndsWith(Slash);
                 _trailingQmark = uri.Query == "?";
                 _trailingHash = uri.Fragment == "#";
 
@@ -246,8 +247,8 @@ namespace Bb
                 {
                     // Uri parsed Authority when it should not have
                     _pathSegments.Insert(0, Authority);
-                    _userInfo = "";
-                    _host = "";
+                    _userInfo = string.Empty;
+                    _host = string.Empty;
                     _port = null;
                 }
             }
@@ -255,8 +256,8 @@ namespace Bb
             else
             {
                 ParseInternal(new Uri("http://temp.com/" + uri.OriginalString));
-                _scheme = "";
-                _host = "";
+                _scheme = string.Empty;
+                _host = string.Empty;
                 _leadingSlash = false;
             }
 
@@ -267,14 +268,14 @@ namespace Bb
         /// Parses a URL query to a QueryParamCollection.
         /// </summary>
         /// <param name="query">The URL query to parse.</param>
-        public static QueryParamCollection ParseQueryParams(string query) => new QueryParamCollection(query);
+        public static QueryParamCollection ParseQueryParam(string query) => new QueryParamCollection(query);
 
         /// <summary>
         /// Splits the given path into segments, encoding illegal characters, "?", and "#".
         /// </summary>
         /// <param name="path">The path to split.</param>
         /// <returns></returns>
-        public static IEnumerable<string> ParsePathSegments(string path)
+        public static IEnumerable<string> ParsePathSegment(string path)
         {
             var segments = EncodeIllegalCharacters(path.ReplaceVariables())
                 .Replace("?", "%3F")
@@ -295,11 +296,13 @@ namespace Bb
                     yield return segments[i];
             }
         }
-        
+
         #endregion
 
         #region fluent builder methods
-        
+
+        #region path segment
+
         /// <summary>
         /// Appends a segment to the URL path, ensuring there is one and only one '/' character as a separator.
         /// </summary>
@@ -307,7 +310,7 @@ namespace Bb
         /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>the Url object with the segment appended</returns>
         /// <exception cref="ArgumentNullException"><paramref name="segment"/> is <see langword="null" />.</exception>
-        public Url AppendPathSegment(object segment, bool fullyEncode = false)
+        public Url WithPathSegment(object segment, bool fullyEncode = false)
         {
             if (segment == null)
                 throw new ArgumentNullException(nameof(segment));
@@ -322,9 +325,9 @@ namespace Bb
             else
             {
                 var subpath = segment.ToInvariantString();
-                foreach (var s in ParsePathSegments(subpath))
+                foreach (var s in ParsePathSegment(subpath.ReplaceVariables()))
                     PathSegments.Add(s);
-                _trailingSlash = subpath.OrdinalEndsWith("/");
+                _trailingSlash = subpath.OrdinalEndsWith(Slash);
             }
 
             _leadingSlash |= !IsRelative;
@@ -332,27 +335,27 @@ namespace Bb
         }
 
         /// <summary>
-        /// Appends multiple segments to the URL path, ensuring there is one and only one '/' character as a seperator.
+        /// Appends multiple segments to the URL path, ensuring there is one and only one '/' character as a separator.
         /// </summary>
         /// <param name="segments">The segments to append</param>
         /// <returns>the Url object with the segments appended</returns>
-        public Url AppendPathSegments(params object[] segments)
+        public Url WithPathSegment(params object[] segments)
         {
             foreach (var segment in segments)
-                AppendPathSegment(segment);
+                WithPathSegment(segment);
 
             return this;
         }
 
         /// <summary>
-        /// Appends multiple segments to the URL path, ensuring there is one and only one '/' character as a seperator.
+        /// Appends multiple segments to the URL path, ensuring there is one and only one '/' character as a separator.
         /// </summary>
         /// <param name="segments">The segments to append</param>
         /// <returns>the Url object with the segments appended</returns>
-        public Url AppendPathSegments(IEnumerable<object> segments)
+        public Url WithPathSegment(IEnumerable<object> segments)
         {
             foreach (var s in segments)
-                AppendPathSegment(s);
+                WithPathSegment(s);
 
             return this;
         }
@@ -380,13 +383,34 @@ namespace Bb
         }
 
         /// <summary>
+        /// Set the URL fragment fluently.
+        /// </summary>
+        /// <param name="fragment">The part of the URL after #</param>
+        /// <returns>The Url object with the new fragment set</returns>
+        public Url SetFragment(string fragment)
+        {
+            Fragment = fragment ?? String.Empty;
+            return this;
+        }
+
+        /// <summary>
+        /// Removes the URL fragment including the #.
+        /// </summary>
+        /// <returns>The Url object with the fragment removed</returns>
+        public Url RemoveFragment() => SetFragment(string.Empty);
+
+        #endregion path segment
+
+        #region query params
+
+        /// <summary>
         /// Adds a parameter to the query, overwriting the value if name exists.
         /// </summary>
         /// <param name="name">Name of query parameter</param>
         /// <param name="value">Value of query parameter</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>The Url object with the query parameter added</returns>
-        public Url SetQueryParam(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public Url WithQueryParam(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
             QueryParams.AddOrReplace(name, value, false, nullValueHandling);
             return this;
@@ -401,7 +425,7 @@ namespace Bb
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>The Url object with the query parameter added</returns>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <see langword="null" />.</exception>
-        public Url SetQueryParam(string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public Url WithQueryParam(string name, string value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
             QueryParams.AddOrReplace(name, value, isEncoded, nullValueHandling);
             return this;
@@ -412,7 +436,7 @@ namespace Bb
         /// </summary>
         /// <param name="name">Name of query parameter</param>
         /// <returns>The Url object with the query parameter added</returns>
-        public Url SetQueryParam(string name)
+        public Url WithQueryParam(string name)
         {
             QueryParams.AddOrReplace(name, null, false, NullValueHandling.NameOnly);
             return this;
@@ -424,16 +448,16 @@ namespace Bb
         /// <param name="values">Typically an anonymous object, ie: new { x = 1, y = 2 }</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>The Url object with the query parameters added</returns>
-        public Url SetQueryParams(object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public Url WithQueryParam(object values, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
             if (values == null)
                 return this;
 
             if (values is string s)
-                return SetQueryParam(s);
+                return WithQueryParam(s);
 
             foreach (var kv in values.ToKeyValuePairs())
-                SetQueryParam(kv.Key, kv.Value, nullValueHandling);
+                WithQueryParam(kv.Key, kv.Value, nullValueHandling);
 
             return this;
         }
@@ -443,13 +467,13 @@ namespace Bb
         /// </summary>
         /// <param name="names">Names of query parameters.</param>
         /// <returns>The Url object with the query parameter added</returns>
-        public Url SetQueryParams(IEnumerable<string> names)
+        public Url WithQueryParam(IEnumerable<string> names)
         {
             if (names == null)
                 return this;
 
             foreach (var name in names.Where(n => !string.IsNullOrEmpty(n)))
-                SetQueryParam(name);
+                WithQueryParam(name);
 
             return this;
         }
@@ -459,7 +483,7 @@ namespace Bb
         /// </summary>
         /// <param name="names">Names of query parameters</param>
         /// <returns>The Url object with the query parameter added.</returns>
-        public Url SetQueryParams(params string[] names) => SetQueryParams(names as IEnumerable<string>);
+        public Url WithQueryParam(params string[] names) => WithQueryParam(names as IEnumerable<string>);
 
         /// <summary>
         /// Removes a name/value pair from the query by name.
@@ -477,7 +501,7 @@ namespace Bb
         /// </summary>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>The Url object.</returns>
-        public Url RemoveQueryParams(params string[] names)
+        public Url RemoveQueryParam(params string[] names)
         {
             foreach (var name in names)
                 QueryParams.Remove(name);
@@ -489,7 +513,7 @@ namespace Bb
         /// </summary>
         /// <param name="names">Query string parameter names to remove</param>
         /// <returns>The Url object with the query parameters removed</returns>
-        public Url RemoveQueryParams(IEnumerable<string> names)
+        public Url RemoveQueryParam(IEnumerable<string> names)
         {
             foreach (var name in names)
                 QueryParams.Remove(name);
@@ -506,22 +530,7 @@ namespace Bb
             return this;
         }
 
-        /// <summary>
-        /// Set the URL fragment fluently.
-        /// </summary>
-        /// <param name="fragment">The part of the URL after #</param>
-        /// <returns>The Url object with the new fragment set</returns>
-        public Url SetFragment(string fragment)
-        {
-            Fragment = fragment ?? "";
-            return this;
-        }
-
-        /// <summary>
-        /// Removes the URL fragment including the #.
-        /// </summary>
-        /// <returns>The Url object with the fragment removed</returns>
-        public Url RemoveFragment() => SetFragment("");
+        #endregion query params
 
         /// <summary>
         /// Resets the URL to its root, including the scheme, any user info, host, and port (if specified).
@@ -531,7 +540,7 @@ namespace Bb
         {
             PathSegments.Clear();
             QueryParams.Clear();
-            Fragment = "";
+            Fragment = String.Empty;
             _leadingSlash = false;
             _trailingSlash = false;
             return this;
@@ -561,7 +570,7 @@ namespace Bb
         /// <summary>
         /// Creates a copy of this Url.
         /// </summary>
-        public Url Clone() => new Url(this);
+        public Url Clone() => new Url(this.ToUri());
         #endregion
 
         #region conversion, equality, etc.
@@ -576,9 +585,11 @@ namespace Bb
             if (!_parsed)
                 return _originalString ?? string.Empty;
 
+            var p = Path;
+
             return string.Concat(
                 Root,
-                encodeSpaceAsPlus ? Path.Replace("%20", "+") : Path,
+                encodeSpaceAsPlus ? p.Replace("%20", "+") : p,
                 _trailingQmark || QueryParams.Any() ? "?" : string.Empty,
                 QueryParams.ToString(encodeSpaceAsPlus),
                 _trailingHash || Fragment?.Length > 0 ? "#" : string.Empty,
@@ -598,6 +609,18 @@ namespace Bb
         public Uri ToUri() => new Uri(this, UriKind.RelativeOrAbsolute);
 
         /// <summary>
+        /// Implicit conversion from Url to System.Uri.
+        /// </summary>
+        /// <param name="url"></param>
+        public static implicit operator Uri(Url url) => url.ToUri();
+
+        /// <summary>
+        /// Implicit conversion from System.Uri to Url.
+        /// </summary>
+        /// <returns>The string</returns>
+        public static implicit operator Url(Uri uri) => new Url(uri.ToString());
+
+        /// <summary>
         /// Implicit conversion from Url to String.
         /// </summary>
         /// <param name="url">The Url object</param>
@@ -612,12 +635,6 @@ namespace Bb
         public static implicit operator Url(string url) => new Url(url);
 
         /// <summary>
-        /// Implicit conversion from System.Uri to Url.
-        /// </summary>
-        /// <returns>The string</returns>
-        public static implicit operator Url(Uri uri) => new Url(uri.ToString());
-
-        /// <summary>
         /// True if obj is an instance of Url and its string representation is equal to this instance's string representation.
         /// </summary>
         /// <param name="obj">The object to compare to this instance.</param>
@@ -625,7 +642,7 @@ namespace Bb
         public override bool Equals(object obj) => obj is Url url && this.ToString().OrdinalEquals(url.ToString());
 
         /// <summary>
-        /// Returns the hashcode for this Url.
+        /// Returns the hash code for this Url.
         /// </summary>
         public override int GetHashCode() => this.ToString().GetHashCode();
         #endregion
@@ -643,7 +660,7 @@ namespace Bb
             if (parts == null)
                 throw new ArgumentNullException(nameof(parts));
 
-            string result = "";
+            string result = String.Empty;
             bool inQuery = false, inFragment = false;
 
             string CombineEnsureSingleSeparator(string a, string b, char separator)
@@ -743,7 +760,7 @@ namespace Bb
                 s = s.Replace(" ", "+");
 
             // Uri.EscapeUriString mostly does what we want - encodes illegal characters only - but it has a quirk
-            // in that % isn't illegal if it's the start of a %-encoded sequence https://stackoverflow.com/a/47636037/62600
+            // in that % isn't illegal if it's the start of a %- encoded sequence https://stackoverflow.com/a/47636037/62600
 
             // no % characters, so avoid the regex overhead
             if (!s.OrdinalContains("%"))
@@ -752,8 +769,8 @@ namespace Bb
             // pick out all %-hex-hex matches and avoid double-encoding
             return Regex.Replace(s, "(.*?)((%[0-9A-Fa-f]{2})|$)", c =>
             {
-                var a = c.Groups[1].Value; // group 1 is a sequence with no %-encoding - encode illegal characters
-                var b = c.Groups[2].Value; // group 2 is a valid 3-character %-encoded sequence - leave it alone!
+                var a = c.Groups[1].Value; // group 1 is a sequence with no %- encoding - encode illegal characters
+                var b = c.Groups[2].Value; // group 2 is a valid 3-character %- encoded sequence - leave it alone!
                 return Uri.EscapeUriString(a) + b;
             });
         }
@@ -764,9 +781,11 @@ namespace Bb
         /// <param name="url">The string to check</param>
         /// <returns>true if the string is a well-formed absolute URL</returns>
         public static bool IsValid(string url) => url != null && Uri.IsWellFormedUriString(url, UriKind.Absolute);
-        
+
         #endregion
 
+
+        public static string Slash = "/";
 
         private string _originalString;
         private bool _parsed;

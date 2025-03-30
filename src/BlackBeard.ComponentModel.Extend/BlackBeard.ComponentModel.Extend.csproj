@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConnexionReaderExtension.cs" />
+    <Compile Remove="LockExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.165" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.165" />
+  </ItemGroup>
+
+</Project>

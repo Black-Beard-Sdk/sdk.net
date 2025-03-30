@@ -27,7 +27,7 @@ namespace Bb.Http.Testing
 			if (conditions.Any())
 				expected += " with " + string.Join(" and ", conditions);
 			else
-				actual = actual.Replace(" matching", "");
+				actual = actual.Replace(" matching", string.Empty);
 			return $"Expected {expected}, but {actual}.";
 		}
 	}

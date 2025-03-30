@@ -185,7 +185,7 @@ namespace Bb.Util
         /// <summary>
         /// Strips any single quotes or double quotes from the beginning and end of a string.
         /// </summary>
-        public static string StripQuotes(this string s) => Regex.Replace(s, "^\\s*['\"]+|['\"]+\\s*$", "");
+        public static string StripQuotes(this string s) => Regex.Replace(s, "^\\s*['\"]+|['\"]+\\s*$", String.Empty);
 
         /// <summary>
         /// True if the given string is a valid IPv4 address.

@@ -31,7 +31,7 @@ namespace Bb.Http
 				return false;
 
 			foreach (var range in pattern.Split(',').Select(p => p.Trim())) {
-				if (range == "")
+				if (range == string.Empty)
 					continue;
 
 				if (range == "*")

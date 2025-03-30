@@ -111,7 +111,7 @@ namespace Bb.Http
 		public string GetKey() {
 			var domain = string.IsNullOrEmpty(Domain) ? "*" + OriginUrl.Host : Domain;
 			var path = string.IsNullOrEmpty(Path) ? OriginUrl.Path : Path;
-			if (path.Length == 0) path = "/";
+			if (path.Length == 0) path = Url.Slash;
 			return $"{domain}{path}:{Name}";
 		}
 
