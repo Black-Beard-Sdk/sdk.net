@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 
 
-namespace Bb.Configuration
+namespace Bb.Extensions
 {
 
     public class ConfigurationLoader : IEnumerable<IGrouping<string, ConfigurationFile>>

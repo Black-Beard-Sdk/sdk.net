@@ -1,7 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
-using Bb.Configuration;
 using Bb.Configuration.Git;
+using Bb.Extensions;
 using System.Diagnostics;
 using System.Reflection;
 

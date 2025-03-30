@@ -45,7 +45,6 @@ namespace Bb.Helpers
         {
             if (sb == null)
                 sb = new StringBuilder(200);
-
             string comma = string.Empty;
             foreach (var url in urls)
             {
@@ -53,9 +52,7 @@ namespace Bb.Helpers
                 sb.Append(url.ToString());
                 comma = ";";
             }
-
             return sb;
-
         }
 
         /// <summary>

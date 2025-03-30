@@ -8,6 +8,7 @@ using System.Diagnostics;
 namespace Bb.Loaders
 {
 
+
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
     public class WebApplicationBuilderInitializerNLog : InjectBuilder<WebApplicationBuilder>
     {      

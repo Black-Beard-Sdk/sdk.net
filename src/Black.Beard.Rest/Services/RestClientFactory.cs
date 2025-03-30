@@ -42,17 +42,12 @@ namespace Bb.Services
 
         public RestClient Create(Url name)
         {
-
             var url = name.Root;
-
-            if (_clients.TryGetValue(url, out var client))
-                if (_clients.TryGetValue(url, out client))
-                    _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
-
+            var client = _clients.GetOrAdd(url, c => new RestClient(_optionFactory.Create(url)));
             return client;
         }
 
-        private readonly ConcurrentDictionary<string, RestClient> _clients 
+        private readonly ConcurrentDictionary<string, RestClient> _clients
             = new ConcurrentDictionary<string, RestClient>();
         private readonly IOptionClientFactory _optionFactory;
 

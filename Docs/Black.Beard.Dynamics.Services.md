@@ -12,11 +12,15 @@
   - [AdditionalAssemblies](#P-Bb-Loaders-Extensions-Assemblies-AdditionalAssemblies 'Bb.Loaders.Extensions.Assemblies.AdditionalAssemblies')
   - [WebAssemblies](#P-Bb-Loaders-Extensions-Assemblies-WebAssemblies 'Bb.Loaders.Extensions.Assemblies.WebAssemblies')
   - [Resolve()](#M-Bb-Loaders-Extensions-Assemblies-Resolve-System-String,System-String[]- 'Bb.Loaders.Extensions.Assemblies.Resolve(System.String,System.String[])')
-- [ConfigurationExtension](#T-Bb-Configuration-ConfigurationExtension 'Bb.Configuration.ConfigurationExtension')
-  - [LoadConfiguration(builder)](#M-Bb-Configuration-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]- 'Bb.Configuration.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String[])')
+- [ConfigurationExtension](#T-Bb-Extensions-ConfigurationExtension 'Bb.Extensions.ConfigurationExtension')
+  - [LoadConfiguration(builder)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String[])')
 - [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader')
 - [IocAutoDiscoverExtension](#T-Bb-Loaders-Extensions-IocAutoDiscoverExtension 'Bb.Loaders.Extensions.IocAutoDiscoverExtension')
   - [GetExposedTypes(contextName)](#M-Bb-Loaders-Extensions-IocAutoDiscoverExtension-GetExposedTypes-System-String- 'Bb.Loaders.Extensions.IocAutoDiscoverExtension.GetExposedTypes(System.String)')
+- [PolicyExtension](#T-Bb-PolicyExtension 'Bb.PolicyExtension')
+  - [AddPolicy(builder,filePath,filter,configureAction)](#M-Bb-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}- 'Bb.PolicyExtension.AddPolicy(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String,System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean},System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions})')
+  - [ConfigurePolicy(app)](#M-Bb-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.PolicyExtension.ConfigurePolicy(Microsoft.AspNetCore.Builder.WebApplication)')
+  - [GetAuthorizePoliciesFromAssemblies()](#M-Bb-PolicyExtension-GetAuthorizePoliciesFromAssemblies 'Bb.PolicyExtension.GetAuthorizePoliciesFromAssemblies')
 
 <a name='T-Bb-Services-ApiKeyGenerator'></a>
 ## ApiKeyGenerator `type`
@@ -196,14 +200,14 @@ Ensure required assemblies are loaded
 
 This method has no parameters.
 
-<a name='T-Bb-Configuration-ConfigurationExtension'></a>
+<a name='T-Bb-Extensions-ConfigurationExtension'></a>
 ## ConfigurationExtension `type`
 
 ##### Namespace
 
-Bb.Configuration
+Bb.Extensions
 
-<a name='M-Bb-Configuration-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]-'></a>
+<a name='M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]-'></a>
 ### LoadConfiguration(builder) `method`
 
 ##### Summary
@@ -306,3 +310,70 @@ Gets the exposed types in loaded assemblies.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | contextName | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | Name of the context. |
+
+<a name='T-Bb-PolicyExtension'></a>
+## PolicyExtension `type`
+
+##### Namespace
+
+Bb
+
+<a name='M-Bb-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}-'></a>
+### AddPolicy(builder,filePath,filter,configureAction) `method`
+
+##### Summary
+
+Append policies form specified file
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| builder | [Microsoft.AspNetCore.Builder.WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') |  |
+| filePath | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') |  |
+| filter | [System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean}') |  |
+| configureAction | [System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions}') |  |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') |  |
+| [System.IO.FileNotFoundException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.FileNotFoundException 'System.IO.FileNotFoundException') |  |
+| [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') |  |
+
+<a name='M-Bb-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication-'></a>
+### ConfigurePolicy(app) `method`
+
+##### Summary
+
+Configures the policy evaluator service.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| app | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') |  |
+
+<a name='M-Bb-PolicyExtension-GetAuthorizePoliciesFromAssemblies'></a>
+### GetAuthorizePoliciesFromAssemblies() `method`
+
+##### Summary
+
+Retrieves all policy names from AuthorizeAttribute across all loaded assemblies
+
+##### Returns
+
+A list of unique policy names
+
+##### Parameters
+
+This method has no parameters.

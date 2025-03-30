@@ -4,6 +4,8 @@ using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
 using Microsoft.AspNetCore.Components;
+using Site.Services;
+using System.Reflection;
 
 namespace Bb.Loaders.Extensions
 {
@@ -45,6 +47,10 @@ namespace Bb.Loaders.Extensions
 
         public static WebApplicationBuilder Initialize(this WebApplicationBuilder self)
         {
+
+            var SchemasPaths = Assembly.GetExecutingAssembly().GetDirectory().Combine("schemas");
+            var idTemplate = "http://Black.Beard.com/schema/{0}";
+            SchemaGenerator.Initialize(SchemasPaths, idTemplate);
 
 
             self.AutoConfigure

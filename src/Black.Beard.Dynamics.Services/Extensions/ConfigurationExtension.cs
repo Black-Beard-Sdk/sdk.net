@@ -4,9 +4,8 @@ using Bb.ComponentModel;
 using System.Reflection;
 using System.Diagnostics;
 
-namespace Bb.Configuration
+namespace Bb.Extensions
 {
-
 
     public static class ConfigurationExtension
     {

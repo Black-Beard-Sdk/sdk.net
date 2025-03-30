@@ -1,12 +1,51 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Principal;
+using System.Text;
 
 namespace Bb.Services
 {
 
     public class TokenProvider
     {
+
+
+        public static IPrincipal ValidateToken(string token, string secretKey, string validIssuer, string validAudience)
+        {
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secretKey);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = validIssuer,
+                ValidAudience = validAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            try
+            {
+                SecurityToken validatedToken;
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+                return principal;
+            }
+            catch (Exception)
+            {
+                // Gestion des exceptions de validation du jeton
+                return null;
+            }
+        }
+
+
+
+
 
         public TokenProvider(IMemoryCache cache, TokenResolver resolver)
         {
