@@ -2,26 +2,29 @@
 using Bb.ComponentModel.Attributes;
 using Bb.Http;
 using RestSharp;
+using Bb.Models;
 
 namespace Bb.Services
 {
+
+
     public class TokenResolver
     {
 
-
-        public TokenResolver(IRestClientFactory restfactory)
+        public TokenResolver(IRestClientFactory restfactory, StartupConfiguration configuration)
         {
             _restFactory = restfactory;
+            _configuration = configuration.RestClient;
         }
 
 
         public async Task<TokenResponse> GeTokenAsync(string username, string password)
         {
 
-            if (_httpClient == null)
+            if (_client == null)
                 Initialize();
 
-            var tokenResponse = await _httpClient.GetTokenAsync(Url, ClientId, ClientSecret, username, password);
+            var tokenResponse = await _client.GetTokenAsync(_configuration.TokenUrl, _configuration.TokenClientId, _configuration.TokenClientSecret, username, password);
             if (tokenResponse == null)
                 throw new InvalidOperationException("Failed to fetch token");
 
@@ -32,31 +35,24 @@ namespace Bb.Services
         private void Initialize()
         {
             
-            if (string.IsNullOrEmpty(Url))
-                throw new InvalidOperationException($" {nameof(Url)} is not defined");
+            if (string.IsNullOrEmpty(_configuration.TokenUrl))
+                throw new InvalidOperationException($" {nameof(_configuration.TokenUrl)} is not defined");
 
-            if (string.IsNullOrEmpty(ClientId))
-                throw new InvalidOperationException($" {nameof(ClientId)} is not defined");
+            if (string.IsNullOrEmpty(_configuration.TokenClientId))
+                throw new InvalidOperationException($" {nameof(_configuration.TokenClientId)} is not defined");
 
-            var client = _restFactory.Create(new Uri(Url));
+            var client = _restFactory.Create(new Uri(_configuration.TokenUrl));
 
-            _httpClient = client;
+            _client = client;
 
         }
 
-        [InjectValueByIoc("TokenResolver:url")]
-        public string Url { get; set; }
-
-        [InjectValueByIoc("TokenResolver:clientId")]
-        public string ClientId { get; set; }
-
-        [InjectValueByIoc("TokenResolver:clientSecret")]
-        public string ClientSecret { get; set; }
 
 
-
-        private RestClient _httpClient;
+        private RestClient _client;
         private readonly IRestClientFactory _restFactory;
+        private readonly Models.RestClientOptions _configuration;
+
     }
 
 

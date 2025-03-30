@@ -355,7 +355,35 @@ namespace Bb
 
         #endregion
 
+
         #region fluent builder methods
+
+
+        public Url Map(params (string, string)[] values)
+        {
+            foreach (var item in values)
+                this.Map(item.Item1, item.Item2);
+            return this;
+        }
+
+        public void Map(string name, string value)
+        {
+
+            var p = PathSegments.ToArray();
+            foreach (var item in p)
+                if (item.IsVariable && item.Value == name)
+                {
+                    var o = _pathSegments.IndexOf(item);
+                    _pathSegments[o] = new Segment(value);
+                }
+
+            var q = this.QueryParams;
+            foreach (var item in q)
+                if (item.Name == name && item.Value.IsVariable && item.Value.Match(name))
+                    QueryParams.AddOrReplace(name, value, false, NullValueHandling.Ignore);
+
+        }
+
 
         #region path segment
 
@@ -542,34 +570,6 @@ namespace Bb
         /// <param name="names">Names of query parameters</param>
         /// <returns>The Url object with the query parameter added.</returns>
         public Url WithQueryParam(params string[] names) => WithQueryParam(names as IEnumerable<string>);
-
-
-        public Url Map(params (string, string)[] values)
-        {
-            foreach (var item in values)
-                this.Map(item.Item1, item.Item2);
-            return this;
-        }       
-
-        public void Map(string name, string value)
-        {
-
-            var p = PathSegments.ToArray();
-            foreach (var item in p)
-                if (item.IsVariable && item.Value == name)
-                {
-                    var o = _pathSegments.IndexOf(item);
-                    _pathSegments[o] = new Segment(value);
-                }
-
-            var q = this.QueryParams;
-            foreach (var item in q)
-                if (item.Name == name && item.Value.IsVariable && item.Value.Match(name))
-                    QueryParams.AddOrReplace(name, value, false, NullValueHandling.Ignore);
-
-        }
-
-
 
         /// <summary>
         /// Removes a name/value pair from the query by name.

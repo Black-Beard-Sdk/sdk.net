@@ -1,7 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 
-namespace Bb.Extensions.EntryFullLogger
+namespace Bb.Middleware.EntryFullLogger
 {
 
     [ExposeClass(Context = ConstantsCore.Service, ExposedType = typeof(IRequestResponseLogger), LifeCycle = IocScopeEnum.Singleton)]

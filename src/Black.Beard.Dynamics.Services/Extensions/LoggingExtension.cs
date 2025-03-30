@@ -1,8 +1,7 @@
-﻿
-using Bb.ComponentModel.Loaders;
+﻿using Bb.ComponentModel.Loaders;
 
 
-namespace Bb.Loaders.Extensions
+namespace Bb.Extensions
 {
 
 

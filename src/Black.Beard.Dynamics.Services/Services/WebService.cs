@@ -3,7 +3,6 @@ using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Extensions;
 using Bb.Loaders;
-using Bb.Loaders.Extensions;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Bb.Services
@@ -147,7 +146,7 @@ namespace Bb.Services
         private WebApplicationBuilder Prepare()
         {
 
-            _Initializer.LoadAssemblies(AssemblyPaths.ToArray());
+            InitializerExtension.LoadAssemblies(AssemblyPaths.ToArray());
 
             var builder = WebApplication
                 .CreateBuilder(_args)
@@ -274,7 +273,7 @@ namespace Bb.Services
 
         public object? GetService(Type serviceType)
         {
-            return _app.Services;
+            return _app.Services.GetService(serviceType);
         }
 
         public T GetService<T>()

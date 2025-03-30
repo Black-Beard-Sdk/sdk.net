@@ -6,14 +6,16 @@ using Bb.ComponentModel;
 using Microsoft.AspNetCore.Components;
 using Site.Services;
 using System.Reflection;
+using Bb.Loaders;
+using Bb.Loaders.Extensions;
 
-namespace Bb.Loaders.Extensions
+namespace Bb.Extensions
 {
 
-    public static class _Initializer
+    public static class InitializerExtension
     {
 
-        static _Initializer()
+        static InitializerExtension()
         {
 
             ObjectCreatorByIoc.SetInjectionAttribute<InjectAttribute>();

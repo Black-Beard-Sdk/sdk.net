@@ -3,7 +3,7 @@ using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
 using Bb.Loaders.SiteExtensions;
 
-namespace Bb.Loaders.Extensions
+namespace Bb.Extensions
 {
 
     public static class TypesExtension
@@ -46,7 +46,7 @@ namespace Bb.Loaders.Extensions
 
             });
 
-            LoaderInjectionExtensions.AutoConfigure(services, null, ConstantsCore.Initialization);
+            services.AutoConfigure(null, ConstantsCore.Initialization);
 
             return builder;
 

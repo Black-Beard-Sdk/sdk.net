@@ -4,8 +4,8 @@ using Bb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Bb.ComponentModel.Attributes;
 using Bb.Models;
+
 
 namespace Bb.Extensions
 {
@@ -35,6 +35,19 @@ namespace Bb.Extensions
 
             if (Configuration != null)
             {
+
+                if (Configuration.RestClient != null)
+                {
+
+                    var c = Configuration.RestClient;
+
+                    if (c.ClientActivated || c.UseApiKey)
+                    {
+                        services.AddRestClient();
+                        if (c.UseApiKey && !string.IsNullOrEmpty(c.TokenUrl) && !string.IsNullOrEmpty(c.TokenClientId))
+                            services.AddTokenProvider();
+                    }
+                }
 
                 if (Configuration.BearerOptions != null && Configuration.BearerOptions.Any())
                     ManageBearer(services);
@@ -97,7 +110,7 @@ namespace Bb.Extensions
             if (Configuration == null && Configuration.LogInfo)
                 app.UseHttpInfoLogger();
 
-            if (Configuration != null && Configuration.UseApiKey)
+            if (Configuration != null && Configuration.RestClient != null && Configuration.RestClient.UseApiKey)
                 app.WithApiKeyAuthentication();
 
             // Configure the HTTP request pipeline.
@@ -122,6 +135,7 @@ namespace Bb.Extensions
 
             if (Configuration != null && Configuration.UseRouting || Configuration != null && Configuration.MapBlazorHub)
             {
+
                 app.UseRouting();
 
                 if (Configuration.MapBlazorHub)
@@ -133,7 +147,11 @@ namespace Bb.Extensions
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapFallbackToPage("/Home");
+
+            app.UseRouteListing();
+
+            if (Configuration != null && !string.IsNullOrEmpty(Configuration.MapFallbackToPage))
+                app.MapFallbackToPage(Configuration.MapFallbackToPage);
 
             if (_service._hosts.Count > 0)
             {
@@ -214,6 +232,4 @@ namespace Bb.Extensions
 
         public StartupConfiguration? Configuration { get; private set; }
     }
-
-  
 }

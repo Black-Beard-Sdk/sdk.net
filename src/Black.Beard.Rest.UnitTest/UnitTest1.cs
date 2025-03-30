@@ -12,8 +12,9 @@ namespace Black.Beard.Rest.UnitTest
 {
     public class UnitTest1
     {
+
         [Fact]
-        public async Task Test1()
+        public async Task TestHttp()
         {
 
             var port = HttpHelper.GetAvailablePort(80);
@@ -23,7 +24,7 @@ namespace Black.Beard.Rest.UnitTest
             using (var web = GetService(port).Build())
             {
 
-                web.GetApplication().MapPost(url2, async (HttpContext context) =>
+                web.GetApplication().MapGet(url2, async (HttpContext context) =>
                 {
                     var response = new { message = "Données reçues avec succès" };
                     context.Response.ContentType = "application/json";
@@ -32,17 +33,14 @@ namespace Black.Beard.Rest.UnitTest
 
                 web.RunAsync();
 
-                var options = new OptionClientFactory();
-                options.Configure(url, context =>
-                {
+                var u = url.WithPathSegment(url2);
 
-                });
+                var factory = web.GetService<IRestClientFactory>();
+                var client = factory.Create(u);
 
-                var factory = new RestClientFactory(options);
+                var o = await client.GetAsync(Method.Get.NewRequest(url2));
 
-                var client = factory.Create(url);
-
-                var o = await client.GetAsync(RestSharp.Method.Get.NewRequest(url2));
+                
 
             }
 

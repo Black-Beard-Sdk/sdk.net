@@ -1,4 +1,4 @@
-﻿namespace Bb.Extensions
+﻿namespace Bb.Models
 {
 
 

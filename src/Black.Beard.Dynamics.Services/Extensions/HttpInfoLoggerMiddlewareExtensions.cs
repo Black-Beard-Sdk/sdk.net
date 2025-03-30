@@ -1,4 +1,4 @@
-﻿using Bb.Extensions.EntryFullLogger;
+﻿using Bb.Middleware;
 
 namespace Bb.Extensions
 {

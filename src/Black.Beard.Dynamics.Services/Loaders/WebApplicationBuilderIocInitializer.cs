@@ -1,6 +1,6 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
-using Bb.Loaders.Extensions;
+using Bb.Extensions;
 
 namespace Bb.Loaders
 {

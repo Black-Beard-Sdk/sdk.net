@@ -1,8 +1,7 @@
-﻿
-using Microsoft.AspNetCore.Http.Extensions;
+﻿using Microsoft.AspNetCore.Http.Extensions;
 using System.Text;
 
-namespace Bb.Extensions
+namespace Bb.Middleware
 {
 
     internal class HttpInfoLoggerMiddleware

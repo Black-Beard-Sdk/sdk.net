@@ -15,8 +15,8 @@
 - [ConfigurationExtension](#T-Bb-Extensions-ConfigurationExtension 'Bb.Extensions.ConfigurationExtension')
   - [LoadConfiguration(builder)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String[])')
 - [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader')
-- [IocAutoDiscoverExtension](#T-Bb-Loaders-Extensions-IocAutoDiscoverExtension 'Bb.Loaders.Extensions.IocAutoDiscoverExtension')
-  - [GetExposedTypes(contextName)](#M-Bb-Loaders-Extensions-IocAutoDiscoverExtension-GetExposedTypes-System-String- 'Bb.Loaders.Extensions.IocAutoDiscoverExtension.GetExposedTypes(System.String)')
+- [IocAutoDiscoverExtension](#T-Bb-Extensions-IocAutoDiscoverExtension 'Bb.Extensions.IocAutoDiscoverExtension')
+  - [GetExposedTypes(contextName)](#M-Bb-Extensions-IocAutoDiscoverExtension-GetExposedTypes-System-String- 'Bb.Extensions.IocAutoDiscoverExtension.GetExposedTypes(System.String)')
 - [PolicyExtension](#T-Bb-PolicyExtension 'Bb.PolicyExtension')
   - [AddPolicy(builder,filePath,filter,configureAction)](#M-Bb-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}- 'Bb.PolicyExtension.AddPolicy(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String,System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean},System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions})')
   - [ConfigurePolicy(app)](#M-Bb-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.PolicyExtension.ConfigurePolicy(Microsoft.AspNetCore.Builder.WebApplication)')
@@ -287,14 +287,14 @@ Bb.Loaders
 
 Download configuration form git repository and load the configuration
 
-<a name='T-Bb-Loaders-Extensions-IocAutoDiscoverExtension'></a>
+<a name='T-Bb-Extensions-IocAutoDiscoverExtension'></a>
 ## IocAutoDiscoverExtension `type`
 
 ##### Namespace
 
-Bb.Loaders.Extensions
+Bb.Extensions
 
-<a name='M-Bb-Loaders-Extensions-IocAutoDiscoverExtension-GetExposedTypes-System-String-'></a>
+<a name='M-Bb-Extensions-IocAutoDiscoverExtension-GetExposedTypes-System-String-'></a>
 ### GetExposedTypes(contextName) `method`
 
 ##### Summary

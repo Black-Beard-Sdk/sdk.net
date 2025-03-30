@@ -1,11 +1,10 @@
-﻿using Bb;
-using Bb.ComponentModel.Attributes;
+﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
 using Site.Services;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Bb.Loaders.Extensions
+namespace Bb.Extensions
 {
 
 
@@ -33,7 +32,7 @@ namespace Bb.Loaders.Extensions
             if (filter == null)
                 filter = (c, d) => true;
 
-            DiscoverTypeExposedByAttribute(contextKey, type =>
+            contextKey.DiscoverTypeExposedByAttribute(type =>
             {
 
                 if (filter(type, contextKey))
@@ -65,14 +64,14 @@ namespace Bb.Loaders.Extensions
         /// <returns></returns>
         public static IEnumerable<Type> GetExposedTypes(string contextName)
         {
-            var items = Bb.ComponentModel.TypeDiscovery.Instance
+            var items = ComponentModel.TypeDiscovery.Instance
                 .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => c.Context == contextName);
             return items;
         }
 
         public static IEnumerable<Type> GetExposedTypes(Func<ExposeClassAttribute, bool> filter)
         {
-            var items = Bb.ComponentModel.TypeDiscovery.Instance
+            var items = ComponentModel.TypeDiscovery.Instance
                 .GetTypesWithAttributes<ExposeClassAttribute>(typeof(object), c => filter(c));
             return items;
         }

@@ -3,11 +3,13 @@
 namespace Bb.Services
 {
     
-    public class OptionConfiguration
+    public class ClientRestOption
     {
 
         public int Timeout { get; set; } = 60;
 
+
+        
         //AllowMultipleDefaultParametersWithSameName = false,
         //CookieContainer = new System.Net.CookieContainer(),                
         //Proxy = null,

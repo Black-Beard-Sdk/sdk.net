@@ -1,4 +1,5 @@
-﻿using Bb.Services;
+﻿using Bb.Models;
+using Bb.Services;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bb.Extensions
@@ -51,8 +52,6 @@ namespace Bb.Extensions
         public static IServiceCollection AddTokenProvider(this IServiceCollection services)
         {
 
-            services.AddRestClient();
-
             services.AddMemoryCache();
             services.AddSingleton<TokenResolver>();
             services.AddSingleton(sp => new TokenProvider
@@ -68,11 +67,39 @@ namespace Bb.Extensions
         public static IServiceCollection AddRestClient(this IServiceCollection services)
         {
 
-            services.AddSingleton<IRestClientFactory, RestClientFactory>();
-            services.AddSingleton<IOptionClientFactory, OptionClientFactory>();
+            services.AddSingleton<IOptionClientFactory, OptionClientFactory>( (serviceProvider) =>
+            {
+
+                var configuration = serviceProvider.GetRequiredService<StartupConfiguration>();
+                var service = new OptionClientFactory(serviceProvider);
+
+                Dictionary<string, ClientOptionConfiguration> _configs = configuration.RestClient.Options.ToDictionary(c => new Url(c.Name.ToLower()).Root);
+
+                service.Configure(string.Empty, option =>
+                {
+
+                    if (_configs.TryGetValue(option.BaseUrl.ToString(), out var c))
+                    {
+                        option.Timeout = TimeSpan.FromSeconds(c.Timeout);
+                    }
+
+
+                });
+
+                return service;
+            });
+
+            services.AddSingleton<IRestClientFactory, RestClientFactory>((serviceProvider) =>
+            {
+                var factoryOption = serviceProvider.GetRequiredService<IOptionClientFactory>();
+                var factory = new RestClientFactory(factoryOption);
+                return factory;
+            });
 
             return services;
+
         }
+
 
 
     }

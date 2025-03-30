@@ -1,4 +1,4 @@
-﻿namespace Bb.Extensions.EntryFullLogger
+﻿namespace Bb.Middleware.EntryFullLogger
 {
 
     public interface IRequestResponseLogger

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Bb.Middleware.EntryFullLogger;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
 
-namespace Bb.Extensions.EntryFullLogger
+namespace Bb.Middleware
 {
 
     public class RequestResponseLoggerMiddleware
