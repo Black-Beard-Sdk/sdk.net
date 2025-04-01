@@ -1,5 +1,5 @@
-﻿using RestSharp;
-using System;
+﻿using Bb.Interfaces;
+using RestSharp;
 using System.Collections.Concurrent;
 
 namespace Bb.Services

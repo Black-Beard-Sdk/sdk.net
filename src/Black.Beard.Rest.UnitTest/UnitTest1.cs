@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Bb.Extensions;
 using RestSharp;
 using Bb.Helpers;
+using Bb.Interfaces;
 
 
 namespace Black.Beard.Rest.UnitTest

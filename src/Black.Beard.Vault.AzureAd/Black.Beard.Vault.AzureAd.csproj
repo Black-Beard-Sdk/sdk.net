@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Bb</RootNamespace>
+    
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Black.Beard.Site.Addon.AzureAd</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IncludeSymbols>True</IncludeSymbols>
+    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.13.2" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.7.0" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.179" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Dynamics.Services\Black.Beard.Dynamics.Services.csproj" />
+  </ItemGroup>
+
+</Project>

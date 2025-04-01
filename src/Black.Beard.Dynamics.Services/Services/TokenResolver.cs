@@ -3,6 +3,7 @@ using Bb.ComponentModel.Attributes;
 using Bb.Http;
 using RestSharp;
 using Bb.Models;
+using Bb.Interfaces;
 
 namespace Bb.Services
 {

@@ -1,25 +1,36 @@
 ﻿using Bb.ComponentModel.Factories;
+using ICSharpCode.Decompiler.CSharp.Syntax;
 
 namespace Bb.Extensions
 {
     public static class StartupExtensions
     {
 
-        //public static WebApplicationBuilder Use<TStartup>(this WebApplicationBuilder builder, TStartup startup, LocalServiceProvider serviceProvider, Func<TStartup, Delegate> func)
-        //{
 
-        //    var configureServicesMethod = func.Method;
 
-        //    //var configureServicesMethod = typeof(TStartup).GetMethod("ConfigureServices");
-        //    if (configureServicesMethod != null)
-        //    {
-        //        var args = ResolveParameters(serviceProvider, configureServicesMethod);
-        //        configureServicesMethod.Invoke(startup, args);
-        //    }
-        //    return builder;
-        //}
+        public static bool TestExist<T> (this IServiceCollection self)
+        {
+      
+            return self.Where(c => c.ServiceType == typeof(T)).Any();
+        }
 
-        public static WebApplicationBuilder UseStartup<TStartup>(this WebApplicationBuilder builder, TStartup startup, LocalServiceProvider serviceProvider)
+
+
+//public static WebApplicationBuilder Use<TStartup>(this WebApplicationBuilder builder, TStartup startup, LocalServiceProvider serviceProvider, Func<TStartup, Delegate> func)
+//{
+
+//    var configureServicesMethod = func.Method;
+
+//    //var configureServicesMethod = typeof(TStartup).GetMethod("ConfigureServices");
+//    if (configureServicesMethod != null)
+//    {
+//        var args = ResolveParameters(serviceProvider, configureServicesMethod);
+//        configureServicesMethod.Invoke(startup, args);
+//    }
+//    return builder;
+//}
+
+public static WebApplicationBuilder UseStartup<TStartup>(this WebApplicationBuilder builder, TStartup startup, LocalServiceProvider serviceProvider)
         {
             var configureServicesMethod = typeof(TStartup).GetMethod("ConfigureServices");
             if (configureServicesMethod != null)

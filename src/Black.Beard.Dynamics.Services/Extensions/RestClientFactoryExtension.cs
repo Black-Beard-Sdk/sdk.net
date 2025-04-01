@@ -1,4 +1,5 @@
-﻿using Bb.Services;
+﻿using Bb.Interfaces;
+using Bb.Services;
 using RestSharp;
 
 namespace Bb.Extensions

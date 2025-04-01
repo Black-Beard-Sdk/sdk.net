@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Bb.Models;
+using Bb.Interfaces;
 
 
 namespace Bb.Extensions
@@ -56,6 +57,9 @@ namespace Bb.Extensions
                     builder.AddPolicy(item);
 
             }
+
+            if (!builder.Services.TestExist<IVaultSecretResolver>())
+                services.AddSingleton<IVaultSecretResolver, VaultEas256Resolver>();
 
         }
 
