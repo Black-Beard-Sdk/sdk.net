@@ -12,7 +12,7 @@ namespace Bb.Services
 {
 
 
-    [ExposeClass(ConstantsCore.Configuration, LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ConstantsCore.Service, LifeCycle = IocScopeEnum.Singleton)]
     public class PackageManager
     {
 
@@ -49,7 +49,7 @@ namespace Bb.Services
 
             Version version = null;
             if (!string.IsNullOrEmpty(package.Version) && !Version.TryParse(package.Version, out version))
-                _logger.LogWarning($"The version {package.Version} is not valid. Switch on latest version");
+                _logger?.LogWarning($"The version {package.Version} is not valid. Switch on latest version");
 
             await Resolve(package.Id, version);
 
@@ -77,7 +77,7 @@ namespace Bb.Services
                 List<AssemblyMatched> filteredAssemblies = ass.Where(c => !c.IsSdk).ToList();
                 foreach (var assembly in filteredAssemblies)
                 {
-                    _logger.LogInformation($"append assembly {assembly.AssemblyName}");
+                    _logger?.LogInformation($"append assembly {assembly.AssemblyName}");
                     _assemblies.Add(assembly);
                 }
             }

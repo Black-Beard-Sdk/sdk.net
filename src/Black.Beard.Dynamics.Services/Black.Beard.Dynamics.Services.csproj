@@ -19,14 +19,14 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Black.Beard.Analysis" Version="1.0.136" />
+    <PackageReference Include="Black.Beard.Analysis" Version="1.0.137" />
 
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.183" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.183" />
-    <PackageReference Include="Black.Beard.Globalization" Version="1.0.183" />
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.56" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.56" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.56" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.184" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.184" />
+    <PackageReference Include="Black.Beard.Globalization" Version="1.0.184" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.58" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.58" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.58" />
     
     <PackageReference Include="LibGit2Sharp" Version="0.31.0" />
     

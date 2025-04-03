@@ -6,8 +6,6 @@ using Bb.ComponentModel;
 using Microsoft.AspNetCore.Components;
 using Site.Services;
 using System.Reflection;
-using Bb;
-using Bb.Loaders.Extensions;
 using Bb.Configurations;
 using Bb.Models;
 using Bb.Services;
@@ -46,6 +44,7 @@ namespace Bb.Extensions
 
         private static void LoadPackages(StartupConfiguration startupConfiguration)
         {
+
             if (startupConfiguration.Packages != null)
             {
 
@@ -53,14 +52,19 @@ namespace Bb.Extensions
                     .WithReference(typeof(ExposeClassAttribute))
                     ;
 
-                var repNuget = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Nuget];
+                var repNuget = StaticContainer
+                    .Get<GlobalConfiguration>()[GlobalConfiguration.Nuget];
                 var nugetPaths = repNuget.GetPaths();
                 if (nugetPaths.Length > 0)
                     manager.SetTarget(nugetPaths[0]);
                 manager.Resolve(startupConfiguration.Packages).Wait();
-                manager.Assemblies.ToList();
+
+                var item = manager.Assemblies.Where(c => !c.IsLoaded && c.Assembly == null).ToArray();
+                item.EnsureIsLoaded();
 
             }
+
+
         }
 
         private static void LoadAssemblies(StartupConfiguration startupConfiguration)
@@ -81,13 +85,9 @@ namespace Bb.Extensions
 
         private static StartupConfiguration ResolveConfiguration()
         {
-            StartupConfiguration startupConfiguration;
-            var o = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
-            var _files = o.GetFiles("StartupConfiguration.json").ToArray();
-            if (_files.Any())
-                startupConfiguration = _files[0].LoadFromFileAndDeserializeConfiguration<StartupConfiguration>();
-            else
-                startupConfiguration = new StartupConfiguration();
+            var o = StaticContainer.Get<GlobalConfiguration>();
+            var startupConfiguration = o.GetDocument<StartupConfiguration>(GlobalConfiguration.Configuration) 
+                ?? new StartupConfiguration();
             return startupConfiguration;
         }
 

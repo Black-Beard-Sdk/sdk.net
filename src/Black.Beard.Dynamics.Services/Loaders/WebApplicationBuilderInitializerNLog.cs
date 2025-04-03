@@ -12,7 +12,7 @@ namespace Bb.Loaders
 
     [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
     public class WebApplicationBuilderInitializerNLog : InjectBuilder<WebApplicationBuilder>
-    {      
+    {
 
         public override object Execute(WebApplicationBuilder builder)
         {
@@ -35,7 +35,7 @@ namespace Bb.Loaders
             var options = new NLogAspNetCoreOptions()
             {
                 IncludeScopes = true,
-                IncludeActivityIdsWithBeginScope = true,                
+                IncludeActivityIdsWithBeginScope = true,
             };
 
             builder.WebHost.UseNLog(options);
@@ -48,23 +48,8 @@ namespace Bb.Loaders
         {
             FileInfo file;
             DirectoryInfo dir;
-
-            if (paths.Length == 0)
-            {
-                dir = Directory
-                    .GetCurrentDirectory()
-                    .Combine("Configs")
-                    .CreateFolderIfNotExists();
-
-                var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
-                paths = folder.GetPaths();
-            }
-            else
-            {
-                dir = paths[0].AsDirectory();
-            }
-
-            _logger.Error("NLog configuration file not found. Loading default configuration");
+            dir = paths[0].AsDirectory();
+            Trace.WriteLine("NLog configuration file not found. Loading default configuration");
             file = dir.Combine("nlog.config").AsFile();
             file.Save(Res.ResourceReader.ReadEmbeddedResource("Bb.Res.nlog.config"));
             return file;

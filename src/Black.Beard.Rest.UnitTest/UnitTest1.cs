@@ -59,11 +59,11 @@ namespace Black.Beard.Rest.UnitTest
         {
 
             // create folder for config, schemas and .nugets
-            var _tempTarget = Path.GetTempPath().Combine(Assembly.GetExecutingAssembly().GetName().Name);
             var conf = StaticContainer.Set(new GlobalConfiguration())
-                .With(GlobalConfiguration.Configuration, c => c.AddDirectory(_tempTarget.Combine("Configs")))
-                .With(GlobalConfiguration.Schema,        c => c.AddDirectory(_tempTarget.Combine("Schemas")))
-                .With(GlobalConfiguration.Nuget,        c => c.AddDirectory(_tempTarget.Combine(".nugets")))
+                .SetRoot(Assembly.GetExecutingAssembly().GetName().Name.GetTempPath())
+                .WithDirectory(GlobalConfiguration.Configuration, "Configs")
+                .WithDirectory(GlobalConfiguration.Schema, "Schemas")
+                .WithDirectory(GlobalConfiguration.Nuget, ".nugets")
                 ;
 
             conf.AppendDocument(GlobalConfiguration.Configuration,

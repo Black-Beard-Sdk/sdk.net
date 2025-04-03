@@ -1,6 +1,7 @@
 ﻿using Bb;
 using Bb.ComponentModel.Attributes;
 using Bb.Configurations;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Site.Services
@@ -47,9 +48,16 @@ namespace Site.Services
             var filename = GetFilename(name);
 
             var id = new Uri(string.Format(_idTemplate, name));
-            var schema = type.GenerateSchemaForConfiguration(id);
 
-            filename.Save(schema);
+            try
+            {
+                var schema = type.GenerateSchemaForConfiguration(id);
+                filename.Save(schema);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+            }
 
         }
 
