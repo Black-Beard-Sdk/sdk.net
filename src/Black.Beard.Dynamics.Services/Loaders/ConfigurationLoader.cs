@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.Configuration.Git;
+using Bb.Configurations;
 using Bb.Extensions;
 using System.Diagnostics;
 using System.Reflection;
@@ -8,17 +9,6 @@ using System.Reflection;
 namespace Bb.Loaders
 {
 
-
-    public static class AssemblyHelper
-    {
-
-        public static string GetDirectory(this Assembly assembly)
-        {
-
-            return assembly.Location.AsFile().Directory.FullName;
-
-        }
-    }
 
     /// <summary>
     /// Download configuration form git repository and load the configuration
@@ -37,15 +27,15 @@ namespace Bb.Loaders
         {
 
             context.LoadConfiguration(Environment.CurrentDirectory);
-            context.LoadConfiguration(Assembly.GetEntryAssembly().GetDirectory());
-            context.LoadConfiguration(Assembly.GetExecutingAssembly().GetDirectory());
+            context.LoadConfiguration(Assembly.GetEntryAssembly().GetDirectory().FullName);
+            context.LoadConfiguration(Assembly.GetExecutingAssembly().GetDirectory().FullName);
 
             if (!InternetConnectivityChecker.IsConnected)
                 return null;
 
             if (ConfigurationPath == null)
             {
-                DefaultConfiguration();
+                Trace.TraceError("no configuration is downloaded because the configuration has no key : 'Bb.Loaders.ConfigLoaderInitializer' like 'url=https://github.com/Configurations/AdapterTest.git;user=gael;email=gael@gmail.com;branch=main;folder=Configs'");
                 return null;
             }
 
@@ -61,9 +51,9 @@ namespace Bb.Loaders
                 if (git.IsValid())
                 {
 
-                    
-                    var branch = ConfigurationPath.ContainsKey(_branch) 
-                        ? ConfigurationPath[_branch] 
+
+                    var branch = ConfigurationPath.ContainsKey(_branch)
+                        ? ConfigurationPath[_branch]
                         : string.Empty;
 
                     if (!string.IsNullOrEmpty(branch))
@@ -93,7 +83,11 @@ namespace Bb.Loaders
                     if (loader.Refresh(folder))
                     {
                         context.LoadConfiguration(folder);
-                        ConfigurationFolder.AddDirectoryIfExists(dir);
+                        StaticContainer.Get<GlobalConfiguration>()
+                            .With(GlobalConfiguration.Configuration, c =>
+                            {
+                                c.AddDirectoryIfExists(dir, true);
+                            });
                     }
 
 
@@ -104,15 +98,6 @@ namespace Bb.Loaders
 
         }
 
-        private void DefaultConfiguration()
-        {
-
-            var dir = Environment.CurrentDirectory.Combine("Config").CreateFolderIfNotExists();
-            ConfigurationFolder.AddDirectoryIfExists(dir);
-
-            Trace.TraceError("no configuration is downloaded because the configuration has no key : 'Bb.Loaders.ConfigLoaderInitializer' like 'url=https://github.com/Configurations/AdapterTest.git;user=gael;email=gael@gmail.com;branch=main;folder=Configs'");
-
-        }
 
         public const string _user = "user";
         public const string _email = "email";
@@ -128,7 +113,7 @@ namespace Bb.Loaders
 
     }
 
-    
+
 
 
 }

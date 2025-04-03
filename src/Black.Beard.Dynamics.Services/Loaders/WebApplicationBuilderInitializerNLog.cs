@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
+using Bb.Configurations;
 using Bb.Monitoring;
 using NLog;
 using NLog.Web;
@@ -16,8 +17,10 @@ namespace Bb.Loaders
         public override object Execute(WebApplicationBuilder builder)
         {
 
+            var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
+
             FileInfo file = null;
-            var paths = ConfigurationFolder.GetPaths();
+            var paths = folder.GetPaths();
             if (paths.Length > 0)
                 file = GetFile(paths);
 
@@ -52,8 +55,9 @@ namespace Bb.Loaders
                     .GetCurrentDirectory()
                     .Combine("Configs")
                     .CreateFolderIfNotExists();
-                ConfigurationFolder.AddDirectoryIfExists(dir);
-                paths = ConfigurationFolder.GetPaths();
+
+                var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
+                paths = folder.GetPaths();
             }
             else
             {

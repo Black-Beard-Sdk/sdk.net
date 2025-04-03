@@ -11,7 +11,6 @@
 - [Assemblies](#T-Bb-Loaders-Extensions-Assemblies 'Bb.Loaders.Extensions.Assemblies')
   - [AdditionalAssemblies](#P-Bb-Loaders-Extensions-Assemblies-AdditionalAssemblies 'Bb.Loaders.Extensions.Assemblies.AdditionalAssemblies')
   - [WebAssemblies](#P-Bb-Loaders-Extensions-Assemblies-WebAssemblies 'Bb.Loaders.Extensions.Assemblies.WebAssemblies')
-  - [Resolve()](#M-Bb-Loaders-Extensions-Assemblies-Resolve-System-String,System-String[]- 'Bb.Loaders.Extensions.Assemblies.Resolve(System.String,System.String[])')
 - [ConfigurationExtension](#T-Bb-Extensions-ConfigurationExtension 'Bb.Extensions.ConfigurationExtension')
   - [LoadConfiguration(builder)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String[])')
 - [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader')
@@ -188,17 +187,6 @@ Return assembly to add for discover routes
 ##### Summary
 
 Return all assemblies that contain type with route attribute
-
-<a name='M-Bb-Loaders-Extensions-Assemblies-Resolve-System-String,System-String[]-'></a>
-### Resolve() `method`
-
-##### Summary
-
-Ensure required assemblies are loaded
-
-##### Parameters
-
-This method has no parameters.
 
 <a name='T-Bb-Extensions-ConfigurationExtension'></a>
 ## ConfigurationExtension `type`

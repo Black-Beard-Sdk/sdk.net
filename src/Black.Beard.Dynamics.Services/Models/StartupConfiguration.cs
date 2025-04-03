@@ -1,9 +1,10 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel;
-using Bb.Services;
+using Bb.Loaders.Extensions;
 
 namespace Bb.Models
 {
+
 
     [ExposeClass(ConstantsCore.Configuration, LifeCycle = IocScopeEnum.Singleton)]
     public class StartupConfiguration
@@ -14,6 +15,9 @@ namespace Bb.Models
             BearerOptions = new List<BearerOption>();
             this.PolicyFiles = new HashSet<string>();
             this.RestClient = new RestClientOptions();
+            this.Packages = new Packages();
+            this.Folders = new HashSet<string>();
+            this.AssemblyNames = new HashSet<string>();
         }
 
         public bool LogExceptions { get; set; } = true;
@@ -36,48 +40,12 @@ namespace Bb.Models
 
         public RestClientOptions RestClient { get; set; }
 
-    }
+        public Packages Packages { get; set; }
 
-    public class RestClientOptions
-    {
+        public HashSet<string> Folders { get; set; }
 
-
-        public RestClientOptions()
-        {
-            this.Options = new List<ClientOptionConfiguration>();
-        }
-
-
-        public bool UseApiKey { get; set; } = false;
-
-        public bool ClientActivated { get; set; } = true;
-
-
-
-        public string TokenUrl { get; set; }
-
-        public string TokenClientId { get; set; }
-
-        public string TokenClientSecret { get; set; }
-
-        public List<ClientOptionConfiguration> Options { get; set; }
+        public HashSet<string> AssemblyNames { get; set; }
 
     }
-
-    public enum SourceCertificate
-    {
-        File,
-        Store
-    }
-
-
-    public class ClientOptionConfiguration : ClientRestOption
-    {
-
-        public string Name { get; set; }
-
-    }
-
-
 
 }

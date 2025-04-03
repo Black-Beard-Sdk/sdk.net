@@ -2,6 +2,7 @@
 using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Extensions;
+using Bb.Models;
 
 namespace Bb.Services
 {
@@ -18,11 +19,9 @@ namespace Bb.Services
             _actions = new List<Action<WebApplication>>();
             _startups = new HashSet<Type>();
             _dicStartup = new Dictionary<Type, object>();
-
             _hosts = new List<(string, string, int?)>();
-
-
         }
+
 
 
         public HashSet<string> AssemblyPaths { get; }
@@ -219,7 +218,7 @@ namespace Bb.Services
         }
 
 
-        
+
         public WebService WithDynamicHttp()
         {
             return WithDynamicHttp("localhost");
@@ -235,11 +234,11 @@ namespace Bb.Services
 
         public WebService WithHttps(int? port = null)
         {
-            return WithHttps("localhost", port );
+            return WithHttps("localhost", port);
         }
 
         public WebService WithHttps(string host, int? port = null)
-        {            
+        {
             _hosts.Add(("https", host, port ?? 443));
             return this;
         }

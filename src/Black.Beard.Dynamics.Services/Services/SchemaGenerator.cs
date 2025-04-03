@@ -1,5 +1,6 @@
 ﻿using Bb;
 using Bb.ComponentModel.Attributes;
+using Bb.Configurations;
 using System.Reflection;
 
 namespace Site.Services

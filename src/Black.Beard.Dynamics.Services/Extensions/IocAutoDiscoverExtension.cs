@@ -1,5 +1,6 @@
 ﻿using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
+using Bb.Configurations;
 using Site.Services;
 using System.Diagnostics;
 using System.Reflection;

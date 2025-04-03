@@ -7,6 +7,12 @@ using Bb.Extensions;
 using RestSharp;
 using Bb.Helpers;
 using Bb.Interfaces;
+using NLog.Targets;
+using System.Reflection;
+using Bb.Loaders;
+using Bb.Configurations;
+using Bb.ComponentModel.Loaders;
+using Bb.Models;
 
 
 namespace Black.Beard.Rest.UnitTest
@@ -41,7 +47,7 @@ namespace Black.Beard.Rest.UnitTest
 
                 var o = await client.GetAsync(Method.Get.NewRequest(url2));
 
-                
+
 
             }
 
@@ -52,14 +58,28 @@ namespace Black.Beard.Rest.UnitTest
         public static WebService GetService(int port)
         {
 
-            var web = new Bb.Services.WebService()
-                .WithHttp(port)
-                .UseStartup<Startup>(c =>
+            // create folder for config, schemas and .nugets
+            var _tempTarget = Path.GetTempPath().Combine(Assembly.GetExecutingAssembly().GetName().Name);
+            var conf = StaticContainer.Set(new GlobalConfiguration())
+                .With(GlobalConfiguration.Configuration, c => c.AddDirectory(_tempTarget.Combine("Configs")))
+                .With(GlobalConfiguration.Schema,        c => c.AddDirectory(_tempTarget.Combine("Schemas")))
+                .With(GlobalConfiguration.Nuget,        c => c.AddDirectory(_tempTarget.Combine(".nugets")))
+                ;
+
+            conf.AppendDocument(GlobalConfiguration.Configuration,
+                new StartupConfiguration()
                 {
-                    //c.UseCertificate = "";
-                    //c.UseSourceCertificate =  Bb.Loaders.SourceCertificate.File;
-                    //c.UsePasswordCertificate = "password";
+                    Packages = ["Black.Beard.ComponentModel"],
                 });
+
+            var web = new WebService()
+                            .WithHttp(port)
+                            .UseStartup<Startup>(c =>
+                            {
+                                //c.UseCertificate = "";
+                                //c.UseSourceCertificate =  Bb.Loaders.SourceCertificate.File;
+                                //c.UsePasswordCertificate = "password";
+                            });
 
             return web;
 

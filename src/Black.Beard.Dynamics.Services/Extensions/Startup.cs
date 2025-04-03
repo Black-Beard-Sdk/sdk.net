@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Bb.Models;
 using Bb.Interfaces;
+using Bb.Configurations;
 
 
 namespace Bb.Extensions
@@ -179,7 +180,7 @@ namespace Bb.Extensions
 
             }
         }
-     
+
         private X509Certificate2 LoadCertificate()
         {
 
@@ -209,14 +210,16 @@ namespace Bb.Extensions
             else
             {
 
-                var files = StartingConfiguration.Folders.GetFiles("*.pfx").ToList();
+                var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
+                var files = folder.GetFiles("*.pfx").ToArray();
+
                 if (files.Any())
                 {
                     cert = CertificateHelpers.LoadCertificateFromFile(files[0], certificate.Password);
                     return cert;
                 }
 
-                var path = ConfigurationFolder.GetPaths().First().Combine("localhost.pfx");
+                var path = folder.GetPaths().First().Combine("localhost.pfx");
                 cert = CertificateHelpers.CreateSelfSignedCertificate("localhost", certificate.Password);
                 CertificateHelpers.SaveCertificateToFile(cert, path, certificate.Password);
             }

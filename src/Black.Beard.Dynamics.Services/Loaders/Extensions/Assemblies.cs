@@ -9,35 +9,35 @@ namespace Bb.Loaders.Extensions
     public static class Assemblies
     {
 
-        /// <summary>
-        /// Ensure required assemblies are loaded
-        /// </summary>
-        public static ExposedAssemblyRepositories Resolve(string filename, string[] configPaths)
-        {
+        ///// <summary>
+        ///// Ensure required assemblies are loaded
+        ///// </summary>
+        //public static ExposedAssemblyRepositories Resolve(string filename, string[] configPaths)
+        //{
 
-            foreach (var repertoireConfig in configPaths)
-            {
+        //    foreach (var repertoireConfig in configPaths)
+        //    {
 
-                var _currentDirectory = Directory.GetCurrentDirectory();
-                var dir = _currentDirectory.Combine(repertoireConfig).AsDirectory();
-                var files = dir.GetFiles(filename, SearchOption.AllDirectories);
-                foreach (var file in files)
-                    try
-                    {
-                        ExposedAssemblyRepositories assemblies
-                            = file.LoadFromFileAndDeserialize<ExposedAssemblyRepositories>();
+        //        var _currentDirectory = Directory.GetCurrentDirectory();
+        //        var dir = _currentDirectory.Combine(repertoireConfig).AsDirectory();
+        //        var files = dir.GetFiles(filename, SearchOption.AllDirectories);
+        //        foreach (var file in files)
+        //            try
+        //            {
+        //                ExposedAssemblyRepositories assemblies
+        //                    = file.LoadFromFileAndDeserialize<ExposedAssemblyRepositories>();
                         
-                        return assemblies;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
-            }
+        //                return assemblies;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                throw;
+        //            }
+        //    }
 
-            return null;
+        //    return null;
 
-        }
+        //}
 
         /// <summary>
         /// Return assembly to add for discover routes
