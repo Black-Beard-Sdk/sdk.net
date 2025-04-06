@@ -1,5 +1,4 @@
-﻿
-namespace Bb.Util
+﻿namespace Bb.Urls
 {
     /// <summary>
     /// Defines an ordered collection of Name/Value pairs where duplicate names are allowed but aren't typical.

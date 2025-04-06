@@ -9,10 +9,39 @@ using System.Text;
 namespace Bb.Services
 {
 
+    /// <summary>
+    /// Provides methods for validating JWT tokens and retrieving tokens based on API keys.
+    /// </summary>
     public class TokenProvider
     {
 
-
+        /// <summary>
+        /// Validates a JWT token and returns the associated principal.
+        /// </summary>
+        /// <param name="token">The JWT token to validate. Must not be null or empty.</param>
+        /// <param name="secretKey">The secret key used to validate the token signature. Must not be null or empty.</param>
+        /// <param name="validIssuer">The expected issuer of the token. Must not be null or empty.</param>
+        /// <param name="validAudience">The expected audience of the token. Must not be null or empty.</param>
+        /// <returns>An <see cref="IPrincipal"/> representing the validated token's claims, or null if validation fails.</returns>
+        /// <remarks>
+        /// This method validates the provided JWT token using the specified secret key, issuer, and audience.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the parameters are null or empty.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var principal = TokenProvider.ValidateToken("jwtToken", "mySecretKey", "myIssuer", "myAudience");
+        /// if (principal != null)
+        /// {
+        ///     // Token is valid
+        /// }
+        /// else
+        /// {
+        ///     // Token is invalid
+        /// }
+        /// </code>
+        /// </example>
         public static IPrincipal ValidateToken(string token, string secretKey, string validIssuer, string validAudience)
         {
 
@@ -43,10 +72,12 @@ namespace Bb.Services
             }
         }
 
-
-
-
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TokenProvider"/> class with the specified cache and token resolver.
+        /// </summary>
+        /// <param name="cache"></param>
+        /// <param name="resolver"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public TokenProvider(IMemoryCache cache, TokenResolver resolver)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
@@ -54,6 +85,23 @@ namespace Bb.Services
             _lockObjects = new ConcurrentDictionary<string, SemaphoreSlim>();
         }
 
+        /// <summary>
+        /// Retrieves a token asynchronously for the specified API key.
+        /// </summary>
+        /// <param name="apiKey">The API key for which to retrieve the token. Must not be null or empty.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of the token as a string.</returns>
+        /// <remarks>
+        /// This method retrieves a token from the cache if available, or fetches it from the token resolver if not.
+        /// </remarks>
+        /// <exception cref="UnauthorizedAccessException">
+        /// Thrown if the API key is invalid.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var tokenProvider = new TokenProvider(memoryCache, tokenResolver);
+        /// var token = await tokenProvider.GetTokenAsync("myApiKey");
+        /// </code>
+        /// </example>
         public async Task<string> GetTokenAsync(string apiKey)
         {
 
@@ -102,6 +150,17 @@ namespace Bb.Services
 
         }
 
+        /// <summary>
+        /// Fetches a token from the token resolver for the specified API key.
+        /// </summary>
+        /// <param name="apiKey">The API key for which to fetch the token. Must not be null or empty.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of the token as a string.</returns>
+        /// <remarks>
+        /// This method generates credentials from the API key, retrieves the token from the token resolver, and caches it.
+        /// </remarks>
+        /// <exception cref="UnauthorizedAccessException">
+        /// Thrown if the API key is invalid.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private async Task<string> Fetch(string apiKey)
         {

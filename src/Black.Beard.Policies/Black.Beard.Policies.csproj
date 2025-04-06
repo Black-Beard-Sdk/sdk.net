@@ -34,11 +34,11 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
     <PackageReference Include="Black.Beard.Analysis" Version="1.0.137" />
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.184" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.187" />
     <PackageReference Include="System.CodeDom" Version="9.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.58" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.58" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />
   </ItemGroup>
 
   <ItemGroup>

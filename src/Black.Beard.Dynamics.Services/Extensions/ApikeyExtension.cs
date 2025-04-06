@@ -1,15 +1,37 @@
 ﻿using Bb.Interfaces;
 using Bb.Models;
 using Bb.Services;
+using Bb.Urls;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bb.Extensions
 {
 
-
     public static class ApikeyExtension
     {
 
+        /// <summary>
+        /// Adds API key authentication middleware to the application.
+        /// </summary>
+        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
+        /// <remarks>
+        /// This method adds middleware to validate API key authentication. If the API key is valid, it adds an authorization header to the request.
+        /// </remarks>
+        /// <exception cref="UnauthorizedAccessException">
+        /// Thrown if the provided API key is invalid.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if an unexpected error occurs during authentication.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var app = builder.Build();
+        /// app.WithApiKeyAuthentication();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public static WebApplication WithApiKeyAuthentication(this WebApplication app)
         {
 
@@ -49,7 +71,21 @@ namespace Bb.Extensions
 
         }
 
-
+        /// <summary>
+        /// Adds the token provider service to the dependency injection container.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the service to. Must not be null.</param>
+        /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+        /// <remarks>
+        /// This method registers the necessary services for token management, including memory caching and token resolution.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var services = new ServiceCollection();
+        /// services.AddTokenProvider();
+        /// var serviceProvider = services.BuildServiceProvider();
+        /// </code>
+        /// </example>
         public static IServiceCollection AddTokenProvider(this IServiceCollection services)
         {
 
@@ -64,17 +100,32 @@ namespace Bb.Extensions
             return services;
         }
 
-
+        /// <summary>
+        /// Adds a REST client factory to the dependency injection container.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the service to. Must not be null.</param>
+        /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+        /// <remarks>
+        /// This method registers the REST client factory and its configuration, allowing for the creation of REST clients with specific options.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var services = new ServiceCollection();
+        /// services.AddRestClient();
+        /// var serviceProvider = services.BuildServiceProvider();
+        /// var restClientFactory = serviceProvider.GetRequiredService&lt;IRestClientFactory&gt;();
+        /// </code>
+        /// </example>
         public static IServiceCollection AddRestClient(this IServiceCollection services)
         {
 
-            services.AddSingleton<IOptionClientFactory, OptionClientFactory>( (serviceProvider) =>
+            services.AddSingleton<IOptionClientFactory, OptionClientFactory>( (Func<IServiceProvider, OptionClientFactory>)((serviceProvider) =>
             {
 
                 var configuration = serviceProvider.GetRequiredService<StartupConfiguration>();
                 var service = new OptionClientFactory(serviceProvider);
 
-                Dictionary<string, ClientOptionConfiguration> _configs = configuration.RestClient.Options.ToDictionary(c => new Url(c.Name.ToLower()).Root);
+                Dictionary<string, ClientOptionConfiguration> _configs = configuration.RestClient.Options.ToDictionary((Func<ClientOptionConfiguration, string>)(c => new Url(c.Name.ToLower()).Root));
 
                 service.Configure(string.Empty, option =>
                 {
@@ -88,7 +139,7 @@ namespace Bb.Extensions
                 });
 
                 return service;
-            });
+            }));
 
             services.AddSingleton<IRestClientFactory, RestClientFactory>((serviceProvider) =>
             {
@@ -101,9 +152,6 @@ namespace Bb.Extensions
 
         }
 
-
-
     }
-
 
 }

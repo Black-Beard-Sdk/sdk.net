@@ -33,7 +33,7 @@
 //            _nlogConf = nlogConf;
 //        }
 
-//        public override object Execute(WebApplicationBuilder builder)
+//        public override void Execute(WebApplicationBuilder builder)
 //        {
 
 //            IEnumerable<string> assemblies = GetSources();
@@ -127,8 +127,6 @@
 //            //    // Add a tag to the Activity
 //            //    activity?.SetTag("greeting", "Hello World!");
 //            //}
-
-//            return null;
 
 //        }
 

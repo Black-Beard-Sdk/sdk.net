@@ -1,61 +1,95 @@
-using Bb;
-using Bb.Util;
-using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
-namespace Bb
+namespace Bb.Urls
 {
 
-
     /// <summary>
-    /// A mutable object for fluently building and parsing URLs.
+    /// Provides extension methods for working with URLs, including manipulation of paths, query parameters, fragments, and creating REST clients.
     /// </summary>
+    /// <remarks>
+    /// This class contains a variety of helper methods for handling and modifying URLs. It supports operations such as:
+    /// - Creating and configuring <see cref="RestClient"/> instances.
+    /// - Mapping variables in URLs to specific values.
+    /// - Concatenating multiple URLs into a single string.
+    /// - Adding, removing, and modifying query parameters.
+    /// - Manipulating URL paths and fragments.
+    /// - Resetting URLs to their root components.
+    /// These methods simplify common URL-related tasks in web applications.
+    /// </remarks>
+    /// <example>
+    /// <code lang="C#">
+    /// var url = "https://example.com/{id}".Map("id", "123");
+    /// Console.WriteLine(url); // Output: https://example.com/123
+    ///
+    /// var urls = new List&lt;Url&gt; { new Url("https://example1.com"), new Url("https://example2.com") };
+    /// var result = urls.ConcatUrl();
+    /// Console.WriteLine(result); // Output: https://example1.com;https://example2.com
+    /// </code>
+    /// </example>
     public class Url
     {
 
         #region public properties
 
-        public Url IsHttp()
-        {
-            this.Scheme = "http";
-            return this;
-        }
-
-        public Url IsHttps()
-        {
-            this.Scheme = "https";
-            return this;
-        }
-
         /// <summary>
-        /// The scheme of the URL, i.e. "http". Does not include ":" delimiter. Empty string if the URL is relative.
+        /// Gets or sets the scheme of the URL, such as "http" or "https".
         /// </summary>
+        /// <value>A <see cref="string"/> representing the scheme of the URL.</value>
+        /// <remarks>
+        /// The scheme does not include the ":" delimiter. If the URL is relative, this property is an empty string.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com");
+        /// Console.WriteLine(url.Scheme); // Output: https
+        /// </code>
+        /// </example>
         public string Scheme
         {
             get => EnsureParsed()._scheme;
-            set => EnsureParsed()._scheme = value;
-        }
-
-        public Url WithUserInfo(string userInfo)
-        {
-            this.UserInfo = userInfo;
-            return this;
+            set
+            {
+                if (!AllowedSchemes.Contains(value))
+                    EnsureParsed()._scheme = value;
+                else
+                    throw new ArgumentException($"The scheme '{value}' is not allowed. Allowed schemes are: {string.Join(", ", AllowedSchemes)}");
+            }
         }
 
         /// <summary>
-        /// i.e. "user:pass" in "https://user:pass@www.site.com". Empty string if not present.
+        /// Gets or sets the user information in the URL, such as "user:pass".
         /// </summary>
+        /// <value>A <see cref="string"/> representing the user information.</value>
+        /// <remarks>
+        /// This property corresponds to the "user:pass" part of the URL, if present.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://user:pass@example.com");
+        /// Console.WriteLine(url.UserInfo); // Output: user:pass
+        /// </code>
+        /// </example>
         public string UserInfo
         {
             get => EnsureParsed()._userInfo;
-            set => EnsureParsed()._userInfo = value;
-        }
+            set
+            {
 
-        public Url WithHost(string host)
-        {
-            this.Host = host;
-            return this;
+                EnsureParsed();
+
+                if (!string.IsNullOrEmpty(value))
+                {
+
+                    if (value.Contains("@") || value.Contains(":"))
+                        throw new ArgumentException("UserInfo cannot contain '@' or ':' characters.");
+
+                    value = Encode(value);
+
+                }
+
+                _userInfo = value;
+
+            }
         }
 
         /// <summary>
@@ -67,15 +101,19 @@ namespace Bb
             set => EnsureParsed()._host = value;
         }
 
-        public Url WithPort(int port)
-        {
-            this.Port = port;
-            return this;
-        }
-
         /// <summary>
-        /// Port number of the URL. Null if not explicitly specified.
+        /// Gets or sets the port of the URL.
         /// </summary>
+        /// <value>An <see cref="int?"/> representing the port of the URL, or <see langword="null"/> if not specified.</value>
+        /// <remarks>
+        /// This property corresponds to the port part of the URL, if explicitly specified.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com:8080");
+        /// Console.WriteLine(url.Port); // Output: 8080
+        /// </code>
+        /// </example>
         public int? Port
         {
             get => EnsureParsed()._port;
@@ -83,29 +121,100 @@ namespace Bb
         }
 
         /// <summary>
-        /// i.e. "www.site.com:8080" in "https://www.site.com:8080/path". Includes both user info and port, if included.
+        /// Gets the authority of the URL, including user info, host, and port.
         /// </summary>
-        public string Authority => string.Concat(
-            UserInfo,
-            UserInfo?.Length > 0 ? "@" : String.Empty,
-            Host,
-            Port.HasValue ? ":" : String.Empty,
-            Port);
+        /// <value>A <see cref="string"/> representing the authority of the URL.</value>
+        /// <remarks>
+        /// This property corresponds to the "user:pass@host:port" part of the URL, if present.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://user:pass@example.com:8080");
+        /// Console.WriteLine(url.Authority); // Output: user:pass@example.com:8080
+        /// </code>
+        /// </example>
+        public string Authority
+        {
+            get
+            {
+
+
+
+
+                return new UriBuilder
+                {
+                    Scheme = Scheme,
+                    Host = Host,
+                    Port = Port ?? -1,
+                    UserName = UserInfo,
+
+                }.ToString();
+
+                return string.Concat
+                (
+                    UserInfo,
+                    UserInfo?.Length > 0 ? "@" : string.Empty,
+                    Host,
+                    Port.HasValue ? ":" : string.Empty,
+                    Port
+                );
+            }
+
+        }
 
         /// <summary>
         /// i.e. "https://www.site.com:8080" in "https://www.site.com:8080/path" (everything before the path).
         /// </summary>
-        public string Root => string.Concat(
-            Scheme,
-            Scheme?.Length > 0 ? ":" : String.Empty,
-            Authority?.Length > 0 ? "//" : String.Empty,
-            Authority);
+        public string Root
+        {
+            get
+            {
+                return new UriBuilder
+                {
+                    Scheme = Scheme,
+                    Host = Host,
+                    Port = Port ?? -1,
+                    Path = p,
+                    Query = Query,
+                    Fragment = Fragment,
 
-        public Uri BaseAddress => new Uri(this.Root);
+                }.ToString();
+            }
+        }
 
         /// <summary>
-        /// i.e. "/path" in "https://www.site.com/path". Empty string if not present. Leading and trailing "/" retained exactly as specified by user.
+        /// Gets the base address of the URL as a <see cref="Uri"/> object.
         /// </summary>
+        public Uri BaseAddress
+        {
+            get
+            {
+                return new UriBuilder
+                {
+                    Scheme = Scheme,
+                    Host = Host,
+                    Port = Port ?? -1,
+                    // Path = p,
+                    // Query = Query,
+                    // Fragment = Fragment,
+
+                }.Uri;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the path of the URL.
+        /// </summary>
+        /// <value>A <see cref="string"/> representing the path of the URL.</value>
+        /// <remarks>
+        /// This property corresponds to the path part of the URL, including leading and trailing slashes as specified.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/path/to/resource");
+        /// Console.WriteLine(url.Path); // Output: /path/to/resource
+        /// </code>
+        /// </example>
         public string Path
         {
             get
@@ -118,9 +227,9 @@ namespace Bb
                     _segments.Add(item.EncodedValue);
 
                 return string.Concat(
-                    _leadingSlash ? Slash : String.Empty,
+                    _leadingSlash ? Slash : string.Empty,
                     string.Join(Slash, _segments),
-                    _trailingSlash && PathSegments.Any() ? Slash : String.Empty);
+                    _trailingSlash && PathSegments.Any() ? Slash : string.Empty);
 
             }
             set
@@ -132,7 +241,7 @@ namespace Bb
                 else if (value == Slash)
                     _leadingSlash = true;
                 else
-                    WithPathSegment(value ?? String.Empty);
+                    WithPathSegment(value ?? string.Empty);
             }
         }
 
@@ -142,8 +251,18 @@ namespace Bb
         public IList<Segment> PathSegments => EnsureParsed()._pathSegments;
 
         /// <summary>
-        /// i.e. "x=1&amp;y=2" in "https://www.site.com/path?x=1&amp;y=2". Does not include "?".
+        /// Gets or sets the query string of the URL.
         /// </summary>
+        /// <value>A <see cref="string"/> representing the query string of the URL.</value>
+        /// <remarks>
+        /// This property corresponds to the query part of the URL, excluding the "?" delimiter.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com?key=value");
+        /// Console.WriteLine(url.Query); // Output: key=value
+        /// </code>
+        /// </example>
         public string Query
         {
             get => QueryParams.ToString();
@@ -156,8 +275,18 @@ namespace Bb
         public QueryParamCollection QueryParams => EnsureParsed()._queryParams;
 
         /// <summary>
-        /// i.e. "fragment" in "https://www.site.com/path?x=y#frag". Does not include "#".
+        /// Gets or sets the fragment of the URL.
         /// </summary>
+        /// <value>A <see cref="string"/> representing the fragment of the URL.</value>
+        /// <remarks>
+        /// This property corresponds to the fragment part of the URL, excluding the "#" delimiter.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com#section");
+        /// Console.WriteLine(url.Fragment); // Output: section
+        /// </code>
+        /// </example>
         public string Fragment
         {
             get => EnsureParsed()._fragment;
@@ -165,14 +294,35 @@ namespace Bb
         }
 
         /// <summary>
-        /// True if URL does not start with a non-empty scheme. i.e. false for "https://www.site.com", true for "//www.site.com".
+        /// Gets a value indicating whether the URL is relative.
         /// </summary>
+        /// <value><see langword="true"/> if the URL is relative; otherwise, <see langword="false"/>.</value>
+        /// <remarks>
+        /// A URL is considered relative if it does not start with a scheme.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("//example.com");
+        /// Console.WriteLine(url.IsRelative); // Output: true
+        /// </code>
+        /// </example>
         public bool IsRelative => string.IsNullOrEmpty(Scheme);
 
         /// <summary>
-        /// True if Url is absolute and scheme is https or wss.
+        /// Gets a value indicating whether the URL uses a secure scheme.
         /// </summary>
+        /// <value><see langword="true"/> if the URL uses "https" or "wss"; otherwise, <see langword="false"/>.</value>
+        /// <remarks>
+        /// A URL is considered secure if it is absolute and uses a secure scheme.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com");
+        /// Console.WriteLine(url.IsSecureScheme); // Output: true
+        /// </code>
+        /// </example>
         public bool IsSecureScheme => !IsRelative && (Scheme.OrdinalEquals("https", true) || Scheme.OrdinalEquals("wss", true));
+
         #endregion
 
         #region constructors and parsing methods
@@ -193,11 +343,11 @@ namespace Bb
             : this()
         {
 
-            this.Scheme = scheme;
-            this.Host = host;
-            this.Port = port;
+            Scheme = scheme;
+            Host = host;
+            Port = port;
 
-            this.WithPathSegment(segments);
+            WithPathSegment(segments);
 
         }
 
@@ -228,7 +378,7 @@ namespace Bb
         {
             _originalString = baseUrl?.Trim();
             if (port.HasValue)
-                this.Port = port;
+                Port = port;
         }
 
         /// <summary>
@@ -249,8 +399,19 @@ namespace Bb
         }
 
         /// <summary>
-        /// Parses a URL string into a Url object.
+        /// Parses a URL string into a <see cref="Url"/> object.
         /// </summary>
+        /// <param name="url">The URL string to parse. Must not be null or empty.</param>
+        /// <returns>A new <see cref="Url"/> object representing the parsed URL.</returns>
+        /// <remarks>
+        /// This method creates a <see cref="Url"/> object from a string representation of a URL.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = Url.Parse("https://example.com/path?query=value#fragment");
+        /// Console.WriteLine(url.Path); // Output: /path
+        /// </code>
+        /// </example>
         public static Url Parse(string url) => new Url(url).ParseInternal();
 
         private Url EnsureParsed() => _parsed ? this : ParseInternal();
@@ -259,7 +420,7 @@ namespace Bb
         {
             _parsed = true;
 
-            uri = uri ?? new Uri(_originalString ?? String.Empty, UriKind.RelativeOrAbsolute);
+            uri = uri ?? new Uri(_originalString ?? string.Empty, UriKind.RelativeOrAbsolute);
 
             if (uri.OriginalString.OrdinalStartsWith("//"))
             {
@@ -278,7 +439,7 @@ namespace Bb
                 _scheme = uri.Scheme;
                 _userInfo = uri.UserInfo;
                 _host = uri.Host;
-                _port = _originalString?.OrdinalStartsWith($"{Root}:{uri.Port}", ignoreCase: true) == true ? uri.Port : (int?)null;
+                _port = _originalString?.OrdinalStartsWith($"{Root}:{uri.Port}", ignoreCase: true) == true ? uri.Port : null;
                 // don't default Port if not included explicitly
                 _pathSegments = new List<Segment>();
                 if (uri.AbsolutePath.Length > 0 && uri.AbsolutePath != Slash)
@@ -321,19 +482,45 @@ namespace Bb
         }
 
         /// <summary>
-        /// Parses a URL query to a QueryParamCollection.
+        /// Parses a URL query string into a <see cref="QueryParamCollection"/>.
         /// </summary>
-        /// <param name="query">The URL query to parse.</param>
+        /// <param name="query">The query string to parse. Must not be null or empty.</param>
+        /// <returns>A <see cref="QueryParamCollection"/> containing the parsed query parameters.</returns>
+        /// <remarks>
+        /// This method converts a query string into a collection of key-value pairs for easier manipulation.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var queryParams = Url.ParseQueryParam("key1=value1&key2=value2");
+        /// Console.WriteLine(queryParams["key1"]); // Output: value1
+        /// </code>
+        /// </example>
         public static QueryParamCollection ParseQueryParam(string query) => new QueryParamCollection(query);
 
         /// <summary>
-        /// Splits the given path into segments, encoding illegal characters, "?", and "#".
+        /// Splits a path string into segments, encoding illegal characters, "?", and "#".
         /// </summary>
-        /// <param name="path">The path to split.</param>
-        /// <returns></returns>
+        /// <param name="path">The path string to split. Must not be null or empty.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Segment"/> objects representing the path segments.</returns>
+        /// <remarks>
+        /// This method processes a path string into individual segments, ensuring proper encoding of illegal characters.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var segments = Url.ParsePathSegment("/path/to/resource");
+        /// foreach (var segment in segments)
+        /// {
+        ///     Console.WriteLine(segment.Value);
+        /// }
+        /// // Output:
+        /// // path
+        /// // to
+        /// // resource
+        /// </code>
+        /// </example>
         public static IEnumerable<Segment> ParsePathSegment(string path)
         {
-            var segments = EncodeIllegalCharacters(path) // path.ReplaceVariables(this.)
+            var segments = EncodeIllegalCharacters(path)
                 .Replace("?", "%3F")
                 .Replace("#", "%23")
                 .Split('/');
@@ -358,14 +545,43 @@ namespace Bb
 
         #region fluent builder methods
 
-
+        /// <summary>
+        /// Maps variables in the URL path and query parameters to specified values.
+        /// </summary>
+        /// <param name="values">An array of key-value pairs representing the variables and their corresponding values. Must not be null.</param>
+        /// <returns>The modified <see cref="Url"/> object with the variables replaced.</returns>
+        /// <remarks>
+        /// This method replaces variables in the URL path and query parameters with the provided values.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/{id}?name={name}");
+        /// url.Map(("id", "123"), ("name", "John"));
+        /// Console.WriteLine(url.ToString()); // Output: https://example.com/123?name=John
+        /// </code>
+        /// </example>
         public Url Map(params (string, string)[] values)
         {
             foreach (var item in values)
-                this.Map(item.Item1, item.Item2);
+                Map(item.Item1, item.Item2);
             return this;
         }
 
+        /// <summary>
+        /// Maps a single variable in the URL path or query parameters to a specified value.
+        /// </summary>
+        /// <param name="name">The name of the variable to replace. Must not be null or empty.</param>
+        /// <param name="value">The value to replace the variable with. Must not be null or empty.</param>
+        /// <remarks>
+        /// This method replaces a single variable in the URL path or query parameters with the provided value.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/{id}");
+        /// url.Map("id", "123");
+        /// Console.WriteLine(url.ToString()); // Output: https://example.com/123
+        /// </code>
+        /// </example>
         public void Map(string name, string value)
         {
 
@@ -377,7 +593,7 @@ namespace Bb
                     _pathSegments[o] = new Segment(value);
                 }
 
-            var q = this.QueryParams;
+            var q = QueryParams;
             foreach (var item in q)
                 if (item.Name == name && item.Value.IsVariable && item.Value.Match(name))
                     QueryParams.AddOrReplace(name, value, false, NullValueHandling.Ignore);
@@ -475,7 +691,7 @@ namespace Bb
         /// <returns>The Url object with the new fragment set</returns>
         public Url SetFragment(string fragment)
         {
-            Fragment = fragment ?? String.Empty;
+            Fragment = fragment ?? string.Empty;
             return this;
         }
 
@@ -626,7 +842,7 @@ namespace Bb
         {
             PathSegments.Clear();
             QueryParams.Clear();
-            Fragment = String.Empty;
+            Fragment = string.Empty;
             _leadingSlash = false;
             _trailingSlash = false;
             return this;
@@ -656,7 +872,7 @@ namespace Bb
         /// <summary>
         /// Creates a copy of this Url.
         /// </summary>
-        public Url Clone() => new Url(this.ToString());
+        public Url Clone() => new Url(ToString());
         #endregion
 
         #region conversion, equality, etc.
@@ -673,6 +889,17 @@ namespace Bb
             //    return _originalString ?? string.Empty;
 
             var p = Path;
+
+
+            new UriBuilder
+            {
+                Scheme = Scheme,
+                Host = Host,
+                Port = Port ?? -1,
+                Path = p,
+                Query = Query,
+                Fragment = Fragment
+            }
 
             return string.Concat
             (
@@ -696,7 +923,7 @@ namespace Bb
         /// Converts this Url object to System.Uri
         /// </summary>
         /// <returns>The System.Uri object</returns>
-        public Uri ToUri() => new Uri(this.ToString(), UriKind.RelativeOrAbsolute);
+        public Uri ToUri() => new Uri(ToString(), UriKind.RelativeOrAbsolute);
 
         /// <summary>
         /// Implicit conversion from Url to System.Uri.
@@ -729,12 +956,12 @@ namespace Bb
         /// </summary>
         /// <param name="obj">The object to compare to this instance.</param>
         /// <returns></returns>
-        public override bool Equals(object obj) => obj is Url url && this.ToString().OrdinalEquals(url.ToString());
+        public override bool Equals(object obj) => obj is Url url && ToString().OrdinalEquals(url.ToString());
 
         /// <summary>
         /// Returns the hash code for this Url.
         /// </summary>
-        public override int GetHashCode() => this.ToString().GetHashCode();
+        public override int GetHashCode() => ToString().GetHashCode();
         #endregion
 
         #region static utility methods        
@@ -750,7 +977,7 @@ namespace Bb
             if (parts == null)
                 throw new ArgumentNullException(nameof(parts));
 
-            string result = String.Empty;
+            string result = string.Empty;
             bool inQuery = false, inFragment = false;
 
             string CombineEnsureSingleSeparator(string a, string b, char separator)
@@ -792,9 +1019,18 @@ namespace Bb
         /// <summary>
         /// Decodes a URL-encoded string.
         /// </summary>
-        /// <param name="s">The URL-encoded string.</param>
-        /// <param name="interpretPlusAsSpace">If true, any '+' character will be decoded to a space.</param>
-        /// <returns></returns>
+        /// <param name="s">The URL-encoded string to decode. Must not be null.</param>
+        /// <param name="interpretPlusAsSpace">If true, "+" characters will be interpreted as spaces.</param>
+        /// <returns>A <see cref="string"/> representing the decoded URL.</returns>
+        /// <remarks>
+        /// This method decodes a URL-encoded string, converting encoded characters back to their original form.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var decoded = Url.Decode("key%3Dvalue%26key2%3Dvalue2", false);
+        /// Console.WriteLine(decoded); // Output: key=value&key2=value2
+        /// </code>
+        /// </example>
         public static string Decode(string s, bool interpretPlusAsSpace)
         {
             if (string.IsNullOrEmpty(s))
@@ -808,9 +1044,18 @@ namespace Bb
         /// <summary>
         /// URL-encodes a string, including reserved characters such as '/' and '?'.
         /// </summary>
-        /// <param name="str">The string to encode.</param>
+        /// <param name="str">The string to encode. Must not be null.</param>
         /// <param name="encodeSpaceAsPlus">If true, spaces will be encoded as + signs. Otherwise, they'll be encoded as %20.</param>
         /// <returns>The encoded URL.</returns>
+        /// <remarks>
+        /// This method ensures that the string is properly encoded for use in a URL, including handling long strings by splitting them into smaller parts.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var encoded = Url.Encode("key=value&key2=value2");
+        /// Console.WriteLine(encoded); // Output: key%3Dvalue%26key2%3Dvalue2
+        /// </code>
+        /// </example>
         public static string Encode(string str, bool encodeSpaceAsPlus = false)
         {
 
@@ -857,14 +1102,14 @@ namespace Bb
 
             // no % characters, so avoid the regex overhead
             if (!s.OrdinalContains("%"))
-                return Uri.EscapeUriString(s);
+                return Uri.EscapeDataString(s);
 
             // pick out all %-hex-hex matches and avoid double-encoding
             return Regex.Replace(s, "(.*?)((%[0-9A-Fa-f]{2})|$)", c =>
             {
                 var a = c.Groups[1].Value; // group 1 is a sequence with no %- encoding - encode illegal characters
                 var b = c.Groups[2].Value; // group 2 is a valid 3-character %- encoded sequence - leave it alone!
-                return Uri.EscapeUriString(a) + b;
+                return Uri.EscapeDataString(a) + b;
             });
         }
 
@@ -875,12 +1120,22 @@ namespace Bb
         /// <returns>true if the string is a well-formed absolute URL</returns>
         public static bool IsValid(string url) => url != null && Uri.IsWellFormedUriString(url, UriKind.Absolute);
 
+        private static string Encode(string datas)
+        {
+
+            if (string.IsNullOrEmpty(datas))
+                return datas;
+
+            return Uri.EscapeDataString(datas);
+        }
+
         #endregion
+
 
 
         public static string Slash = "/";
 
-        //private Variables _variables = new Variables();
+        private static readonly HashSet<string> AllowedSchemes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "http", "https" };
         private string _originalString;
         private bool _parsed;
         private string _scheme;

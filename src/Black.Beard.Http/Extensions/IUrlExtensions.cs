@@ -4,6 +4,10 @@ using System.Net;
 
 namespace Bb.Extensions
 {
+
+    /// <summary>
+    /// Extension methods for Url and UrlRequest.
+    /// </summary>
     public static partial class IUrlExtensions
     {
 

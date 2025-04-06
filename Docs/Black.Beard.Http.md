@@ -3737,6 +3737,10 @@ Strategy to create a UrlClient or reuse an existing one, based on the URL being 
 
 Bb.Extensions
 
+##### Summary
+
+Extension methods for Url and UrlRequest.
+
 <a name='M-Bb-Extensions-IUrlExtensions-AllowAnyHttpStatus-Bb-Url-'></a>
 ### AllowAnyHttpStatus(url) `method`
 

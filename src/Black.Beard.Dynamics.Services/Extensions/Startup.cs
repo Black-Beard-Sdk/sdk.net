@@ -12,6 +12,9 @@ using Bb.Configurations;
 namespace Bb.Extensions
 {
 
+    /// <summary>
+    /// Represents the startup configuration for a web application.
+    /// </summary>
     public class Startup
     {
 
@@ -27,6 +30,23 @@ namespace Bb.Extensions
 
         #region services
 
+        /// <summary>
+        /// Configures services for the web application.
+        /// </summary>
+        /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure. Must not be null.</param>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add services to. Must not be null.</param>
+        /// <remarks>
+        /// This method configures various services such as HTTPS, REST clients, bearer authentication, and policies based on the startup configuration.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var startup = new Startup(builder.Configuration, new WebService());
+        /// startup.ConfigureServices(builder, builder.Services);
+        /// var app = builder.Build();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public virtual void ConfigureServices(WebApplicationBuilder builder, IServiceCollection services)
         {
 
@@ -64,6 +84,16 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Manages bearer authentication for the application.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to configure authentication for. Must not be null.</param>
+        /// <remarks>
+        /// This method configures JWT bearer authentication using the options specified in the startup configuration.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the configuration for bearer options is null.
+        /// </exception>
         private void ManageBearer(IServiceCollection services)
         {
             var auth = services.AddAuthentication(options =>
@@ -72,22 +102,33 @@ namespace Bb.Extensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             });
 
-            foreach (var item in Configuration.BearerOptions)
-                auth.AddJwtBearer(item.Name, options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+            if (Configuration != null)
+                foreach (var item in Configuration.BearerOptions)
+                    auth.AddJwtBearer(item.Name, options =>
                     {
-                        ValidateIssuer = item.ValidateIssuer,
-                        ValidateAudience = item.ValidateAudience,
-                        ValidateLifetime = item.ValidateLifetime,
-                        ValidateIssuerSigningKey = item.ValidateIssuerSigningKey,
-                        ValidIssuer = item.ValidIssuer,
-                        ValidAudience = item.ValidAudience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(item.IssuerSigningKey))
-                    };
-                });
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = item.ValidateIssuer,
+                            ValidateAudience = item.ValidateAudience,
+                            ValidateLifetime = item.ValidateLifetime,
+                            ValidateIssuerSigningKey = item.ValidateIssuerSigningKey,
+                            ValidIssuer = item.ValidIssuer,
+                            ValidAudience = item.ValidAudience,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(item.IssuerSigningKey))
+                        };
+                    });
         }
 
+        /// <summary>
+        /// Configures HTTPS settings for the application.
+        /// </summary>
+        /// <param name="webHost">The <see cref="ConfigureWebHostBuilder"/> to configure HTTPS for. Must not be null.</param>
+        /// <remarks>
+        /// This method sets up HTTPS defaults and loads the server certificate.
+        /// </remarks>
+        /// <exception cref="Exception">
+        /// Thrown if the certificate cannot be loaded.
+        /// </exception>
         private void ManageCertificate(ConfigureWebHostBuilder webHost)
         {
             webHost.ConfigureKestrel(options =>
@@ -104,6 +145,23 @@ namespace Bb.Extensions
 
         #region configurations
 
+        /// <summary>
+        /// Configures the HTTP request pipeline for the web application.
+        /// </summary>
+        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <param name="env">The <see cref="IWebHostEnvironment"/> representing the hosting environment. Must not be null.</param>
+        /// <remarks>
+        /// This method sets up middleware such as exception handling, HTTPS redirection, static files, routing, authentication, and authorization.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var app = builder.Build();
+        /// var startup = new Startup(builder.Configuration, new WebService());
+        /// startup.Configure(app, builder.Environment);
+        /// app.Run();
+        /// </code>
+        /// </example>
         public virtual void Configure(WebApplication app, IWebHostEnvironment env)
         {
 
@@ -181,6 +239,25 @@ namespace Bb.Extensions
             }
         }
 
+        /// <summary>
+        /// Loads the server certificate for HTTPS.
+        /// </summary>
+        /// <returns>The loaded <see cref="X509Certificate2"/> instance.</returns>
+        /// <remarks>
+        /// This method attempts to load the certificate from the specified path or creates a self-signed certificate if none is found.
+        /// </remarks>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown if the certificate file is not found.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if the certificate cannot be loaded or created.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var certificate = LoadCertificate();
+        /// Console.WriteLine($"Certificate loaded: {certificate.Subject}");
+        /// </code>
+        /// </example>
         private X509Certificate2 LoadCertificate()
         {
 

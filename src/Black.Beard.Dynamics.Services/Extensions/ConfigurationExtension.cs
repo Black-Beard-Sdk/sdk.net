@@ -7,6 +7,9 @@ using System.Diagnostics;
 namespace Bb.Extensions
 {
 
+    /// <summary>
+    /// Extension methods for configuring types in a web application.
+    /// </summary>
     public static class ConfigurationExtension
     {
 

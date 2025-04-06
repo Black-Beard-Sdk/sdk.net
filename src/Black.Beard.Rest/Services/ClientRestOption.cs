@@ -6,6 +6,9 @@ namespace Bb.Services
     public class ClientRestOption
     {
 
+        /// <summary>
+        /// Gets or sets the base URL for the REST client.
+        /// </summary>
         public int Timeout { get; set; } = 60;
 
 

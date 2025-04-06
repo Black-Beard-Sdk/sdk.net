@@ -70,9 +70,25 @@ namespace Bb.Configuration.Git
         public bool HasPassword => !string.IsNullOrEmpty(GitPassword);
 
         /// <summary>
-        /// Return true if the configuration is valid
+        /// Returns true if the configuration is valid.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see langword="true"/> if the configuration is valid; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method validates the Git configuration by checking if the remote URL is well-formed.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var config = new GitConfiguration
+        /// {
+        ///     GitRemoteUrl = "https://github.com/user/repo.git",
+        ///     GitUserName = "username",
+        ///     GitEmail = "user@example.com",
+        ///     GitPassword = "password"
+        /// };
+        /// bool isValid = config.IsValid();
+        /// Console.WriteLine($"Configuration is valid: {isValid}");
+        /// </code>
+        /// </example>
         public bool IsValid()
         {
 
@@ -89,10 +105,20 @@ namespace Bb.Configuration.Git
         }
 
         /// <summary>
-        /// return the status of the git repository
+        /// Returns the status of the Git repository.
         /// </summary>
-        /// <param name="localRoot"></param>
-        /// <returns></returns>
+        /// <param name="localRoot">The root directory of the local repository. Must be a valid directory path.</param>
+        /// <returns>A <see cref="GitStatus"/> value indicating the status of the repository.</returns>
+        /// <remarks>
+        /// This method checks the state of the local repository folder to determine if it is initialized, empty, or not created.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var config = new GitConfiguration();
+        /// GitStatus status = config.Initialized(@"C:\MyRepo");
+        /// Console.WriteLine($"Repository status: {status}");
+        /// </code>
+        /// </example>
         public GitStatus Initialized(string localRoot)
         {
 

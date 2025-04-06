@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 
 
-namespace Bb.Util
+namespace Bb.Urls
 {
 
     /// <summary>
@@ -72,7 +72,7 @@ namespace Bb.Util
                 return new[] { s };
 
             var i = s.IndexOf(separator);
-            return (i == -1) ?
+            return i == -1 ?
                 new[] { s } :
                 new[] { s.Substring(0, i), s.Substring(i + separator.Length) };
         }
@@ -86,7 +86,7 @@ namespace Bb.Util
                 from p in s.Split('&')
                 let pair = p.SplitOnFirstOccurence("=")
                 let name = pair[0]
-                let value = (pair.Length == 1) ? null : pair[1]
+                let value = pair.Length == 1 ? null : pair[1]
                 select (name, (object)value);
         }
 
@@ -186,7 +186,7 @@ namespace Bb.Util
         /// <summary>
         /// Strips any single quotes or double quotes from the beginning and end of a string.
         /// </summary>
-        public static string StripQuotes(this string s) => Regex.Replace(s, "^\\s*['\"]+|['\"]+\\s*$", String.Empty);
+        public static string StripQuotes(this string s) => Regex.Replace(s, "^\\s*['\"]+|['\"]+\\s*$", string.Empty);
 
         /// <summary>
         /// True if the given string is a valid IPv4 address.

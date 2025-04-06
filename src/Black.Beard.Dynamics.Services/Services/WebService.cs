@@ -1,5 +1,4 @@
-﻿
-using Bb.ComponentModel;
+﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Extensions;
 using Bb.Models;
@@ -7,26 +6,45 @@ using Bb.Models;
 namespace Bb.Services
 {
 
-
-    public class WebService : IDisposable, IServiceProvider
+    /// <summary>
+    /// Initializes and configures a web service using ASP.NET Core.
+    /// </summary>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="WebService"/> class.
+    /// </remarks>
+    /// <param name="args">An array of strings representing the command-line arguments. Must not be null.</param>
+    /// <remarks>
+    /// This constructor initializes the web service with default settings, including assembly paths, startup actions, and host configurations.
+    /// </remarks>
+    /// <example>
+    /// <code lang="C#">
+    /// var webService = new WebService(args);
+    /// webService.WithHttp(5000).Build().Run();
+    /// </code>
+    /// </example>
+    public class WebService(params string[] args) : IDisposable, IServiceProvider
     {
 
-        public WebService(params string[] args)
-        {
-            _args = args;
-            AssemblyPaths = new HashSet<string>();
-            _actionbuilders = new List<Action<WebApplicationBuilder, IServiceProvider>>();
-            _actions = new List<Action<WebApplication>>();
-            _startups = new HashSet<Type>();
-            _dicStartup = new Dictionary<Type, object>();
-            _hosts = new List<(string, string, int?)>();
-        }
 
-
-
-        public HashSet<string> AssemblyPaths { get; }
-
-        public WebService UseStartup<T>(Action<T> action = null)
+        /// <summary>
+        /// Configures the web service to use a specified startup class.
+        /// </summary>
+        /// <typeparam name="T">The type of the startup class.</typeparam>
+        /// <param name="action">An optional action to configure the startup instance. Can be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method ensures that the specified startup class contains the required "ConfigureServices" and "Configure" methods, and registers it for dependency injection.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the startup class does not contain the required methods.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.UseStartup&lt;Startup&gt;();
+        /// </code>
+        /// </example>
+        public WebService UseStartup<T>(Action<T>? action = null)
         {
 
             if (typeof(T).GetMethod("ConfigureServices") == null)
@@ -40,8 +58,7 @@ namespace Bb.Services
             Prepare(c =>
             {
                 var i = Resolve<T>();
-                if (action != null)
-                    action(i);
+                action?.Invoke(i);
                 c.UseStartup(i, _services);
             });
 
@@ -54,94 +71,72 @@ namespace Bb.Services
 
         }
 
+        /// <summary>
+        /// Resolves an instance of the specified type from the service provider.
+        /// </summary>
+        /// <typeparam name="T">The type of the instance to resolve.</typeparam>
+        /// <returns>An instance of the specified type.</returns>
+        /// <remarks>
+        /// This method retrieves an instance of the specified type from the service provider, caching it for future use.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var instance = webService.Resolve&lt;MyService&gt;();
+        /// </code>
+        /// </example>
         protected T Resolve<T>()
         {
-            if (_dicStartup.TryGetValue(typeof(T), out object value))
+            if (_dicStartup.TryGetValue(typeof(T), out object? value))
                 return (T)value;
 
             else
             {
                 var instance = _services.GetService<T>();
-                _dicStartup.Add(typeof(T), instance);
+                if (instance != null)
+                    _dicStartup.Add(typeof(T), instance);
                 return instance;
             }
         }
 
-        public WebService Prepare(Action<WebApplicationBuilder> configure)
-        {
+        #region prepare
 
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-
-            Action<WebApplicationBuilder, IServiceProvider> action = (builder, service) =>
-            {
-                configure(builder);
-            };
-
-            _actionbuilders.Add(action);
-
-            return this;
-
-        }
-
-        public WebService Configure(Action<WebApplication> configure)
-        {
-
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-
-            Action<WebApplication> action = (application) =>
-            {
-                configure?.Invoke(application);
-            };
-
-            _actions.Add(action);
-
-            return this;
-
-        }
-
-        public WebService Configure<T>(Action<T> configure)
-            where T : InjectBuilder<WebApplication>
-        {
-
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
-
-            Action<WebApplication> action = (application) =>
-            {
-                var instance = application.Services.GetService<T>();
-                configure?.Invoke(instance);
-                instance.Execute(application);
-            };
-
-            _actions.Add(action);
-
-            return this;
-
-        }
-
+        /// <summary>
+        /// Prepares the web application builder with a specified configuration action.
+        /// </summary>
+        /// <typeparam name="T">The type of the configuration builder.</typeparam>
+        /// <param name="configure">An action to configure the <typeparamref name="T"/> instance. Must not be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method allows custom configuration of the web application builder using a specific builder type.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="configure"/> is null.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.Prepare(builder => builder.AddCustomConfiguration());
+        /// </code>
+        /// </example>
         public WebService Prepare<T>(Action<T> configure)
             where T : InjectBuilder<WebApplicationBuilder>
         {
-
-            Action<WebApplicationBuilder, IServiceProvider> action = (builder, service) =>
+            void action(WebApplicationBuilder builder, IServiceProvider service)
             {
                 var instance = service.GetService<T>();
-                configure?.Invoke(instance);
-                instance.Execute(builder);
-            };
+                if (instance != null)
+                {
+                    configure?.Invoke(instance);
+                    instance.Execute(builder);
+                }
+            }
 
             _actionbuilders.Add(action);
 
             return this;
-
         }
 
         private WebApplicationBuilder Prepare()
         {
-
-            InitializerExtension.LoadAssemblies(AssemblyPaths.ToArray());
 
             var builder = WebApplication
                 .CreateBuilder(_args)
@@ -161,7 +156,115 @@ namespace Bb.Services
 
         }
 
-        public WebService Build(Action<WebApplication> configure = null)
+        /// <summary>
+        /// Prepares the web application builder with the specified configuration action.
+        /// </summary>
+        /// <param name="configure">An action to configure the <see cref="WebApplicationBuilder"/>. Must not be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method allows custom configuration of the web application builder before building the application.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="configure"/> is null.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.Prepare(builder => builder.Services.AddControllers());
+        /// </code>
+        /// </example>
+        public WebService Prepare(Action<WebApplicationBuilder> configure)
+        {
+
+            ArgumentNullException.ThrowIfNull(configure, nameof(configure));
+            void action(WebApplicationBuilder builder, IServiceProvider service)
+            {
+                configure(builder);
+            }
+
+            _actionbuilders.Add(action);
+
+            return this;
+
+        }
+
+        #endregion prepare
+
+        #region Configure
+
+        /// <summary>
+        /// Configures the web application with the specified action.
+        /// </summary>
+        /// <param name="configure">An action to configure the <see cref="WebApplication"/>. Must not be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method allows custom configuration of the web application after it has been built.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="configure"/> is null.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.Configure(app => app.UseRouting());
+        /// </code>
+        /// </example>
+        public WebService Configure(Action<WebApplication> configure)
+        {
+            ArgumentNullException.ThrowIfNull(configure, nameof(configure));
+            void action(WebApplication application)
+            {
+                configure?.Invoke(application);
+            }
+
+            _actions.Add(action);
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Configures the web application with the specified action.
+        /// </summary>
+        /// <typeparam name="TInjectBuilder">inject Builder</typeparam>
+        /// <param name="configure">An action to configure the <see cref="WebApplication"/>. Must not be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public WebService Configure<TInjectBuilder>(Action<TInjectBuilder> configure)
+            where TInjectBuilder : InjectBuilder<WebApplication>
+        {
+
+            ArgumentNullException.ThrowIfNull(configure, nameof(configure));
+            void action(WebApplication application)
+            {
+                var instance = application.Services.GetService<TInjectBuilder>();
+                if (instance != null)
+                {
+                    configure?.Invoke(instance);
+                    instance.Execute(application);
+                }
+            }
+
+            _actions.Add(action);
+
+            return this;
+
+        }
+
+        #endregion Configure
+
+        /// <summary>
+        /// Builds the web application and applies all configured actions.
+        /// </summary>
+        /// <param name="configure">An optional action to configure the <see cref="WebApplication"/> after it is built. Can be null.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method builds the web application by applying all prepared actions and configurations.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.Build(app => app.UseEndpoints(endpoints => endpoints.MapControllers()));
+        /// </code>
+        /// </example>
+        public WebService Build(Action<WebApplication>? configure = null)
         {
 
             _app = Prepare()
@@ -178,20 +281,42 @@ namespace Bb.Services
                 item(_app);
             }
 
-            if (configure != null)
-                configure(_app);
+            configure?.Invoke(_app);
 
             return this;
 
         }
 
 
+        /// <summary>
+        /// Runs the web application.
+        /// </summary>
+        /// <remarks>
+        /// This method starts the web application and blocks the calling thread until the application is stopped.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.Run();
+        /// </code>
+        /// </example>
         public void Run()
         {
             _app.Run();
         }
 
 
+        /// <summary>
+        /// Runs the web application asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method starts the web application and returns a task that completes when the application is stopped.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// await webService.RunAsync();
+        /// </code>
+        /// </example>
         public async Task<WebService> RunAsync()
         {
 
@@ -206,51 +331,155 @@ namespace Bb.Services
         #region Ports & urls
 
 
-        public WebService WithHttp(int? port = null)
+        /// <summary>
+        /// Configures the web service to use HTTP with an optional port.
+        /// </summary>
+        /// <param name="port">The port number for HTTP. Defaults to 80 if not specified.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds an HTTP host configuration to the web service.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.WithHttp(5000);
+        /// </code>
+        /// </example>
+        public WebService WithHTTP(int? port = null)
         {
-            return WithHttp("localhost", port);
+            return WithHTTP(Localhost, port);
         }
 
-        public WebService WithHttp(string host, int? port = null)
+        /// <summary>
+        /// Configures the web service to use HTTP with a specified host and optional port.
+        /// </summary>
+        /// <param name="host">The host name for the HTTP configuration. Must not be null or empty.</param>
+        /// <param name="port">The port number for HTTP. Defaults to 80 if not specified.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds an HTTP host configuration to the web service, allowing it to listen on the specified host and port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithHttp("localhost", 5000);
+        /// </code>
+        /// </example>
+        public WebService WithHTTP(string host, int? port = null)
         {
             _hosts.Add(("http", host, port ?? 80));
             return this;
         }
 
-
-
-        public WebService WithDynamicHttp()
+        /// <summary>
+        /// Configures the web service to use HTTP dynamically with the default host.
+        /// </summary>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds a dynamic HTTP host configuration to the web service, allowing it to listen on the default host without specifying a port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithDynamicHttp();
+        /// </code>
+        /// </example>
+        public WebService WithDynamicHTTP()
         {
-            return WithDynamicHttp("localhost");
+            return WithDynamicHTTP(Localhost);
         }
 
-        public WebService WithDynamicHttp(string host)
+        /// <summary>
+        /// Configures the web service to use HTTP dynamically with a specified host.
+        /// </summary>
+        /// <param name="host">The host name for the dynamic HTTP configuration. Must not be null or empty.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds a dynamic HTTP host configuration to the web service, allowing it to listen on the specified host without specifying a port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithDynamicHttp("example.com");
+        /// </code>
+        /// </example>
+        public WebService WithDynamicHTTP(string host)
         {
             _hosts.Add(("http", host, null));
             return this;
         }
 
-
-
-        public WebService WithHttps(int? port = null)
+        /// <summary>
+        /// Configures the web service to use HTTPS with an optional port.
+        /// </summary>
+        /// <param name="port">The port number for HTTPS. Defaults to 443 if not specified.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds an HTTPS host configuration to the web service.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// webService.WithHttps(5001);
+        /// </code>
+        /// </example>
+        public WebService WithHTTPS(int? port = null)
         {
-            return WithHttps("localhost", port);
+            return WithHTTPS(Localhost, port);
         }
 
-        public WebService WithHttps(string host, int? port = null)
+        /// <summary>
+        /// Configures the web service to use HTTPS with a specified host and optional port.
+        /// </summary>
+        /// <param name="host">The host name for the HTTPS configuration. Must not be null or empty.</param>
+        /// <param name="port">The port number for HTTPS. Defaults to 443 if not specified.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds an HTTPS host configuration to the web service, allowing it to listen on the specified host and port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithHttps("localhost", 5001);
+        /// </code>
+        /// </example>
+        public WebService WithHTTPS(string host, int? port = null)
         {
             _hosts.Add(("https", host, port ?? 443));
             return this;
         }
 
-
-
-        public WebService WithDynamicHttps()
+        /// <summary>
+        /// Configures the web service to use HTTPS dynamically with the default host.
+        /// </summary>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds a dynamic HTTPS host configuration to the web service, allowing it to listen on the default host without specifying a port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithDynamicHttps();
+        /// </code>
+        /// </example>
+        public WebService WithDynamicHTTPS()
         {
-            return WithDynamicHttps("localhost");
+            return WithDynamicHTTPS(Localhost);
         }
 
-        public WebService WithDynamicHttps(string host)
+        /// <summary>
+        /// Configures the web service to use HTTPS dynamically with a specified host.
+        /// </summary>
+        /// <param name="host">The host name for the dynamic HTTPS configuration. Must not be null or empty.</param>
+        /// <returns>The configured <see cref="WebService"/> instance.</returns>
+        /// <remarks>
+        /// This method adds a dynamic HTTPS host configuration to the web service, allowing it to listen on the specified host without specifying a port.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var webService = new WebService(args);
+        /// webService.WithDynamicHttps("example.com");
+        /// </code>
+        /// </example>
+        public WebService WithDynamicHTTPS(string host)
         {
             _hosts.Add(("https", host, null));
             return this;
@@ -260,36 +489,106 @@ namespace Bb.Services
         #endregion Ports & urls
 
 
-        public async void Dispose()
-        {
-            _app?.DisposeAsync();
-            _app.ConfigureAwait(true);
-        }
 
+        /// <summary>
+        /// Retrieves a service object of the specified type from the service provider.
+        /// </summary>
+        /// <param name="serviceType">The type of the service object to retrieve. Must not be null.</param>
+        /// <returns>An object of the specified type, or null if the service is not available.</returns>
+        /// <remarks>
+        /// This method resolves a service from the application's service provider.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var service = webService.GetService(typeof(IMyService));
+        /// </code>
+        /// </example>
         public object? GetService(Type serviceType)
         {
             return _app.Services.GetService(serviceType);
         }
 
-        public T GetService<T>()
+        /// <summary>
+        /// Retrieves a service object of the specified generic type from the service provider.
+        /// </summary>
+        /// <typeparam name="T">The type of the service object to retrieve.</typeparam>
+        /// <returns>An object of the specified type, or null if the service is not available.</returns>
+        /// <remarks>
+        /// This method resolves a service from the application's service provider using a generic type parameter.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var myService = webService.GetService&lt;IMyService&gt;();
+        /// </code>
+        /// </example>
+        public T? GetService<T>()
         {
             return _app.Services.GetService<T>();
         }
 
+        /// <summary>
+        /// Retrieves the built web application instance.
+        /// </summary>
+        /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
+        /// <remarks>
+        /// This method provides access to the underlying web application instance for further customization or inspection.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var app = webService.GetApplication();
+        /// </code>
+        /// </example>
         public WebApplication GetApplication()
         {
             return _app;
         }
 
-        private readonly List<Action<WebApplicationBuilder, IServiceProvider>> _actionbuilders;
-        private readonly List<Action<WebApplication>> _actions;
-        private readonly HashSet<Type> _startups;
-        private readonly Dictionary<Type, object> _dicStartup;
-        private readonly string[] _args;
+        private readonly List<Action<WebApplicationBuilder, IServiceProvider>> _actionbuilders = [];
+        private readonly List<Action<WebApplication>> _actions = [];
+        private readonly HashSet<Type> _startups = [];
+        private readonly Dictionary<Type, object> _dicStartup = [];
+        private readonly string[] _args = args;
         private WebApplication _app;
         private LocalServiceProvider _services;
+        private const string Localhost = "localhost";
 
-        internal List<(string, string, int?)> _hosts;
+        internal List<(string, string, int?)> _hosts = [];
+        private bool disposedValue;
+
+        #region IDisposable Support
+
+        /// <summary>
+        /// Disposes the web application and releases resources.
+        /// </summary>
+        /// <param name="disposing">if the call come from dispose or not</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _app?.DisposeAsync();
+                    _app?.ConfigureAwait(true);
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// Disposes the web application and releases resources.
+        /// </summary>
+        /// <remarks>
+        /// This method disposes of the web application asynchronously and ensures proper cleanup of resources.
+        /// </remarks>
+        public void Dispose()
+        {
+            // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion IDisposable Support
 
 
     }

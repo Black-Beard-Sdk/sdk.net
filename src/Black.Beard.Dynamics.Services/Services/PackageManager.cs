@@ -1,7 +1,5 @@
-﻿
-using Bb.ComponentModel;
+﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
-using Bb.Loaders;
 using Bb.Models;
 using Bb.Nugets;
 using NuGet.Common;
@@ -12,52 +10,99 @@ namespace Bb.Services
 {
 
 
+    /// <summary>
+    /// manage downloading of nuget packages
+    /// </summary>
+    /// <param name="logger"></param>
     [ExposeClass(ConstantsCore.Service, LifeCycle = IocScopeEnum.Singleton)]
-    public class PackageManager
+    public class PackageManager(ILogger<PackageManager>? logger)
     {
 
-        public PackageManager(ILogger<PackageManager>? logger)
-        {
-            this._logger = logger;
-            _assemblies = new List<AssemblyMatched>();
-            _addon = new AddonsResolver();
-            _target = Path.GetTempPath().Combine(Assembly.GetExecutingAssembly().GetName().Name, ".nuget");
-        }
 
+        /// <summary>
+        /// add the type to looking for in assemblies
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public PackageManager WithReference(Type type)
         {
             _addon.WithReference(type);
             return this;
         }
 
+        /// <summary>
+        /// Set the root directory for storing nuget packages
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public PackageManager SetTarget(string path)
         {
             _target = path;
             return this;
         }
 
+        /// <summary>
+        /// Resolves a collection of packages by downloading and processing them.
+        /// </summary>
+        /// <param name="packages">The collection of packages to resolve. Must not be null.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method processes each package in the collection by downloading and resolving its dependencies.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var packages = new Packages { new Package("PackageA"), new Package("PackageB") };
+        /// await packageManager.Resolve(packages);
+        /// </code>
+        /// </example>
         public async Task Resolve(Packages packages)
         {
-
             foreach (var package in packages)
                 await Resolve(package);
-
         }
 
+        /// <summary>
+        /// Resolves a single package by downloading and processing it.
+        /// </summary>
+        /// <param name="package">The package to resolve. Must not be null.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method downloads the specified package and resolves its dependencies.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var package = new Package("PackageA");
+        /// await packageManager.Resolve(package);
+        /// </code>
+        /// </example>
         public async Task Resolve(Package package)
         {
-
             Version version = null;
             if (!string.IsNullOrEmpty(package.Version) && !Version.TryParse(package.Version, out version))
                 _logger?.LogWarning($"The version {package.Version} is not valid. Switch on latest version");
 
             await Resolve(package.Id, version);
-
         }
 
+        /// <summary>
+        /// Resolves a NuGet package by its ID and optional version.
+        /// </summary>
+        /// <param name="packageId">The ID of the package to resolve. Must not be null or empty.</param>
+        /// <param name="version">The optional version of the package. If null, the latest version is used.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method downloads the specified NuGet package by its ID and resolves its dependencies.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="packageId"/> is null or empty.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// await packageManager.Resolve("Newtonsoft.Json", new Version("13.0.1"));
+        /// </code>
+        /// </example>
         public async Task Resolve(string packageId, Version? version = null)
         {
-
             NuGet.Common.ILogger l = this._logger != null
                     ? new NuGetILogger(this._logger)
                     : new NuGetLogger();
@@ -81,15 +126,21 @@ namespace Bb.Services
                     _assemblies.Add(assembly);
                 }
             }
-
         }
 
+        /// <summary>
+        /// Gets the resolved assemblies.
+        /// </summary>
+        /// <value>An array of <see cref="AssemblyMatched"/> representing the resolved assemblies.</value>
+        /// <remarks>
+        /// This property provides access to the assemblies that have been resolved during the package resolution process.
+        /// </remarks>
         public AssemblyMatched[] Assemblies => _assemblies.ToArray();
 
-        private readonly ILogger<PackageManager> _logger;
-        private List<AssemblyMatched> _assemblies;
-        private string _target;
-        private readonly AddonsResolver _addon;
+        private readonly ILogger<PackageManager> _logger = logger;
+        private List<AssemblyMatched> _assemblies = new List<AssemblyMatched>();
+        private string _target = Path.GetTempPath().Combine(Assembly.GetExecutingAssembly().GetName().Name, ".nuget");
+        private readonly AddonsResolver _addon = new AddonsResolver();
 
         private class NuGetILogger : NuGet.Common.ILogger
         {

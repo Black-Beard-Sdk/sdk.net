@@ -1,5 +1,6 @@
 ﻿
 using Bb.Http;
+using Bb.Urls;
 using RestSharp;
 using System.Reflection;
 

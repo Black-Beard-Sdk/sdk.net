@@ -1,47 +1,117 @@
-﻿using RestSharp;
+﻿using Bb.Urls;
+using RestSharp;
 using System.Text;
 
-namespace Bb.Helpers
+namespace Bb.Urls
 {
 
-    public static class UrlExtension
+
+        /// <summary>
+        /// Provides extension methods for working with URLs, including manipulation of paths, query parameters, fragments, and creating REST clients.
+        /// </summary>
+        /// <remarks>
+        /// This class contains a variety of helper methods for handling and modifying URLs. It supports operations such as:
+        /// - Creating and configuring <see cref="RestClient"/> instances.
+        /// - Mapping variables in URLs to specific values.
+        /// - Concatenating multiple URLs into a single string.
+        /// - Adding, removing, and modifying query parameters.
+        /// - Manipulating URL paths and fragments.
+        /// - Resetting URLs to their root components.
+        /// These methods simplify common URL-related tasks in web applications.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = "https://example.com/{id}".Map("id", "123");
+        /// Console.WriteLine(url); // Output: https://example.com/123
+        ///
+        /// var urls = new List&lt;Url&gt; { new Url("https://example1.com"), new Url("https://example2.com") };
+        /// var result = urls.ConcatUrl();
+        /// Console.WriteLine(result); // Output: https://example1.com;https://example2.com
+        /// </code>
+        /// </example>
+        public static partial class UrlExtension
     {
 
-
-
-
+        /// <summary>
+        /// Creates a new <see cref="RestClient"/> instance using the specified <see cref="Url"/>.
+        /// </summary>
+        /// <param name="url">The <see cref="Url"/> instance to use for creating the client. Must not be null.</param>
+        /// <returns>A new <see cref="RestClient"/> instance configured with the root URL.</returns>
+        /// <remarks>
+        /// This method initializes a REST client using the root URL of the provided <see cref="Url"/> instance.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com");
+        /// var client = url.RestClient();
+        /// </code>
+        /// </example>
         public static RestClient RestClient(this Url url)
         {
-            return new RestClient(url.Root);
+            return new RestClient(url.ToUri());
         }
 
-
-
-        public static Url Map(this string self, string variable,  string value )
+        /// <summary>
+        /// Maps a variable in the URL to a specified value.
+        /// </summary>
+        /// <param name="self">The URL string to map. Must not be null or empty.</param>
+        /// <param name="variable">The variable name to replace in the URL. Must not be null or empty.</param>
+        /// <param name="value">The value to replace the variable with. Must not be null or empty.</param>
+        /// <returns>A new <see cref="Url"/> instance with the variable replaced by the specified value.</returns>
+        /// <remarks>
+        /// This method replaces a variable in the URL with the provided value.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = "https://example.com/{id}".Map("id", "123");
+        /// Console.WriteLine(url); // Output: https://example.com/123
+        /// </code>
+        /// </example>
+        public static Url Map(this string self, string variable, string value)
         {
             Url url = new Url(self);
             url.Map(variable, value);
             return url;
         }
 
-
         /// <summary>
-        /// return a <see cref="StringBuilder"/> with Concatenated url separated by ';'.
+        /// Concatenates a collection of URLs into a single <see cref="StringBuilder"/> separated by semicolons.
         /// </summary>
-        /// <param name="urls"><see cref="Url"/></param>
-        /// <returns></returns>
-        public static StringBuilder ConcatUrl(this IEnumerable<Url> urls)
+        /// <param name="urls">The collection of <see cref="Url"/> instances to concatenate. Must not be null.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the concatenated URLs.</returns>
+        /// <remarks>
+        /// This method combines multiple URLs into a single string, separated by semicolons.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var urls = new List&lt;Url&gt; { new Url("https://example1.com"), new Url("https://example2.com") };
+        /// var result = urls.ConcatUrl();
+        /// Console.WriteLine(result); // Output: https://example1.com;https://example2.com
+        /// </code>
+        /// </example>
+        public static StringBuilder CombineUrl(this IEnumerable<Url> urls)
         {
-            return new StringBuilder().ConcatUrl(urls);
+            return new StringBuilder().CombineUrl(urls);
         }
-
+        
         /// <summary>
-        /// return a <see cref="StringBuilder"/> with Concatenated url separated by ';'.
+        /// Concatenates a collection of URLs into the provided <see cref="StringBuilder"/> separated by semicolons.
         /// </summary>
-        /// <param name="sb"><see cref="StringBuilder"/></param>
-        /// <param name="urls"><see cref="Url"/></param>
-        /// <returns></returns>
-        public static StringBuilder ConcatUrl(this StringBuilder sb, IEnumerable<Url> urls)
+        /// <param name="sb">The <see cref="StringBuilder"/> to append the URLs to. If null, a new instance is created.</param>
+        /// <param name="urls">The collection of <see cref="Url"/> instances to concatenate. Must not be null.</param>
+        /// <returns>The <see cref="StringBuilder"/> containing the concatenated URLs.</returns>
+        /// <remarks>
+        /// This method appends multiple URLs to the provided <see cref="StringBuilder"/>, separated by semicolons.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var sb = new StringBuilder();
+        /// var urls = new List&lt;Url&gt; { new Url("https://example1.com"), new Url("https://example2.com") };
+        /// sb.ConcatUrl(urls);
+        /// Console.WriteLine(sb); // Output: https://example1.com;https://example2.com
+        /// </code>
+        /// </example>
+        public static StringBuilder CombineUrl(this StringBuilder sb, IEnumerable<Url> urls)
         {
             if (sb == null)
                 sb = new StringBuilder(200);
@@ -62,9 +132,9 @@ namespace Bb.Helpers
         /// <param name="segment">The segment to append</param>
         /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this string url, object segment, bool fullyEncode = false)
+        public static Url WithPathSegment(this string url, string segment)
         {
-            return new Url(url).WithPathSegment(segment, fullyEncode);
+            return new Url(url).WithPathSegment(segment);
         }
 
         /// <summary>
@@ -73,7 +143,7 @@ namespace Bb.Helpers
         /// <param name="url">This URL.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this string url, params object[] segments)
+        public static Url WithPathSegment(this string url, params string[] segments)
         {
             return new Url(url).WithPathSegment(segments);
         }
@@ -84,7 +154,7 @@ namespace Bb.Helpers
         /// <param name="url">This URL.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this string url, IEnumerable<object> segments)
+        public static Url WithPathSegment(this string url, IEnumerable<string> segments)
         {
             return new Url(url).WithPathSegment(segments);
         }
@@ -94,9 +164,9 @@ namespace Bb.Helpers
         /// </summary>
         /// <param name="url">This URL.</param>
         /// <returns>A new Url object.</returns>
-        public static Url RemovePathSegment(this string url)
+        public static Url RemoveLastPathSegment(this string url)
         {
-            return new Url(url).RemovePathSegment();
+            return new Url(url).RemoveLastPathSegment();
         }
 
         /// <summary>
@@ -262,9 +332,9 @@ namespace Bb.Helpers
         /// <param name="segment">The segment to append</param>
         /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this Uri uri, object segment, bool fullyEncode = false)
+        public static Url WithPathSegment(this Uri uri, string segment)
         {
-            return new Url(uri).WithPathSegment(segment, fullyEncode);
+            return new Url(uri).WithPathSegment(segment);
         }
 
         /// <summary>
@@ -273,7 +343,7 @@ namespace Bb.Helpers
         /// <param name="uri">This System.Uri.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this Uri uri, params object[] segments)
+        public static Url WithPathSegment(this Uri uri, params string[] segments)
         {
             return new Url(uri).WithPathSegment(segments);
         }
@@ -284,7 +354,7 @@ namespace Bb.Helpers
         /// <param name="uri">This System.Uri.</param>
         /// <param name="segments">The segments to append</param>
         /// <returns>A new Url object.</returns>
-        public static Url WithPathSegment(this Uri uri, IEnumerable<object> segments)
+        public static Url WithPathSegment(this Uri uri, IEnumerable<string> segments)
         {
             return new Url(uri).WithPathSegment(segments);
         }
@@ -296,7 +366,7 @@ namespace Bb.Helpers
         /// <returns>A new Url object.</returns>
         public static Url WithRemovePathSegment(this Uri uri)
         {
-            return new Url(uri).RemovePathSegment();
+            return new Url(uri).RemoveLastPathSegment();
         }
 
         /// <summary>

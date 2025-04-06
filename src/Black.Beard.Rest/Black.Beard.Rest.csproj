@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Compile Remove="Curls\CurlParserExtension.httpResponses.cs" />
+    <Compile Remove="Url.cs" />
     <Compile Remove="Util\VariableReplacer.cs" />
     <Compile Remove="Util\Variables.cs" />
     <Compile Remove="Util\VariablesBase.cs" />

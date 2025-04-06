@@ -6,6 +6,10 @@ using System.Reflection;
 namespace Bb
 {
 
+
+    /// <summary>
+    /// Extension methods for configuring policies in a web application.
+    /// </summary>
     public static class PolicyExtension
     {
 
@@ -19,16 +23,33 @@ namespace Bb
         }
 
         /// <summary>
-        /// Append policies form specified file
+        /// Appends policies from the specified file.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="filePath"></param>
-        /// <param name="filter"></param>
-        /// <param name="configureAction"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="FileNotFoundException"></exception>
-        /// <exception cref="Exception"></exception>
+        /// <param name="builder">The <see cref="WebApplicationBuilder"/> instance to configure. Must not be null.</param>
+        /// <param name="filePath">The path to the policy file. Must not be null or empty.</param>
+        /// <param name="filter">An optional filter function to apply to policy rules. Can be null.</param>
+        /// <param name="configureAction">An optional action to configure authorization options. Can be null.</param>
+        /// <returns>The configured <see cref="WebApplicationBuilder"/> instance.</returns>
+        /// <remarks>
+        /// This method parses a policy file, evaluates its rules, and registers them into the application's authorization system.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="filePath"/> is null.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown if the specified policy file does not exist.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if the policy file fails to evaluate successfully.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// builder.AddPolicy("policies.json", rule => rule.Name.StartsWith("Admin"), options => options.InvokeHandlersAfterFailure = true);
+        /// var app = builder.Build();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public static WebApplicationBuilder AddPolicy(this WebApplicationBuilder builder, string filePath, Func<PolicyRule, bool>? filter = null, Action<AuthorizationOptions>? configureAction = null)
         {
 
@@ -80,8 +101,19 @@ namespace Bb
         /// <summary>
         /// Configures the policy evaluator service.
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
+        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
+        /// <remarks>
+        /// This method sets up the policy evaluator service and enables authentication and authorization middleware in the application.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var app = builder.Build();
+        /// app.ConfigurePolicy();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public static WebApplication ConfigurePolicy(this WebApplication app)
         {
             
@@ -95,9 +127,21 @@ namespace Bb
         }
 
         /// <summary>
-        /// Retrieves all policy names from AuthorizeAttribute across all loaded assemblies
+        /// Retrieves all policy names from <see cref="AuthorizeAttribute"/> across all loaded assemblies.
         /// </summary>
-        /// <returns>A list of unique policy names</returns>
+        /// <returns>A list of unique policy names.</returns>
+        /// <remarks>
+        /// This method scans all loaded assemblies for <see cref="AuthorizeAttribute"/> applied to types, methods, and properties, and collects their policy names.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var policies = PolicyExtension.GetAuthorizePoliciesFromAssemblies();
+        /// foreach (var policy in policies)
+        /// {
+        ///     Console.WriteLine($"Policy: {policy}");
+        /// }
+        /// </code>
+        /// </example>
         public static IEnumerable<string> GetAuthorizePoliciesFromAssemblies()
         {
 

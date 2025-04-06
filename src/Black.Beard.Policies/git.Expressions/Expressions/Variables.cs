@@ -30,10 +30,10 @@ namespace Bb.Expressions
 
         }
 
-        internal Variable GetByName(string name)
+        internal Variable? GetByName(string name)
         {
 
-            if (this._variables.TryGetValue(name, out Variable variable))
+            if (this._variables.TryGetValue(name, out Variable? variable))
             {
                 if (variable.Type == null && variable.Instance != null)
                     variable.Type = variable.Instance.Type;

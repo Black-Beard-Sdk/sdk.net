@@ -1,5 +1,4 @@
-﻿
-using Bb.ComponentModel.Factories;
+﻿using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
@@ -13,6 +12,9 @@ using Bb.Services;
 namespace Bb.Extensions
 {
 
+    /// <summary>
+    /// Provides extension methods for initializing and configuring the application.
+    /// </summary>
     public static class InitializerExtension
     {
 
@@ -23,6 +25,18 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Loads assemblies and packages based on the provided paths and configuration.
+        /// </summary>
+        /// <param name="paths">An array of folder paths to search for assemblies. Can be null.</param>
+        /// <remarks>
+        /// This method resolves the startup configuration, appends folders to the discovery process, and loads assemblies and packages.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// InitializerExtension.LoadAssemblies("C:\\MyAssemblies", "D:\\MoreAssemblies");
+        /// </code>
+        /// </example>
         public static void LoadAssemblies(params string[] paths)
         {
 
@@ -33,7 +47,7 @@ namespace Bb.Extensions
             LoadPackages(startupConfiguration);
 
             // Ensure all required assemblies are loaded
-            var search = new AddonsResolver()
+            new AddonsResolver()
                     .WithReference(typeof(ExposeClassAttribute))
                     .SearchAssemblies()
                     .ToList()
@@ -42,6 +56,13 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Loads packages specified in the startup configuration.
+        /// </summary>
+        /// <param name="startupConfiguration">The startup configuration containing package information. Must not be null.</param>
+        /// <remarks>
+        /// This method resolves and loads packages using the package manager and ensures that all required assemblies are loaded.
+        /// </remarks>
         private static void LoadPackages(StartupConfiguration startupConfiguration)
         {
 
@@ -67,6 +88,13 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Loads assemblies specified in the startup configuration.
+        /// </summary>
+        /// <param name="startupConfiguration">The startup configuration containing assembly names. Must not be null.</param>
+        /// <remarks>
+        /// This method loads assemblies by their names as specified in the startup configuration.
+        /// </remarks>
         private static void LoadAssemblies(StartupConfiguration startupConfiguration)
         {
             if (startupConfiguration.AssemblyNames != null && startupConfiguration.AssemblyNames.Count > 0)
@@ -74,23 +102,59 @@ namespace Bb.Extensions
                     AssemblyLoader.Instance.LoadAssemblyName(assemblyName);
         }
 
+        /// <summary>
+        /// Appends folders to the assembly discovery process.
+        /// </summary>
+        /// <param name="paths">An array of folder paths to add. Can be null.</param>
+        /// <param name="startupConfiguration">The startup configuration containing additional folders. Must not be null.</param>
+        /// <remarks>
+        /// This method adds the specified paths and folders from the startup configuration to the assembly directory resolver.
+        /// </remarks>
         private static void AppendFoldersToDiscovers(string[] paths, StartupConfiguration startupConfiguration)
         {
             if (paths != null || paths.Length > 0)
                 AssemblyDirectoryResolver.Instance.AddDirectories(paths);
             if (startupConfiguration.Folders != null && startupConfiguration.Folders.Count > 0)
-                foreach (var assemblyName in startupConfiguration.Folders)
-                    AssemblyDirectoryResolver.Instance.AddDirectories(startupConfiguration.Folders);
+                AssemblyDirectoryResolver.Instance.AddDirectories(startupConfiguration.Folders);
         }
 
+        /// <summary>
+        /// Resolves the startup configuration from the global configuration.
+        /// </summary>
+        /// <returns>A <see cref="StartupConfiguration"/> object containing the resolved configuration.</returns>
+        /// <remarks>
+        /// This method retrieves the startup configuration document from the global configuration or creates a new one if not found.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var config = InitializerExtension.ResolveConfiguration();
+        /// Console.WriteLine($"Configuration loaded: {config}");
+        /// </code>
+        /// </example>
         private static StartupConfiguration ResolveConfiguration()
         {
             var o = StaticContainer.Get<GlobalConfiguration>();
-            var startupConfiguration = o.GetDocument<StartupConfiguration>(GlobalConfiguration.Configuration) 
+            var startupConfiguration = o.GetDocument<StartupConfiguration>(GlobalConfiguration.Configuration)
                 ?? new StartupConfiguration();
             return startupConfiguration;
         }
 
+        /// <summary>
+        /// Initializes the application builder with custom configurations.
+        /// </summary>
+        /// <param name="self">The <see cref="WebApplicationBuilder"/> instance to initialize. Must not be null.</param>
+        /// <returns>The configured <see cref="WebApplicationBuilder"/> instance.</returns>
+        /// <remarks>
+        /// This method sets up schema generation, auto-configuration, and trace configuration for the application builder.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// builder.Initialize();
+        /// var app = builder.Build();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public static WebApplicationBuilder Initialize(this WebApplicationBuilder self)
         {
 
@@ -129,6 +193,22 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Initializes the web application with custom configurations.
+        /// </summary>
+        /// <param name="self">The <see cref="WebApplication"/> instance to initialize. Must not be null.</param>
+        /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
+        /// <remarks>
+        /// This method sets up auto-configuration for the web application.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var app = builder.Build();
+        /// app.Initialize();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public static WebApplication Initialize(this WebApplication self)
         {
 

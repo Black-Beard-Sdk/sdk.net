@@ -1,5 +1,4 @@
-﻿
-namespace Bb.Util
+﻿namespace Bb.Urls
 {
     /// <summary>
     /// Defines common methods for INameValueList and IReadOnlyNameValueList.

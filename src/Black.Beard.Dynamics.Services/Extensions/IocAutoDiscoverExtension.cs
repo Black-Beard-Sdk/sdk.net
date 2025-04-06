@@ -9,6 +9,9 @@ namespace Bb.Extensions
 {
 
 
+    /// <summary>
+    /// Provides extension methods for discovering and registering types exposed by attributes in the context of dependency injection.
+    /// </summary>
     public static class IocAutoDiscoverExtension
     {
 
@@ -18,6 +21,19 @@ namespace Bb.Extensions
             _methodOptionConfiguration = typeof(IocAutoDiscoverExtension).GetMethod(nameof(BindConfiguration), BindingFlags.NonPublic | BindingFlags.Static);            
         }
 
+        /// <summary>
+        /// Discovers types exposed by attributes in the specified context and applies an action to each type.
+        /// </summary>
+        /// <param name="contextKey">The context key used to filter exposed types. Must not be null.</param>
+        /// <param name="action">An optional action to apply to each discovered type. Can be null.</param>
+        /// <remarks>
+        /// This method retrieves all types exposed by attributes in the specified context and optionally applies a user-defined action to each type.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// "MyContext".DiscoverTypeExposedByAttribute(type => Console.WriteLine(type.Name));
+        /// </code>
+        /// </example>
         public static void DiscoverTypeExposedByAttribute(this string contextKey, Action<Type> action = null)
         {
 
@@ -27,6 +43,24 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Registers types exposed by attributes in the specified context into the service collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to register the types into. Must not be null.</param>
+        /// <param name="configuration">The application configuration. Must not be null.</param>
+        /// <param name="contextKey">The context key used to filter exposed types. Must not be null.</param>
+        /// <param name="filter">A filter function to determine which types to register. Can be null.</param>
+        /// <param name="action">An optional action to apply to each registered type. Can be null.</param>
+        /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+        /// <remarks>
+        /// This method discovers types exposed by attributes in the specified context, applies an optional filter, and registers them into the service collection.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var services = new ServiceCollection();
+        /// services.UseTypeExposedByAttribute(configuration, "MyContext", (type, context) => true, type => Console.WriteLine($"Registered: {type.Name}"));
+        /// </code>
+        /// </example>
         public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Func<Type, string, bool> filter, Action<Type> action = null)
         {
 
@@ -51,6 +85,22 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Binds a configuration section to a specified options type.
+        /// </summary>
+        /// <param name="self">The <see cref="IServiceCollection"/> to bind the configuration to. Must not be null.</param>
+        /// <param name="type">The type of the options to bind. Must not be null.</param>
+        /// <param name="configuration">The application configuration. Must not be null.</param>
+        /// <returns>The updated <see cref="IServiceCollection"/> instance.</returns>
+        /// <remarks>
+        /// This method binds a configuration section to a specified options type and validates the data annotations.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var services = new ServiceCollection();
+        /// services.BindConfiguration(typeof(MyOptions), configuration);
+        /// </code>
+        /// </example>
         public static IServiceCollection BindConfiguration(this IServiceCollection self, Type type, IConfiguration configuration)
         {
             _methodOptionConfiguration.MakeGenericMethod(type)
@@ -59,10 +109,22 @@ namespace Bb.Extensions
         }
 
         /// <summary>
-        /// Gets the exposed types in loaded assemblies.
+        /// Gets the exposed types in loaded assemblies filtered by a context name.
         /// </summary>
-        /// <param name="contextName">Name of the context.</param>
-        /// <returns></returns>
+        /// <param name="contextName">The name of the context to filter exposed types. Must not be null.</param>
+        /// <returns>An enumerable of <see cref="Type"/> objects representing the exposed types.</returns>
+        /// <remarks>
+        /// This method retrieves all types in loaded assemblies that are exposed by the <see cref="ExposeClassAttribute"/> and match the specified context name.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var types = IocAutoDiscoverExtension.GetExposedTypes("MyContext");
+        /// foreach (var type in types)
+        /// {
+        ///     Console.WriteLine(type.Name);
+        /// }
+        /// </code>
+        /// </example>
         public static IEnumerable<Type> GetExposedTypes(string contextName)
         {
             var items = ComponentModel.TypeDiscovery.Instance
@@ -70,6 +132,23 @@ namespace Bb.Extensions
             return items;
         }
 
+        /// <summary>
+        /// Gets the exposed types in loaded assemblies filtered by a custom filter function.
+        /// </summary>
+        /// <param name="filter">A filter function to apply to the <see cref="ExposeClassAttribute"/>. Must not be null.</param>
+        /// <returns>An enumerable of <see cref="Type"/> objects representing the exposed types.</returns>
+        /// <remarks>
+        /// This method retrieves all types in loaded assemblies that are exposed by the <see cref="ExposeClassAttribute"/> and match the specified filter.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var types = IocAutoDiscoverExtension.GetExposedTypes(attr => attr.Context == "MyContext");
+        /// foreach (var type in types)
+        /// {
+        ///     Console.WriteLine(type.Name);
+        /// }
+        /// </code>
+        /// </example>
         public static IEnumerable<Type> GetExposedTypes(Func<ExposeClassAttribute, bool> filter)
         {
             var items = ComponentModel.TypeDiscovery.Instance
@@ -99,6 +178,12 @@ namespace Bb.Extensions
 
         }
 
+        /// <summary>
+        /// Resolves a configuration section for a specified type and applies an action to it.
+        /// </summary>
+        /// <param name="configuration">configuration that provide the section for resolve the mapping</param>
+        /// <param name="type"></param>
+        /// <param name="action"></param>
         public static void ResolveConfiguration(this IConfiguration configuration, Type type, Action<Type, string, IConfigurationSection> action)
         {
 

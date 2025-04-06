@@ -7,6 +7,17 @@ namespace Bb.Middleware
     internal class HttpInfoLoggerMiddleware
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpInfoLoggerMiddleware"/> class.
+        /// </summary>
+        /// <param name="next">The next middleware in the pipeline. Must not be null.</param>
+        /// <param name="logger">The <see cref="ILogger{HttpInfoLoggerMiddleware}"/> instance used for logging. Must not be null.</param>
+        /// <remarks>
+        /// This constructor sets up the middleware to log HTTP request and response details.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="next"/> or <paramref name="logger"/> is null.
+        /// </exception>
         public HttpInfoLoggerMiddleware(RequestDelegate next, ILogger<HttpInfoLoggerMiddleware> logger)
         {
             _next = next;
@@ -16,6 +27,22 @@ namespace Bb.Middleware
         // RemoteIpAddress = ::1 is localhost
         // https://stackoverflow.com/questions/28664686/how-do-i-get-client-ip-address-in-asp-net-core
 
+        /// <summary>
+        /// Processes an HTTP request and logs its details, along with the response details.
+        /// </summary>
+        /// <param name="context">The <see cref="HttpContext"/> representing the current HTTP request. Must not be null.</param>
+        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <remarks>
+        /// This method logs the HTTP request and response details, including headers, cookies, and form data, if available.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var builder = WebApplication.CreateBuilder(args);
+        /// var app = builder.Build();
+        /// app.UseMiddleware&lt;HttpInfoLoggerMiddleware&gt;();
+        /// app.Run();
+        /// </code>
+        /// </example>
         public async Task InvokeAsync(HttpContext context)
         {
 
@@ -47,13 +74,27 @@ namespace Bb.Middleware
 
         }
 
-
-
+        /// <summary>
+        /// Logs the details of the HTTP request.
+        /// </summary>
+        /// <param name="context">The <see cref="HttpContext"/> representing the current HTTP request. Must not be null.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the logged request details.</returns>
+        /// <remarks>
+        /// This method captures details such as the HTTP method, URL, headers, cookies, and form data.
+        /// </remarks>
         private StringBuilder LogRequest(HttpContext context)
         {
             return TraceRequest(context.Request);
         }
 
+        /// <summary>
+        /// Captures the details of an HTTP request.
+        /// </summary>
+        /// <param name="r">The <see cref="HttpRequest"/> to capture details from. Must not be null.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the captured request details.</returns>
+        /// <remarks>
+        /// This method captures details such as the HTTP method, URL, headers, cookies, and form data.
+        /// </remarks>
         private static StringBuilder TraceRequest(HttpRequest r)
         {
 
@@ -117,6 +158,14 @@ namespace Bb.Middleware
 
         }
 
+        /// <summary>
+        /// Attempts to retrieve the form data from an HTTP request.
+        /// </summary>
+        /// <param name="r">The <see cref="HttpRequest"/> to retrieve form data from. Must not be null.</param>
+        /// <returns>An <see cref="IFormCollection"/> containing the form data, or <see langword="null"/> if the form data is not available.</returns>
+        /// <remarks>
+        /// This method safely attempts to retrieve form data from the request, handling any exceptions that may occur.
+        /// </remarks>
         private static IFormCollection? TryToGetForm(HttpRequest r)
         {
             IFormCollection form = null;
@@ -131,13 +180,27 @@ namespace Bb.Middleware
             return form;
         }
 
-
+        /// <summary>
+        /// Logs the details of the HTTP response.
+        /// </summary>
+        /// <param name="context">The <see cref="HttpContext"/> representing the current HTTP response. Must not be null.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the logged response details.</returns>
+        /// <remarks>
+        /// This method captures details such as the status code and response headers.
+        /// </remarks>
         private StringBuilder LogResponse(HttpContext context)
         {
             return TraceResponse(context.Response);
         }
 
-
+        /// <summary>
+        /// Captures the details of an HTTP response.
+        /// </summary>
+        /// <param name="r">The <see cref="HttpResponse"/> to capture details from. Must not be null.</param>
+        /// <returns>A <see cref="StringBuilder"/> containing the captured response details.</returns>
+        /// <remarks>
+        /// This method captures details such as the status code and response headers.
+        /// </remarks>
         private static StringBuilder TraceResponse(HttpResponse r)
         {
 

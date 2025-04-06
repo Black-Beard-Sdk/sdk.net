@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Bb.Util
+namespace Bb.Urls
 {
 
 
@@ -21,7 +21,7 @@ namespace Bb.Util
 
             _values.AddRange(
                 from kv in query.TrimStart('?').ToKeyValuePairs()
-                select (kv.Key, new QueryParamValue(kv.Value, true)));
+                select (kv.Key, new QueryParamValue(kv.Value)));
 
         }
 
@@ -37,8 +37,8 @@ namespace Bb.Util
         /// <returns></returns>
         public string ToString(bool encodeSpaceAsPlus) => string.Join("&",
             from p in _values
-            let name = Url.EncodeIllegalCharacters(p.Name, encodeSpaceAsPlus)   // .ReplaceVariables(variables)
-            let value = p.Value.Encode(encodeSpaceAsPlus)
+            let name = Url.EncodeIllegalCharacters(p.Name, encodeSpaceAsPlus)
+            let value = p.Value.EncodedValue(encodeSpaceAsPlus)
             select value == null ? name : $"{name}={value}");
 
         /// <summary>
@@ -47,9 +47,8 @@ namespace Bb.Util
         /// </summary>
         /// <param name="name">Name of the parameter.</param>
         /// <param name="value">Value of the parameter. If it's a collection, multiple parameters of the same name are added.</param>
-        /// <param name="isEncoded">If true, assume value(s) already URL-encoded.</param>
         /// <param name="nullValueHandling">Describes how to handle null values.</param>
-        public void Add(string name, object value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public void Add(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
 
             if (value == null && nullValueHandling == NullValueHandling.Remove)
@@ -63,12 +62,8 @@ namespace Bb.Util
 
                 if (val == null && nullValueHandling != NullValueHandling.NameOnly)
                     continue;
-
-                var subValue = val;
-                if (subValue is string s)
-                    subValue = s;
-
-                _values.Add(name, new QueryParamValue(subValue, isEncoded));
+                
+                _values.Add(name, new QueryParamValue(val));
 
             }
 
@@ -84,11 +79,11 @@ namespace Bb.Util
         /// <param name="value">Value of the parameter. If it's a collection, multiple parameters of the same name are added/replaced.</param>
         /// <param name="isEncoded">If true, assume value(s) already URL-encoded.</param>
         /// <param name="nullValueHandling">Describes how to handle null values.</param>
-        public void AddOrReplace(string name, object value, bool isEncoded = false, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public void AddOrReplace(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
 
             if (!Contains(name))
-                Add(name, value, isEncoded, nullValueHandling);
+                Add(name, value, nullValueHandling);
 
             // This covers some complex edge cases involving multiple values of the same name.
             // example: x has values at positions 2 and 4 in the query string, then we set x to
@@ -118,12 +113,12 @@ namespace Bb.Util
                     continue;
 
                 else
-                    Add(name, val, isEncoded, nullValueHandling);
+                    Add(name, val, nullValueHandling);
             }
 
             // add the rest to the end
             while (values.Count > 0)
-                Add(name, values.Dequeue(), isEncoded, nullValueHandling);
+                Add(name, values.Dequeue(), nullValueHandling);
 
         }
 

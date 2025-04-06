@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.58" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.58" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />
     <PackageReference Include="Keycloak.AuthServices.Authentication" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.3" />

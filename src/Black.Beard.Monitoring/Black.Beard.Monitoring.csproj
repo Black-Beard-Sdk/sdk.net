@@ -52,10 +52,10 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
 
-    <PackageReference Include="Black.Beard.Helpers" Version="2.0.58" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.184" />
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.184" />
-    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.58" />
+    <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.187" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.187" />
+    <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />
     
   </ItemGroup>
 

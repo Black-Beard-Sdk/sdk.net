@@ -7,16 +7,15 @@ using Bb.Extensions;
 using RestSharp;
 using Bb.Helpers;
 using Bb.Interfaces;
-using NLog.Targets;
 using System.Reflection;
-using Bb.Loaders;
 using Bb.Configurations;
-using Bb.ComponentModel.Loaders;
 using Bb.Models;
-
+using Bb.Urls;
 
 namespace Black.Beard.Rest.UnitTest
 {
+
+
     public class UnitTest1
     {
 
@@ -28,42 +27,42 @@ namespace Black.Beard.Rest.UnitTest
             var url = new Url("http://localhost", port);
             var url2 = "/api/sample";
 
-            using (var web = GetService(port).Build())
-            {
+            using var web = GetService(port).Build();
 
-                web.GetApplication().MapGet(url2, async (HttpContext context) =>
-                {
-                    var response = new { message = "Données reçues avec succès" };
-                    context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-                });
-
-                web.RunAsync();
-
-                var u = url.WithPathSegment(url2);
-
-                var factory = web.GetService<IRestClientFactory>();
-                var client = factory.Create(u);
-
-                var o = await client.GetAsync(Method.Get.NewRequest(url2));
+            web.GetApplication()
+                .MapGet(url2, async (HttpContext context)
+                    => await context.SetResponse(new MessageResult { Message = "Ok" })
+                );
+            web.RunAsync();
 
 
+            var client = web
+                .GetService<IRestClientFactory>()
+                .Create(url.WithPathSegment(url2));
 
-            }
+            var o = await client.GetAsync(Method.Get.NewRequest(url2));
+
+            var m = o.Content.Deserialize<MessageResult>();
+            Assert.Equal(m.Message, "Ok");
 
         }
 
-
+        public class MessageResult
+        {
+            public string Message { get; set; }
+        }
 
         public static WebService GetService(int port)
         {
 
+            var name = Assembly.GetExecutingAssembly().GetName().Name;
             // create folder for config, schemas and .nugets
             var conf = StaticContainer.Set(new GlobalConfiguration())
-                .SetRoot(Assembly.GetExecutingAssembly().GetName().Name.GetTempPath())
-                .WithDirectory(GlobalConfiguration.Configuration, "Configs")
-                .WithDirectory(GlobalConfiguration.Schema, "Schemas")
-                .WithDirectory(GlobalConfiguration.Nuget, ".nugets")
+                .SetRoot(name.GetTempPath())
+                .WithRelatedDirectory(GlobalConfiguration.Configuration, "Configs")
+                .WithRelatedDirectory(GlobalConfiguration.Schema, "Schemas")
+                .WithRelatedDirectory(GlobalConfiguration.Nuget, ".nugets")
+                .WithRelatedDirectory(GlobalConfiguration.Logs, "logs")
                 ;
 
             conf.AppendDocument(GlobalConfiguration.Configuration,
@@ -72,8 +71,10 @@ namespace Black.Beard.Rest.UnitTest
                     Packages = ["Black.Beard.ComponentModel"],
                 });
 
+            InitializerExtension.LoadAssemblies(null);
+
             var web = new WebService()
-                            .WithHttp(port)
+                            .WithHTTP(port)
                             .UseStartup<Startup>(c =>
                             {
                                 //c.UseCertificate = "";

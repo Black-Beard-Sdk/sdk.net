@@ -37,6 +37,27 @@ namespace Bb.Configuration.Git
         #endregion ctor
 
 
+        /// <summary>
+        /// Gets the name of the local branch for the specified repository folder.
+        /// </summary>
+        /// <param name="localFolder">The path to the local repository folder. Must be a valid Git repository path.</param>
+        /// <returns>The name of the local branch being tracked, or <see langword="null"/> if no branch is found.</returns>
+        /// <remarks>
+        /// This method retrieves the name of the local branch that is being tracked by the repository.
+        /// </remarks>
+        /// <exception cref="LibGit2Sharp.RepositoryNotFoundException">
+        /// Thrown if the specified folder is not a valid Git repository.
+        /// </exception>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if the provided folder path is invalid.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var loader = new ConfigurationLoader();
+        /// string branchName = loader.GetLocalBranchName(@"C:\MyRepo");
+        /// Console.WriteLine($"Local branch: {branchName}");
+        /// </code>
+        /// </example>
         public string GetLocalBranchName(string localFolder)
         {
 
@@ -65,6 +86,25 @@ namespace Bb.Configuration.Git
 
         }
 
+        /// <summary>
+        /// Displays the status of the latest commit in the specified repository folder.
+        /// </summary>
+        /// <param name="localFolder">The path to the local repository folder. Must be a valid Git repository path.</param>
+        /// <remarks>
+        /// This method prints details about the latest commit, including the commit ID, author, date, and message.
+        /// </remarks>
+        /// <exception cref="LibGit2Sharp.RepositoryNotFoundException">
+        /// Thrown if the specified folder is not a valid Git repository.
+        /// </exception>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if the provided folder path is invalid.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var loader = new ConfigurationLoader();
+        /// loader.GetStatus(@"C:\MyRepo");
+        /// </code>
+        /// </example>
         public void GetStatus(string localFolder)
         {
 
@@ -95,11 +135,24 @@ namespace Bb.Configuration.Git
         public GitConfiguration GitConfiguration { get; set; }
 
         /// <summary>
-        /// Refresh the git repository
+        /// Refreshes the Git repository in the specified folder by cloning or pulling changes.
         /// </summary>
-        /// <param name="folder">target folder</param>
-        /// <param name="branch">branch to clone</param>
-        /// <returns></returns>
+        /// <param name="localFolder">The path to the local repository folder. Must be a valid directory path.</param>
+        /// <param name="branch">The branch to clone or pull. If <see langword="null"/>, the default branch is used.</param>
+        /// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method ensures that the repository is up-to-date by either cloning it if it is not initialized or pulling changes if it is already initialized.
+        /// </remarks>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if there is an issue accessing the folder.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var loader = new ConfigurationLoader();
+        /// bool success = loader.Refresh(@"C:\MyRepo", "main");
+        /// Console.WriteLine($"Refresh successful: {success}");
+        /// </code>
+        /// </example>
         public bool Refresh(string localFolder, string? branch = null)
         {
             var folder = localFolder.AsDirectory();
@@ -107,11 +160,25 @@ namespace Bb.Configuration.Git
         }
 
         /// <summary>
-        /// Clone the git repository
+        /// Refreshes the Git repository in the specified folder by cloning or pulling changes.
         /// </summary>
-        /// <param name="folder">target folder</param>
-        /// <param name="branch">branch to clone</param>
-        /// <returns></returns>
+        /// <param name="folder">The target folder as a <see cref="DirectoryInfo"/> object. Must be a valid directory.</param>
+        /// <param name="branch">The branch to clone or pull. If <see langword="null"/>, the default branch is used.</param>
+        /// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This method ensures that the repository is up-to-date by either cloning it if it is not initialized or pulling changes if it is already initialized.
+        /// </remarks>
+        /// <exception cref="System.IO.IOException">
+        /// Thrown if there is an issue accessing the folder.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var loader = new ConfigurationLoader();
+        /// var folder = new DirectoryInfo(@"C:\MyRepo");
+        /// bool success = loader.Refresh(folder, "main");
+        /// Console.WriteLine($"Refresh successful: {success}");
+        /// </code>
+        /// </example>
         public bool Refresh(DirectoryInfo folder, string? branch = null)
         {
 

@@ -43,6 +43,8 @@ namespace Bb.Services
         /// </summary>
         /// <param name="apiKey">The raw data to use as seed for generating identifiers. Must not be null or empty.</param>
         /// <param name="salt">third part for concatenate to rawData before generate login and password</param>
+        /// <param name="loginLength">after hash is computed select only length character for login</param>
+        /// <param name="pwdLength">after hash is computed select only length character for password</param>
         /// <returns>A tuple containing the generated login and password.</returns>
         /// <remarks>
         /// This method first generates a login by hashing the raw data using SHA256.
@@ -60,7 +62,7 @@ namespace Bb.Services
         /// Console.WriteLine($"Generated password: {{cnx[2]}");
         /// </code>
         /// </example>
-        public static string[] GenerateIdentifiers(this string apiKey, int loginLength = 25, int pwdLength = 35, string salt = null)
+        public static string[] GenerateIdentifiers(this string apiKey, int loginLength = 25, int pwdLength = 35, string? salt = null)
         {
             var login = ResolveLogin(apiKey, loginLength, salt);
             return [apiKey, login, GeneratePassword(login, pwdLength, apiKey)];
@@ -70,7 +72,7 @@ namespace Bb.Services
         /// Generates a login identifier by hashing the provided raw data using SHA256.
         /// </summary>
         /// <param name="rawData">The raw data to hash. Must not be null.</param>
-        /// <param name="lengthPassword">string length of the login. Must be upper of 15 characters</param>
+        /// <param name="lengthLogin">string length of the login. Must be upper of 15 characters</param>
         /// <param name="salt">third part for concatenate to rawData before generate login</param>
         /// <returns>A hexadecimal string representation of the SHA256 hash of the raw data.</returns>
         /// <remarks>
@@ -95,8 +97,6 @@ namespace Bb.Services
                     builder.Append(bytes[i].ToString("x2"));
 
                 string secret = builder.ToString();
-                
-                secret = builder.ToString();
                 if (secret.Length > lengthLogin)
                     secret = secret.Substring(0, lengthLogin);
 
