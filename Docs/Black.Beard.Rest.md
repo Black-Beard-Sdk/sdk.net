@@ -17,8 +17,11 @@
   - [ToKeyValuePairs(obj)](#M-Bb-Urls-CommonExtensions-ToKeyValuePairs-System-Object- 'Bb.Urls.CommonExtensions.ToKeyValuePairs(System.Object)')
 - [CurlContext](#T-Bb-Curls-CurlContext 'Bb.Curls.CurlContext')
   - [#ctor(cancellationTokenSource)](#M-Bb-Curls-CurlContext-#ctor-System-Threading-CancellationTokenSource- 'Bb.Curls.CurlContext.#ctor(System.Threading.CancellationTokenSource)')
+  - [CallAsync()](#M-Bb-Curls-CurlContext-CallAsync-RestSharp-RestClient- 'Bb.Curls.CurlContext.CallAsync(RestSharp.RestClient)')
 - [CurlInterpreter](#T-Bb-Curls-CurlInterpreter 'Bb.Curls.CurlInterpreter')
   - [#ctor(arguments)](#M-Bb-Curls-CurlInterpreter-#ctor-System-String[]- 'Bb.Curls.CurlInterpreter.#ctor(System.String[])')
+  - [CallAsync(source)](#M-Bb-Curls-CurlInterpreter-CallAsync-System-Threading-CancellationTokenSource- 'Bb.Curls.CurlInterpreter.CallAsync(System.Threading.CancellationTokenSource)')
+  - [CallAsync(source)](#M-Bb-Curls-CurlInterpreter-CallAsync-Bb-Interfaces-IRestClientFactory,System-Threading-CancellationTokenSource- 'Bb.Curls.CurlInterpreter.CallAsync(Bb.Interfaces.IRestClientFactory,System.Threading.CancellationTokenSource)')
   - [op_Implicit(self)](#M-Bb-Curls-CurlInterpreter-op_Implicit-System-String-~Bb-Curls-CurlInterpreter 'Bb.Curls.CurlInterpreter.op_Implicit(System.String)~Bb.Curls.CurlInterpreter')
 - [CurlInterpreterAction](#T-Bb-Curls-CurlInterpreterAction 'Bb.Curls.CurlInterpreterAction')
   - [#ctor(configureAction,arguments)](#M-Bb-Curls-CurlInterpreterAction-#ctor-System-Action{Bb-Curls-CurlInterpreterAction,Bb-Curls-CurlContext},Bb-Curls-Argument[]- 'Bb.Curls.CurlInterpreterAction.#ctor(System.Action{Bb.Curls.CurlInterpreterAction,Bb.Curls.CurlContext},Bb.Curls.Argument[])')
@@ -48,6 +51,7 @@
 - [INamedFactory\`2](#T-Bb-Interfaces-INamedFactory`2 'Bb.Interfaces.INamedFactory`2')
   - [Create(name)](#M-Bb-Interfaces-INamedFactory`2-Create-`0- 'Bb.Interfaces.INamedFactory`2.Create(`0)')
 - [IOptionClientFactory](#T-Bb-Interfaces-IOptionClientFactory 'Bb.Interfaces.IOptionClientFactory')
+  - [Interceptor](#P-Bb-Interfaces-IOptionClientFactory-Interceptor 'Bb.Interfaces.IOptionClientFactory.Interceptor')
 - [IReadOnlyNameValueList\`1](#T-Bb-Urls-IReadOnlyNameValueList`1 'Bb.Urls.IReadOnlyNameValueList`1')
 - [IRestClientFactory](#T-Bb-Interfaces-IRestClientFactory 'Bb.Interfaces.IRestClientFactory')
 - [LocalLogger](#T-Bb-Services-LocalLogger 'Bb.Services.LocalLogger')
@@ -98,6 +102,7 @@
   - [#ctor(serviceProvider)](#M-Bb-Services-OptionClientFactory-#ctor-System-IServiceProvider- 'Bb.Services.OptionClientFactory.#ctor(System.IServiceProvider)')
   - [#ctor(configuration)](#M-Bb-Services-OptionClientFactory-#ctor-Microsoft-Extensions-Options-IOptions{Bb-Services-ClientRestOption}- 'Bb.Services.OptionClientFactory.#ctor(Microsoft.Extensions.Options.IOptions{Bb.Services.ClientRestOption})')
   - [Debug](#P-Bb-Services-OptionClientFactory-Debug 'Bb.Services.OptionClientFactory.Debug')
+  - [Interceptor](#P-Bb-Services-OptionClientFactory-Interceptor 'Bb.Services.OptionClientFactory.Interceptor')
   - [Configure(url,action)](#M-Bb-Services-OptionClientFactory-Configure-Bb-Urls-Url,System-Action{RestSharp-RestClientOptions}- 'Bb.Services.OptionClientFactory.Configure(Bb.Urls.Url,System.Action{RestSharp.RestClientOptions})')
   - [Configure(uri,action)](#M-Bb-Services-OptionClientFactory-Configure-System-Uri,System-Action{RestSharp-RestClientOptions}- 'Bb.Services.OptionClientFactory.Configure(System.Uri,System.Action{RestSharp.RestClientOptions})')
   - [Configure(name,action)](#M-Bb-Services-OptionClientFactory-Configure-System-String,System-Action{RestSharp-RestClientOptions}- 'Bb.Services.OptionClientFactory.Configure(System.String,System.Action{RestSharp.RestClientOptions})')
@@ -183,6 +188,7 @@
 - [UrlExtension](#T-Bb-Urls-UrlExtension 'Bb.Urls.UrlExtension')
   - [CombineUrl(urls)](#M-Bb-Urls-UrlExtension-CombineUrl-System-Collections-Generic-IEnumerable{Bb-Urls-Url}- 'Bb.Urls.UrlExtension.CombineUrl(System.Collections.Generic.IEnumerable{Bb.Urls.Url})')
   - [CombineUrl(sb,urls)](#M-Bb-Urls-UrlExtension-CombineUrl-System-Text-StringBuilder,System-Collections-Generic-IEnumerable{Bb-Urls-Url}- 'Bb.Urls.UrlExtension.CombineUrl(System.Text.StringBuilder,System.Collections.Generic.IEnumerable{Bb.Urls.Url})')
+  - [GetTokenAsync(self,path,client_id,client_secret,username,password)](#M-Bb-Urls-UrlExtension-GetTokenAsync-Bb-Urls-Url,System-String,System-String,System-String,System-String- 'Bb.Urls.UrlExtension.GetTokenAsync(Bb.Urls.Url,System.String,System.String,System.String,System.String)')
   - [Map(self,variable,value)](#M-Bb-Urls-UrlExtension-Map-System-String,System-String,System-String- 'Bb.Urls.UrlExtension.Map(System.String,System.String,System.String)')
   - [RemoveFragment(url)](#M-Bb-Urls-UrlExtension-RemoveFragment-System-String- 'Bb.Urls.UrlExtension.RemoveFragment(System.String)')
   - [RemoveLastPathSegment(url)](#M-Bb-Urls-UrlExtension-RemoveLastPathSegment-System-String- 'Bb.Urls.UrlExtension.RemoveLastPathSegment(System.String)')
@@ -409,6 +415,21 @@ Initializes a new instance of the [CurlContext](#T-Bb-Curls-CurlContext 'Bb.Curl
 | ---- | ---- | ----------- |
 | cancellationTokenSource | [System.Threading.CancellationTokenSource](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationTokenSource 'System.Threading.CancellationTokenSource') | The cancellation token to cancel operation. |
 
+<a name='M-Bb-Curls-CurlContext-CallAsync-RestSharp-RestClient-'></a>
+### CallAsync() `method`
+
+##### Summary
+
+Send an HTTP request as an asynchronous operation.
+
+##### Returns
+
+
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-Bb-Curls-CurlInterpreter'></a>
 ## CurlInterpreter `type`
 
@@ -432,6 +453,40 @@ Initializes a new instance of the [CurlInterpreter](#T-Bb-Curls-CurlInterpreter 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | arguments | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The arguments. |
+
+<a name='M-Bb-Curls-CurlInterpreter-CallAsync-System-Threading-CancellationTokenSource-'></a>
+### CallAsync(source) `method`
+
+##### Summary
+
+Calls asynchronously.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| source | [System.Threading.CancellationTokenSource](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.CancellationTokenSource 'System.Threading.CancellationTokenSource') |  |
+
+<a name='M-Bb-Curls-CurlInterpreter-CallAsync-Bb-Interfaces-IRestClientFactory,System-Threading-CancellationTokenSource-'></a>
+### CallAsync(source) `method`
+
+##### Summary
+
+Calls asynchronously.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| source | [Bb.Interfaces.IRestClientFactory](#T-Bb-Interfaces-IRestClientFactory 'Bb.Interfaces.IRestClientFactory') |  |
 
 <a name='M-Bb-Curls-CurlInterpreter-op_Implicit-System-String-~Bb-Curls-CurlInterpreter'></a>
 ### op_Implicit(self) `method`
@@ -859,6 +914,13 @@ public class OptionClientFactory : IOptionClientFactory
 ##### Remarks
 
 This interface extends [INamedFactory\`2](#T-Bb-Interfaces-INamedFactory`2 'Bb.Interfaces.INamedFactory`2') to provide a mechanism for creating [RestClientOptions](#T-RestSharp-RestClientOptions 'RestSharp.RestClientOptions') based on a string key.
+
+<a name='P-Bb-Interfaces-IOptionClientFactory-Interceptor'></a>
+### Interceptor `property`
+
+##### Summary
+
+Gets or sets an interceptor for modifying the [RestClientOptions](#T-RestSharp-RestClientOptions 'RestSharp.RestClientOptions') before use.
 
 <a name='T-Bb-Urls-IReadOnlyNameValueList`1'></a>
 ## IReadOnlyNameValueList\`1 `type`
@@ -1725,6 +1787,13 @@ Gets or sets a value indicating whether debug mode is enabled.
 ##### Remarks
 
 When debug mode is enabled, additional logging is performed.
+
+<a name='P-Bb-Services-OptionClientFactory-Interceptor'></a>
+### Interceptor `property`
+
+##### Summary
+
+Gets or sets the interceptor for the [RestClientOptions](#T-RestSharp-RestClientOptions 'RestSharp.RestClientOptions').
 
 <a name='M-Bb-Services-OptionClientFactory-Configure-Bb-Urls-Url,System-Action{RestSharp-RestClientOptions}-'></a>
 ### Configure(url,action) `method`
@@ -3356,6 +3425,45 @@ Console.WriteLine(sb); // Output: https://example1.com;https://example2.com
 ##### Remarks
 
 This method appends multiple URLs to the provided [StringBuilder](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Text.StringBuilder 'System.Text.StringBuilder'), separated by semicolons.
+
+<a name='M-Bb-Urls-UrlExtension-GetTokenAsync-Bb-Urls-Url,System-String,System-String,System-String,System-String-'></a>
+### GetTokenAsync(self,path,client_id,client_secret,username,password) `method`
+
+##### Summary
+
+Retrieves an authentication token asynchronously using the specified credentials.
+
+##### Returns
+
+A [Task\`1](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Threading.Tasks.Task`1 'System.Threading.Tasks.Task`1') representing the asynchronous operation, with a result of [TokenResponse](#T-Bb-Http-TokenResponse 'Bb.Http.TokenResponse') containing the token details.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| self | [Bb.Urls.Url](#T-Bb-Urls-Url 'Bb.Urls.Url') | The the url on the server. Must not be null. |
+| path | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The endpoint path for the token request. Must not be null or empty. |
+| client_id | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The client ID for authentication. Must not be null or empty. |
+| client_secret | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The client secret for authentication. Can be null or empty. |
+| username | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The username for authentication. Must not be null or empty. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if `self`, `path`, `client_id`, `username`, or `password` is null or empty. |
+| [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | Thrown if the token request fails or the response is not successful. |
+
+##### Example
+
+```C#
+var client = new RestClient("https://example.com");
+var tokenResponse = await client.GetTokenAsync("/token", "myClientId", "myClientSecret", "myUsername", "myPassword");
+```
+
+##### Remarks
+
+This method sends a POST request to the specified endpoint to retrieve an authentication token using the provided credentials.
 
 <a name='M-Bb-Urls-UrlExtension-Map-System-String,System-String,System-String-'></a>
 ### Map(self,variable,value) `method`

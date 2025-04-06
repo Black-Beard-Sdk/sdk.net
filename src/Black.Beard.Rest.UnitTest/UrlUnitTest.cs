@@ -1,16 +1,16 @@
+using Bb;
+using Bb.Helpers;
 using Bb.Urls;
-using System;
-using System.Collections.Generic;
-using Bb.Urls;
-using System;
-using Xunit;
+using RestSharp;
 
 namespace Black.Beard.Rest.UnitTest
 {
 
-
     namespace Black.Beard.Rest.UnitTest
     {
+
+
+
         public class UrlUnitTest
         {
 
@@ -519,6 +519,7 @@ namespace Black.Beard.Rest.UnitTest
             }
 
         }
+
     }
 }
 

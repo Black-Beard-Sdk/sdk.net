@@ -1,4 +1,6 @@
-﻿using Bb.Urls;
+﻿using Bb.Helpers;
+using Bb.Http;
+using Bb.Urls;
 using RestSharp;
 using System.Text;
 
@@ -524,6 +526,62 @@ namespace Bb.Urls
         {
             return new Url(uri).ResetToRoot();
         }
+
+        /// <summary>
+        /// Retrieves an authentication token asynchronously using the specified credentials.
+        /// </summary>
+        /// <param name="self">The the url on the server. Must not be null.</param>
+        /// <param name="path">The endpoint path for the token request. Must not be null or empty.</param>
+        /// <param name="client_id">The client ID for authentication. Must not be null or empty.</param>
+        /// <param name="client_secret">The client secret for authentication. Can be null or empty.</param>
+        /// <param name="username">The username for authentication. Must not be null or empty.</param>
+        /// <param name="password">The password for authentication. Must not be null or empty.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of <see cref="TokenResponse"/> containing the token details.</returns>
+        /// <remarks>
+        /// This method sends a POST request to the specified endpoint to retrieve an authentication token using the provided credentials.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="self"/>, <paramref name="path"/>, <paramref name="client_id"/>, <paramref name="username"/>, or <paramref name="password"/> is null or empty.
+        /// </exception>
+        /// <exception cref="Exception">
+        /// Thrown if the token request fails or the response is not successful.
+        /// </exception>
+        /// <example>
+        /// <code lang="C#">
+        /// var client = new RestClient("https://example.com");
+        /// var tokenResponse = await client.GetTokenAsync("/token", "myClientId", "myClientSecret", "myUsername", "myPassword");
+        /// </code>
+        /// </example>
+        public static async Task<TokenResponse?> GetTokenAsync(this Url self, string client_id, string client_secret, string username, string password)
+        {
+            var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
+            return await client.GetTokenAsync(self.Path, client_id, client_secret, username, password);
+        }
+
+
+        public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format = null)
+        {
+            var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
+            var request = method.NewRequest(self.Path, format);
+            return await client.ExecuteAsync(request);
+        }
+
+        public static async Task<RestResponse?> CallAsync(this Url self, Method method, Action<RestRequest> initializer)
+        {
+            var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
+            var request = method.NewRequest(self.Path, DataFormat.Json);
+            initializer(request);
+            return await client.ExecuteAsync(request);
+        }
+
+        public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format, Action<RestRequest> initializer)
+        {
+            var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
+            var request = method.NewRequest(self.Path, format);
+            initializer(request);
+            return await client.ExecuteAsync(request);
+        }
+
 
     }
 

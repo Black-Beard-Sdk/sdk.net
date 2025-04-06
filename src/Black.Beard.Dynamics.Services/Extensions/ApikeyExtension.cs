@@ -119,13 +119,14 @@ namespace Bb.Extensions
         public static IServiceCollection AddRestClient(this IServiceCollection services)
         {
 
-            services.AddSingleton<IOptionClientFactory, OptionClientFactory>( (Func<IServiceProvider, OptionClientFactory>)((serviceProvider) =>
+            services.AddSingleton<IOptionClientFactory, OptionClientFactory>((serviceProvider) =>
             {
 
                 var configuration = serviceProvider.GetRequiredService<StartupConfiguration>();
                 var service = new OptionClientFactory(serviceProvider);
 
-                Dictionary<string, ClientOptionConfiguration> _configs = configuration.RestClient.Options.ToDictionary((Func<ClientOptionConfiguration, string>)(c => new Url(c.Name.ToLower()).Root));
+                Dictionary<string, ClientOptionConfiguration> _configs = configuration.RestClient.Options
+                    .ToDictionary(c => new Url(c.Name.ToLower()).Root);
 
                 service.Configure(string.Empty, option =>
                 {
@@ -139,7 +140,7 @@ namespace Bb.Extensions
                 });
 
                 return service;
-            }));
+            });
 
             services.AddSingleton<IRestClientFactory, RestClientFactory>((serviceProvider) =>
             {

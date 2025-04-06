@@ -2,10 +2,13 @@
 using Bb.Http;
 using Bb.Urls;
 using RestSharp;
+using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 
 namespace Bb.Curls
 {
+
 
     // https://curlconverter.com/csharp/
     public partial class CurlInterpreter
@@ -18,10 +21,10 @@ namespace Bb.Curls
             var arg = arguments.GetArgument();
 
             Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-            {
-                Url url = sender.FirstValue;
-                //var req = context.Request = url.Request();
-                context.Headers.Add("Host", $"{url.Host}:{url.Port}");
+            {                
+                context.Url = sender.FirstValue;
+                context.Request = new RestRequest(context.Url.Path);
+                context.Headers.Add("Host", $"{context.Url.Host}:{context.Url.Port}");
             };
 
             return new CurlInterpreterAction(action, arg) { Priority = 0 };
@@ -132,64 +135,90 @@ namespace Bb.Curls
             if (arguments.ReadNext())
             {
 
-                //var arg = arguments.Current.Split(';');
-                //List<Argument> _args = new List<Argument>(arg.Length);
+                var arg = arguments.Current.Split(';');
+                List<Argument> _args = new List<Argument>(arg.Length);
 
-                //foreach (var item in arg)
-                //{
-                //    var i = item.Split('=');
-                //    _args.Add(new Argument(i[1], i[0].Trim()));
-                //}
+                foreach (var item in arg)
+                {
+                    var i = item.Split('=');
+                    _args.Add(new Argument(i[1], i[0].Trim()));
+                }
 
-                //Action<CurlInterpreterAction, CurlContext> actionForm = (sender, context) =>
-                //{
+                Action<CurlInterpreterAction, CurlContext> actionForm = (sender, context) =>
+                {
 
-                //    var args = sender.Arguments;
-                //    var req = context.Request;
+                    var args = sender.Arguments;
+                    var type = args.FirstOrDefault(c => c.Name == "type")?.Value;
+                    if (type == null)
+                        Stop();
 
-                //    MultipartFormDataContent form = null;
+                    int countFile = 0;
+                    int countParameter = 0;
 
-                //    bool created = false;
-                //    if (req.Content == null)
-                //    {
-                //        req.Content = form = new MultipartFormDataContent();
-                //        created = true;
-                //    }
+                    var list = args.Where(c => c.Name != "type").ToList();
+                    foreach (var item in list)
+                        if (item.Value.StartsWith("@"))
+                        {
+                            var filePath = item.Value.Substring(1);
+                            if (!File.Exists(filePath))
+                            {
+                                Trace.TraceError($"file not found : {filePath}");
+                            }
+                            else
+                            {
+                                context.Request.AddFile(item.Name, filePath, type);
+                                countParameter++;
+                                countFile++;
+                            }
+                        }
+                        else
+                        {
+                            context.Request.AddParameter(item.Name, item.Value);
+                            countParameter++;
+                        }
 
-                //    else if (req.Content is MultipartFormDataContent)
-                //        form = (MultipartFormDataContent)req.Content;
 
-                //    else
-                //    {
-                //        Stop();
-                //    }
-
-                //    var type = sender.Arguments.Where(c => c.Name == "type").FirstOrDefault()?.Value;
-
-                //    if (type == null)
-                //        Stop();
-
-                //    var list = sender.Arguments.Where(c => c.Name != "type").ToList();
-
-                //    foreach (var item in list)
-                //        if (item.Value.StartsWith("@"))
-                //        {
-
-                //            if (created)
-                //                context.Request.Headers.Remove("Content-Type");
-
-                //            form.AddFile(item.Name, item.Value, type);
-                //        }
-                //        else
-                //        {
+                    if (countFile > 0)
+                        context.Request.AlwaysMultipartFormData = true;
+                    
+                    else if (countParameter > 1)
+                        context.Request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
 
 
-                //        }
+                    //var args = sender.Arguments;
+                    //var req = context.Request;
+                    //MultipartFormDataContent form = null;
+                    //bool created = false;
+                    //if (req.Content == null)
+                    //{
+                    //    req.Content = form = new MultipartFormDataContent();
+                    //    created = true;
+                    //}
+                    //else if (req.Content is MultipartFormDataContent)
+                    //    form = (MultipartFormDataContent)req.Content;
+                    //else
+                    //{
+                    //    Stop();
+                    //}
+                    //var type = sender.Arguments.Where(c => c.Name == "type").FirstOrDefault()?.Value;
+                    //if (type == null)
+                    //    Stop();
+                    //var list = sender.Arguments.Where(c => c.Name != "type").ToList();
+                    //foreach (var item in list)
+                    //    if (item.Value.StartsWith("@"))
+                    //    {
+                    //        if (created)
+                    //            context.Request.Headers.Remove("Content-Type");
+                    //        form.AddFile(item.Name, item.Value, type);
+                    //    }
+                    //    else
+                    //    {
+                    //    }
 
-                //};
+                };
 
-                //return new CurlInterpreterAction(actionForm, _args.ToArray()) { Priority = 3 };
+                return new CurlInterpreterAction(actionForm, _args.ToArray()) { Priority = 3 };
 
             }
 
@@ -202,23 +231,16 @@ namespace Bb.Curls
 
             if (arguments.ReadNext())
             {
+                Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
+                {
+                    var data = sender.Arguments.First().Value;
+                    context.Request.AddParameter("application/x-www-form-urlencoded", data, ParameterType.RequestBody);
+                };
 
-                //Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-                // {
-
-                //     if (!context.Headers.TryGetFirst("Content-Type", out var contentType))
-                //         contentType = Bb.Http.ContentType.ApplicationJson;
-
-                //     var datas = sender.Arguments.First().Value?.ToString() ?? string.Empty;
-                //     context.Request.Content = new StringContent(datas, null, contentType);
-
-                // };
-
-                //return new CurlInterpreterAction(action, new Argument(arguments.Current))
-                //{
-                //    Priority = 60
-                //};
-
+                return new CurlInterpreterAction(action, new Argument(arguments.Current))
+                {
+                    Priority = 60
+                };
             }
 
             return null;
@@ -229,64 +251,68 @@ namespace Bb.Curls
         {
 
             if (arguments.ReadNext())
-            {
-
+            { 
                 var arg = arguments.Current.Split(':');
                 var a = new Argument(arg[1].Trim(), arg[0].Trim());
 
                 static void action(CurlInterpreterAction sender, CurlContext context)
                 {
-
+                    if (context.Request.CookieContainer == null)
+                        context.Request.CookieContainer = new System.Net.CookieContainer();
+                    var uri = context.Url.ToUri();
                     var arg = sender.First;
-                    context.Request.AddCookie(arg.Name, arg.Value, "", "");
+                    context.Request.CookieContainer.Add(uri, new System.Net.Cookie( arg.Name, arg.Value));
                 }
 
-                var r = new CurlInterpreterAction(action, a) { Priority = 2 };
-
-                return r;
-
+                return new CurlInterpreterAction(action, a) { Priority = 2 };
             }
 
-            arguments.Failed($"Failed to read header");
-
-            return null;
-
-
-        }
-
-        internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
-        {
-
-            //if (arguments.ReadNext())
-            //{
-
-            //    var arg = arguments.Current.Split(':');
-            //    var a = new Argument(arg[1].Trim(), arg[0].Trim());
-
-            //    static void action(CurlInterpreterAction sender, CurlContext context)
-            //    {
-
-            //        CookieJar jar = null;
-            //        if (context.Request.CookieJar == null)
-            //            context.Request.CookieContainer.WithCookies(jar = new CookieJar());
-
-            //        var arg = sender.First;
-
-            //        jar.AddOrReplace(arg.Name, arg.Value, context.Request.Url.Root);
-
-            //    }
-
-            //    var r = new CurlInterpreterAction(action, a) { Priority = 2 };
-
-            //    return r;
-
-            //}
-
-            //arguments.Failed($"Failed to read header");
-
+            arguments.Failed($"Failed to read cookie");
             return null;
 
         }
+
+        //internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
+        //{
+
+        //    if (arguments.ReadNext())
+        //    {
+        //        var arg = arguments.Current.Split(':');
+        //        var a = new Argument(arg[1].Trim(), arg[0].Trim());
+
+        //        static void action(CurlInterpreterAction sender, CurlContext context)
+        //        {
+        //            CookieJar jar = null;
+        //            if (context.Request.CookieContainer == null)
+        //                context.Request.CookieContainer = new CookieContainer();
+
+        //            var arg = sender.First;
+        //            context.Request.CookieContainer.Add(new Uri(context.Request.Resource), new Cookie(arg.Name, arg.Value));
+        //        }
+
+        //        return new CurlInterpreterAction(action, a) { Priority = 2 };
+        //    }
+
+        //    arguments.Failed($"Failed to read cookie jar");
+        //    return null;
+        //    //if (arguments.ReadNext())
+        //    //{
+        //    //    var arg = arguments.Current.Split(':');
+        //    //    var a = new Argument(arg[1].Trim(), arg[0].Trim());
+        //    //    static void action(CurlInterpreterAction sender, CurlContext context)
+        //    //    {
+        //    //        CookieJar jar = null;
+        //    //        if (context.Request.CookieJar == null)
+        //    //            context.Request.CookieContainer.WithCookies(jar = new CookieJar());
+        //    //        var arg = sender.First;
+        //    //        jar.AddOrReplace(arg.Name, arg.Value, context.Request.Url.Root);
+        //    //    }
+        //    //    var r = new CurlInterpreterAction(action, a) { Priority = 2 };
+        //    //    return r;
+        //    //}
+        //    //arguments.Failed($"Failed to read header");
+        //    return null;
+        //}
 
 
         internal static CurlInterpreterAction? User(ArgumentSource arguments)
@@ -311,6 +337,27 @@ namespace Bb.Curls
 
             return null;
 
+        }
+
+        internal static CurlInterpreterAction? Oauth2Bearer(ArgumentSource arguments)
+        {
+            if (arguments.ReadNext())
+            {
+                var token = arguments.Current;
+                var headerValue = $"Bearer {token}";
+                var a = new Argument(headerValue);
+
+                Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
+                {
+                    string name = "Authorization";
+                    context.Headers.AddOrReplace(name, sender.First.Value);
+                };
+
+                return new CurlInterpreterAction(action, a) { Priority = 20 };
+            }
+
+            arguments.Failed($"Failed to read OAuth2 Bearer token");
+            return null;
         }
 
 
@@ -1314,17 +1361,6 @@ namespace Bb.Curls
         //    return new CurlInterpreterAction(action) { Priority = 20 };
         //}
 
-        //internal static CurlInterpreterAction? Oauth2Bearer(ArgumentSource arguments)
-        //{
-        //    Stop();
-        //    Action<CurlInterpreterAction, CurlContext> action = (sender, context) =>
-        //     {
-        //         Stop();
-
-        //     };
-
-        //    return new CurlInterpreterAction(action) { Priority = 20 };
-        //}
 
         //internal static CurlInterpreterAction? NtlmWb(ArgumentSource arguments)
         //{

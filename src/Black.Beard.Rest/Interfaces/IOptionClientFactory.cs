@@ -23,5 +23,15 @@ namespace Bb.Interfaces
     public interface IOptionClientFactory
         : INamedFactory<string, RestClientOptions>
     {
+
+
+
+        /// <summary>
+        /// Gets or sets an interceptor for modifying the <see cref="RestClientOptions"/> before use.
+        /// </summary>
+        Action<RestClientOptions> Interceptor { get; set; }
+
+
     }
+
 }

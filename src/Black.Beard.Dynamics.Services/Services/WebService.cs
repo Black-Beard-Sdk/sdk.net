@@ -1,6 +1,7 @@
 ﻿using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.Extensions;
+using Bb.Interfaces;
 using Bb.Models;
 
 namespace Bb.Services
@@ -283,6 +284,8 @@ namespace Bb.Services
 
             configure?.Invoke(_app);
 
+            GlobalSettings.CreateFactory = () => _app.Services.GetService<IRestClientFactory>();
+
             return this;
 
         }
@@ -316,15 +319,12 @@ namespace Bb.Services
         /// <code lang="C#">
         /// await webService.RunAsync();
         /// </code>
-        /// </example>
-        public async Task<WebService> RunAsync()
+        /// </example>        
+        public WebService RunAsync(bool continueOnCapturedContext = true)
         {
-
-            await _app.RunAsync()
-                .ConfigureAwait(false);
-
+            _currentTask = _app.RunAsync();
+            _currentTask.ConfigureAwait(continueOnCapturedContext);
             return this;
-
         }
 
 
@@ -554,6 +554,7 @@ namespace Bb.Services
 
         internal List<(string, string, int?)> _hosts = [];
         private bool disposedValue;
+        private Task? _currentTask;
 
         #region IDisposable Support
 
@@ -561,17 +562,28 @@ namespace Bb.Services
         /// Disposes the web application and releases resources.
         /// </summary>
         /// <param name="disposing">if the call come from dispose or not</param>
-        protected virtual void Dispose(bool disposing)
+        protected virtual async Task Dispose(bool disposing)
         {
             if (!disposedValue)
             {
+
                 if (disposing)
                 {
-                    _app?.DisposeAsync();
-                    _app?.ConfigureAwait(true);
+                    
+                    if (_currentTask != null)
+                    {
+                        var t = _app.StopAsync();
+                        await t.ConfigureAwait(true);
+                        _currentTask = null;
+                    }
+
+                    _app?.DisposeAsync()
+                         .ConfigureAwait(true);
+
                 }
 
                 disposedValue = true;
+
             }
         }
 

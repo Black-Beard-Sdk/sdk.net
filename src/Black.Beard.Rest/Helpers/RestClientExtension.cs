@@ -1,4 +1,5 @@
 ﻿using Bb.Http;
+using Bb.Urls;
 using RestSharp;
 
 namespace Bb.Helpers
@@ -8,7 +9,7 @@ namespace Bb.Helpers
     /// Extension methods for the <see cref="RestClient"/> class.
     /// </summary>
     public static class RestClientExtension
-    {
+    {        
 
         /// <summary>
         /// Retrieves an authentication token asynchronously using the specified credentials.

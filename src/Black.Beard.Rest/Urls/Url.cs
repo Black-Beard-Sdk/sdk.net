@@ -198,7 +198,7 @@ namespace Bb.Urls
                 {
                     Scheme = _builder.Scheme,
                     Host = _builder.Host,
-                    Port = _builder.Port
+                    //Port = _builder.Port
                 }.Uri;
             }
         }
@@ -277,7 +277,7 @@ namespace Bb.Urls
         public static string ConcatenatePath(IEnumerable<Segment> paths)
         {
 
-            if (paths == null || paths.Any())
+            if (paths == null || !paths.Any())
                 return string.Empty;
 
             return string.Join("/", paths.Select(x => x.Value));

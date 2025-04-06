@@ -1,5 +1,6 @@
-﻿using RestSharp;
-using System.Net.Http;
+﻿using Bb.Interfaces;
+using Bb.Urls;
+using RestSharp;
 
 namespace Bb.Curls
 {
@@ -27,19 +28,18 @@ namespace Bb.Curls
 
         public RestResponse Result { get; private set; }
 
-        ///// <summary>
-        ///// Send an HTTP request as an asynchronous operation.
-        ///// </summary>
-        ///// <returns></returns>
-        //internal async Task<RestResponse> CallAsync(RestClientFactory factory)
-        //{
-        //    var client = factory.Cre(Request.Url);
-        //    Result = await client.SendAsync(Request, HttpCompletionOption.ResponseContentRead, _token);
-        //    return Result;
-        //}
+        /// <summary>
+        /// Send an HTTP request as an asynchronous operation.
+        /// </summary>
+        /// <returns></returns>
+        internal async Task<RestResponse> CallAsync(RestClient client)
+        {        
+            Result = await client.ExecuteAsync(Request, _token);
+            return Result;
+        }
 
         public Headers Headers { get; }
-
+        public Url Url { get; internal set; }
 
         internal void Add(KeyValuePair<string, string> item)
         {
@@ -69,6 +69,11 @@ namespace Bb.Curls
                 list[i].Configure(this);
 
             return this;
+        }
+
+        internal async Task<RestResponse> CallAsync(object urlClientFactory)
+        {
+            throw new NotImplementedException();
         }
 
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();

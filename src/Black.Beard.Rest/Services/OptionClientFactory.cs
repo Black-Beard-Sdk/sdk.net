@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using System;
 using System.Xml.Linq;
 
 namespace Bb.Services
@@ -59,8 +60,8 @@ namespace Bb.Services
         /// </example>
         public RestClientOptions Create(string name)
         {
-            var n = new Url(name).Root;
 
+            var n = new Url(name).BaseAddress;
             RestClientOptions options = new RestClientOptions(n)
             {
                 Timeout = TimeSpan.FromSeconds(_configuration.Timeout),
@@ -69,10 +70,13 @@ namespace Bb.Services
             if (Debug)
                 Trace(options);
 
-            if (_config.TryGetValue(n, out var action))
+            if (_config.TryGetValue(n.ToString(), out var action))
                 action(options);
+
             else if (_config.TryGetValue(string.Empty, out action))
                 action(options);
+
+            Interceptor?.Invoke(options);
 
             return options;
         }
@@ -132,7 +136,15 @@ namespace Bb.Services
         /// </example>
         public void Configure(string name, Action<RestClientOptions> action)
         {
-            Configure(new Url(name), action);
+            if (string.IsNullOrEmpty(name))
+            {
+                if (_config.ContainsKey(string.Empty))
+                    _config[name] = action;
+                else
+                    _config.Add(name, action);
+            }
+            else
+                Configure(new Url(name), action);
         }
 
         /// <summary>
@@ -166,6 +178,11 @@ namespace Bb.Services
         /// When debug mode is enabled, additional logging is performed.
         /// </remarks>
         public bool Debug { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interceptor for the <see cref="RestClientOptions"/>.
+        /// </summary>
+        public Action<RestClientOptions> Interceptor { get; set; }
 
     }
 }

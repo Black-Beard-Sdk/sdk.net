@@ -19,8 +19,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Black.Beard.Http\Black.Beard.Http.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -112,7 +112,7 @@ namespace Bb.Extensions
         /// </remarks>
         private static void AppendFoldersToDiscovers(string[] paths, StartupConfiguration startupConfiguration)
         {
-            if (paths != null || paths.Length > 0)
+            if (paths != null && paths.Length > 0)
                 AssemblyDirectoryResolver.Instance.AddDirectories(paths);
             if (startupConfiguration.Folders != null && startupConfiguration.Folders.Count > 0)
                 AssemblyDirectoryResolver.Instance.AddDirectories(startupConfiguration.Folders);

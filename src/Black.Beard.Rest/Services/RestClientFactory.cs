@@ -46,8 +46,8 @@ namespace Bb.Services
         {
             var url = new Url(baseUrl).Root;
 
-            if (_clients.TryGetValue(url, out var client))
-            _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
+            if (!_clients.TryGetValue(url, out var client))
+                _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
             return client;
         }
 
@@ -70,8 +70,8 @@ namespace Bb.Services
         {
             var url = new Url(name).Root;
 
-            if (_clients.TryGetValue(url, out var client))
-            _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
+            if (!_clients.TryGetValue(url, out var client))
+                _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
             return client;
         }
 

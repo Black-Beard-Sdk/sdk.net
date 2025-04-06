@@ -1,4 +1,5 @@
 ﻿
+using Bb.Interfaces;
 using RestSharp;
 
 namespace Bb.Curls
@@ -21,12 +22,11 @@ namespace Bb.Curls
             Append(Form, "--form", "-F");                                   // <name=content> Specify multipart MIME data
             Append(Data, "--data", "-d");                                   // <data>   HTTP POST data
             Append(Cookie, "--cookie", "-b");                               // <data|filename> Send cookies from string/file
-            Append(CookieJar, "--cookie-jar","-c");                         // <filename> Write cookies to <filename> after operation
-            Append(User, "--user", "-u");                                   // <user:password> Server user and password
-            //Append(Oauth2Bearer, "--oauth2-bearer");                        // <token> OAuth 2 Bearer Token
+            Append(Cookie, "--cookie-jar","-c");                            // <filename> Write cookies to <filename> after operation
+            Append(User, "--basic", "--user", "-u");                        // Use HTTP Basic Authentication <user:password> Server user and password
+            Append(Oauth2Bearer, "--oauth2-bearer");                        // <token> OAuth 2 Bearer Token
             
             //Append(AppendMethod, "--append", "-a");                         // Append to target file when uploading
-            //Append(Basic, "--basic");                                       // Use HTTP Basic Authentication
             //Append(CaCert, "--cacert");                                     // <file> CA certificate to verify peer against
             //Append(Capath, "--capath");                                     // <dir>  CA directory to verify peer against
             //Append(Cert, "--cert", "-E");                                   // <certificate[:password]> Client certificate file and password
@@ -253,29 +253,41 @@ namespace Bb.Curls
         }
 
 
-        ///// <summary>
-        ///// Calls asynchronously.
-        ///// </summary>
-        ///// <param name="source"></param>
-        ///// <param name="ensureSuccessStatusCode">if true thrown an exception if the result of the call is not 2xx</param>
-        ///// <returns></returns>
-        //public async Task<RestResponse?> CallAsync(bool ensureSuccessStatusCode, CancellationTokenSource ? source = null)
-        //{
+        /// <summary>
+        /// Calls asynchronously.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<RestResponse?> CallAsync(CancellationTokenSource? source = null)
+        {
+            return await CallAsync(GlobalSettings.UrlClientFactory, source);
+        }
 
-        //    if (BuildActions())
-        //    {
-        //        var context = new CurlContext(source) // { RequestMessage = message, }
-        //            .Apply(_list);
 
-        //        context.Request.EnsureSuccessStatusCode = ensureSuccessStatusCode;
+        /// <summary>
+        /// Calls asynchronously.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public async Task<RestResponse?> CallAsync(IRestClientFactory factory = null, CancellationTokenSource? source = null)
+        {
 
-        //        this.LastResponse = await context.CallAsync(UrlHttp.GlobalSettings.UrlClientFactory);
-        //        return this.LastResponse;
-        //    }
+            if (BuildActions())
+            {
 
-        //    return default;
+                var context = new CurlContext(source)
+                    .Apply(_list);
 
-        //}
+                var f = factory ?? GlobalSettings.UrlClientFactory;
+                var client = f.Create(context.Url.ToUri());
+
+                this.LastResponse = await context.CallAsync(client);
+                return this.LastResponse;
+            }
+
+            return default;
+
+        }
 
         public bool IsFailed { get; private set; }
 
@@ -292,7 +304,6 @@ namespace Bb.Curls
         {
             return self.Precompile();
         }
-
 
         internal bool BuildActions()
         {
@@ -317,6 +328,13 @@ namespace Bb.Curls
 
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
+        [System.Diagnostics.DebuggerNonUserCode]
+        protected static void Stop()
+        {
+            if (System.Diagnostics.Debugger.IsAttached)
+                System.Diagnostics.Debugger.Break();
+        }
 
         protected static void Append(Func<ArgumentSource, CurlInterpreterAction?> action, params string[] keys)
         {
@@ -328,15 +346,6 @@ namespace Bb.Curls
                     _parameters.Add(item, action);
             }
         }
-
-        [System.Diagnostics.DebuggerStepThrough]
-        [System.Diagnostics.DebuggerNonUserCode]
-        protected static void Stop()
-        {
-            if (System.Diagnostics.Debugger.IsAttached)
-                System.Diagnostics.Debugger.Break();
-        }
-
 
         private void Append(CurlInterpreterAction? curlInterpreterAction)
         {
