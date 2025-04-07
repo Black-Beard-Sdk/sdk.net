@@ -61,9 +61,9 @@ namespace Bb.Sdk.Net.Mails.Senders
 
             var m = (MailMessage)email;
 
-            Trace.WriteLine(string.Format("MailService : sending email at {0}", m.To.Select(o => o.Address).Aggregate((current, next) => current = current + "; " + next)));
+            Trace.TraceInformation(string.Format("MailService : sending email at {0}", m.To.Select(o => o.Address).Aggregate((current, next) => current = current + "; " + next)));
             _client.Send(m);
-            Trace.WriteLine("MailService : email sended succefully");
+            Trace.TraceInformation("MailService : email sended succefully");
         }
 
         /// <summary>

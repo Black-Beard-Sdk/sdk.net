@@ -40,7 +40,7 @@ namespace Bb.Monitoring
                         GlobalDiagnosticsContext.Set(variableName, v);
 
                     else if (variableName != web_log_directory)
-                        Trace.WriteLine($"the variable '{variableName}' in the configuration file {file.FullName} can't be resolved");
+                        Trace.TraceInformation($"the variable '{variableName}' in the configuration file {file.FullName} can't be resolved");
                 
                 }
 

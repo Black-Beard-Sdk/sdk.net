@@ -34,7 +34,7 @@ namespace Bb.Extensions
         /// "MyContext".DiscoverTypeExposedByAttribute(type => Console.WriteLine(type.Name));
         /// </code>
         /// </example>
-        public static void DiscoverTypeExposedByAttribute(this string contextKey, Action<Type> action = null)
+        public static void DiscoverTypeExposedByAttribute(this string contextKey, Action<Type>? action = null)
         {
 
             if (action != null)
@@ -61,7 +61,7 @@ namespace Bb.Extensions
         /// services.UseTypeExposedByAttribute(configuration, "MyContext", (type, context) => true, type => Console.WriteLine($"Registered: {type.Name}"));
         /// </code>
         /// </example>
-        public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Func<Type, string, bool> filter, Action<Type> action = null)
+        public static IServiceCollection UseTypeExposedByAttribute(this IServiceCollection services, IConfiguration configuration, string contextKey, Func<Type, string, bool> filter, Action<Type>? action = null)
         {
 
             if (filter == null)
@@ -73,7 +73,7 @@ namespace Bb.Extensions
                 if (filter(type, contextKey))
                 {
 
-                    _methodRegister.MakeGenericMethod(type).Invoke(null, new object[] { services, configuration });
+                    _methodRegister?.MakeGenericMethod(type).Invoke(null, new object[] { services, configuration });
 
                     if (action != null)
                         action(type);
@@ -103,7 +103,7 @@ namespace Bb.Extensions
         /// </example>
         public static IServiceCollection BindConfiguration(this IServiceCollection self, Type type, IConfiguration configuration)
         {
-            _methodOptionConfiguration.MakeGenericMethod(type)
+            _methodOptionConfiguration?.MakeGenericMethod(type)
                 .Invoke(self, new object[] { self, configuration });
             return self;
         }
@@ -206,21 +206,24 @@ namespace Bb.Extensions
         {
 
             var attribute = typeof(T).GetCustomAttribute<ExposeClassAttribute>();
-            var exposed = attribute?.ExposedType ?? typeof(T);
-            var i = typeof(IInitialize).IsAssignableFrom(typeof(T));
-            var c = IocConstructorAttribute.GetMethods(typeof(T)).Any();
-
-            if (i || c)
+            if (attribute != null)
             {
-                var serviceBuilder = ObjectCreatorByIoc.GetActivator<T>();
-                Func<IServiceProvider, T> _func = (serviceProvider) => serviceBuilder.Call(null, serviceProvider);
-                services.RegisterType(_func, attribute.LifeCycle, exposed);
+                var exposed = attribute.ExposedType ?? typeof(T);
+                var i = typeof(IInitialize).IsAssignableFrom(typeof(T));
+                var c = IocConstructorAttribute.GetMethods(typeof(T)).Any();
+
+                if (i || c)
+                {
+                    var serviceBuilder = ObjectCreatorByIoc.GetActivator<T>();
+                    Func<IServiceProvider, T> _func = (serviceProvider) => serviceBuilder.Call(null, serviceProvider);
+                    services.RegisterType(_func, attribute.LifeCycle, exposed);
+                }
+                else
+                    services.RegisterType<T>(attribute.LifeCycle, exposed);
+
+                Trace.TraceInformation($"registered {attribute.Context} {typeof(T).Name} exposed by {exposed.Name} with life-cycle {attribute.LifeCycle.ToString()}");
+
             }
-            else
-                services.RegisterType<T>(attribute.LifeCycle, exposed);
-
-            Trace.TraceInformation($"registered {attribute.Context} {typeof(T).Name} exposed by {exposed.Name} with life-cycle {attribute.LifeCycle.ToString()}");
-
         }
 
         private static void RegisterType<T>(this IServiceCollection services, Func<IServiceProvider, T> func, IocScopeEnum lifeCycle, Type exposedType)
@@ -274,9 +277,7 @@ namespace Bb.Extensions
 
         private static readonly MethodInfo? _methodRegister;
         private static readonly MethodInfo? _methodOptionConfiguration;
-        private static readonly MethodInfo? _methodConfiguration;
-        private static readonly MethodInfo? _methodModel;
-        private static readonly MethodInfo? _methodService;
+
 
     }
 

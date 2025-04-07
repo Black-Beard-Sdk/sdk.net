@@ -38,7 +38,7 @@ namespace Bb.Sdk.Net.Mails
             _inTreatment = true;
             bool ok = false;
 
-            Trace.WriteLine(string.Format("MailNotificationService : Starting render generation. model'name : {0}", model.GetType().FullName));
+            Trace.TraceInformation(string.Format("MailNotificationService : Starting render generation. model'name : {0}", model.GetType().FullName));
 
             object message = null;
 
@@ -74,7 +74,7 @@ namespace Bb.Sdk.Net.Mails
                         }
                         catch (Exception e)
                         {
-                            Trace.WriteLine(e.ToString(), erroCategory);
+                            Trace.TraceInformation(e.ToString(), erroCategory);
                         }
 
                     message = null;
@@ -82,9 +82,9 @@ namespace Bb.Sdk.Net.Mails
                 }
 
                 if (ok)
-                    Trace.WriteLine("MailNotificationService : sending process succesfully ended");
+                    Trace.TraceInformation("MailNotificationService : sending process succesfully ended");
                 else
-                    Trace.WriteLine("MailNotificationService : sending process failed ended");
+                    Trace.TraceInformation("MailNotificationService : sending process failed ended");
 
                 _inTreatment = false;
 

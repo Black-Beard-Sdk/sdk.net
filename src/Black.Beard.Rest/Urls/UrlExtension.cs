@@ -555,21 +555,21 @@ namespace Bb.Urls
         public static async Task<TokenResponse?> GetTokenAsync(this Url self, string client_id, string client_secret, string username, string password)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
-            return await client.GetTokenAsync(self.Path, client_id, client_secret, username, password);
+            return await client.GetTokenAsync(self.PathAndQuery, client_id, client_secret, username, password);
         }
 
 
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format = null)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
-            var request = method.NewRequest(self.Path, format);
+            var request = method.NewRequest(self.PathAndQuery, format);
             return await client.ExecuteAsync(request);
         }
 
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, Action<RestRequest> initializer)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
-            var request = method.NewRequest(self.Path, DataFormat.Json);
+            var request = method.NewRequest(self.PathAndQuery, DataFormat.Json);
             initializer(request);
             return await client.ExecuteAsync(request);
         }
@@ -577,7 +577,7 @@ namespace Bb.Urls
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format, Action<RestRequest> initializer)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
-            var request = method.NewRequest(self.Path, format);
+            var request = method.NewRequest(self.PathAndQuery, format);
             initializer(request);
             return await client.ExecuteAsync(request);
         }

@@ -106,7 +106,7 @@ namespace Site.Services
             }
             catch (Exception ex)
             {
-                Trace.WriteLine(ex.ToString());
+                Trace.TraceError(ex.ToString());
             }
 
         }

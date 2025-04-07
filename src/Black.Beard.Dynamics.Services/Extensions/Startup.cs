@@ -170,7 +170,7 @@ namespace Bb.Extensions
             if (Configuration == null || Configuration.LogExceptions)
                 app.UseHttpExceptionInterceptor();
 
-            if (Configuration == null && Configuration.LogInfo)
+            if (Configuration == null || Configuration.LogInfo)
                 app.UseHttpInfoLogger();
 
             if (Configuration != null && Configuration.RestClient != null && Configuration.RestClient.UseApiKey)
@@ -261,50 +261,57 @@ namespace Bb.Extensions
         private X509Certificate2 LoadCertificate()
         {
 
-            var certificate = Configuration.HttpsCertificate;
+            X509Certificate2 cert = null;
 
-            if (certificate == null)
-                certificate = new Certificate();
-
-            X509Certificate2 cert;
-
-            if (!string.IsNullOrEmpty(certificate.SourcePath))
+            if (Configuration != null)
             {
 
-                if (certificate.TypeSource == SourceCertificate.Store)
-                    cert = CertificateHelpers.LoadCertificateFromStore(certificate.SourcePath);
+                var certificate = Configuration.HttpsCertificate;
 
+                if (certificate == null)
+                    certificate = new Certificate();
+
+                if (!string.IsNullOrEmpty(certificate.SourcePath))
+                {
+
+                    if (certificate.TypeSource == SourceCertificate.Store)
+                        cert = CertificateHelpers.LoadCertificateFromStore(certificate.SourcePath);
+
+                    else
+                    {
+                        var file = certificate.SourcePath.AsFile();
+                        if (file.Exists)
+                            cert = CertificateHelpers.LoadCertificateFromFile(file, certificate.Password);
+                        else
+                            throw new FileNotFoundException(file.FullName);
+                    }
+
+                }
                 else
                 {
-                    var file = certificate.SourcePath.AsFile();
-                    if (file.Exists)
-                        cert = CertificateHelpers.LoadCertificateFromFile(file, certificate.Password);
-                    else
-                        throw new FileNotFoundException(file.FullName);
+
+                    var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
+                    var files = folder.GetFiles("*.pfx").ToArray();
+
+                    if (files.Any())
+                    {
+                        cert = CertificateHelpers.LoadCertificateFromFile(files[0], certificate.Password);
+                        return cert;
+                    }
+
+                    var path = folder.GetPaths().First().Combine("localhost.pfx");
+                    cert = CertificateHelpers.CreateSelfSignedCertificate("localhost", certificate.Password);
+                    CertificateHelpers.SaveCertificateToFile(cert, path, certificate.Password);
                 }
 
-            }
-            else
-            {
-
-                var folder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
-                var files = folder.GetFiles("*.pfx").ToArray();
-
-                if (files.Any())
-                {
-                    cert = CertificateHelpers.LoadCertificateFromFile(files[0], certificate.Password);
-                    return cert;
-                }
-
-                var path = folder.GetPaths().First().Combine("localhost.pfx");
-                cert = CertificateHelpers.CreateSelfSignedCertificate("localhost", certificate.Password);
-                CertificateHelpers.SaveCertificateToFile(cert, path, certificate.Password);
             }
 
             if (cert == null)
                 throw new Exception("Certificate not found");
 
             return cert;
+
+
 
         }
 

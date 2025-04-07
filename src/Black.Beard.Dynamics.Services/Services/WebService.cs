@@ -2,7 +2,6 @@
 using Bb.ComponentModel.Factories;
 using Bb.Extensions;
 using Bb.Interfaces;
-using Bb.Models;
 
 namespace Bb.Services
 {
@@ -46,6 +45,7 @@ namespace Bb.Services
         /// </code>
         /// </example>
         public WebService UseStartup<T>(Action<T>? action = null)
+               where T : class
         {
 
             if (typeof(T).GetMethod("ConfigureServices") == null)
@@ -86,6 +86,7 @@ namespace Bb.Services
         /// </code>
         /// </example>
         protected T Resolve<T>()
+               where T : class
         {
             if (_dicStartup.TryGetValue(typeof(T), out object? value))
                 return (T)value;
@@ -93,7 +94,7 @@ namespace Bb.Services
             else
             {
                 var instance = _services.GetService<T>();
-                if (instance != null)
+                if (instance != default(T))
                     _dicStartup.Add(typeof(T), instance);
                 return instance;
             }

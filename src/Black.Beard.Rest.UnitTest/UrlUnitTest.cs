@@ -1,14 +1,11 @@
 using Bb;
-using Bb.Helpers;
 using Bb.Urls;
-using RestSharp;
 
 namespace Black.Beard.Rest.UnitTest
 {
 
     namespace Black.Beard.Rest.UnitTest
     {
-
 
 
         public class UrlUnitTest
@@ -20,7 +17,19 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url(Url.DEFAULT_SCHEME, "example.com", 80);
                 Assert.Equal(Url.DEFAULT_SCHEME, url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(80, url.Port);
+                Assert.Equal(-1, url.Port);
+                Assert.Equal("http://example.com/", url.ToString());
+            }
+
+
+            [Fact]
+            public void TestHttpScheme2()
+            {
+                var url = new Url(Url.DEFAULT_SCHEME, "example.com", 8080);
+                Assert.Equal(Url.DEFAULT_SCHEME, url.Scheme);
+                Assert.Equal("example.com", url.Host);
+                Assert.Equal(8080, url.Port);
+                Assert.Equal("http://example.com:8080/", url.ToString());
             }
 
             [Fact]
@@ -29,7 +38,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url(Url.DEFAULT_SECURED_SCHEME, "example.com", 443);
                 Assert.Equal(Url.DEFAULT_SECURED_SCHEME, url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(443, url.Port);
+                Assert.Equal(-1, url.Port);
             }
 
             [Fact]
@@ -422,7 +431,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url("https", "example.com", 443, "user:pass", "path", "to", "resource");
                 Assert.Equal("https", url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(443, url.Port);
+                Assert.Equal(-1, url.Port);
                 Assert.Equal("user", url.UserName);
                 Assert.Equal("pass", url.Password);
                 Assert.Equal("path/to/resource", url.Path);
@@ -434,7 +443,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url("https", "example.com", null, "user:pass", "path", "to", "resource");
                 Assert.Equal("https", url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(80, url.Port);
+                Assert.Equal(-1, url.Port);
                 Assert.Equal("user", url.UserName);
                 Assert.Equal("pass", url.Password);
                 Assert.Equal("path/to/resource", url.Path);
@@ -446,7 +455,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url("https", "example.com", null, "user", "path", "to", "resource");
                 Assert.Equal("https", url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(443, url.Port);
+                Assert.Equal(-1, url.Port);
                 Assert.Equal("user", url.UserName);
                 Assert.Equal(string.Empty, url.Password);
                 Assert.Equal("path/to/resource", url.Path);
@@ -458,7 +467,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url("https", "example.com", 443, null, "path", "to", "resource");
                 Assert.Equal("https", url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(443, url.Port);
+                Assert.Equal(-1, url.Port);
                 Assert.Equal(string.Empty, url.UserName);
                 Assert.Equal(string.Empty, url.Password);
                 Assert.Equal("path/to/resource", url.Path);
@@ -470,7 +479,7 @@ namespace Black.Beard.Rest.UnitTest
                 var url = new Url("https", "example.com", 443, "user:pass");
                 Assert.Equal("https", url.Scheme);
                 Assert.Equal("example.com", url.Host);
-                Assert.Equal(443, url.Port);
+                Assert.Equal(-1, url.Port);
                 Assert.Equal("user", url.UserName);
                 Assert.Equal("pass", url.Password);
                 Assert.Equal(string.Empty, url.Path);
@@ -494,15 +503,15 @@ namespace Black.Beard.Rest.UnitTest
 
                 var u1 = new Url("http", "example.com", -1, "user:pass", "path");
                 var txt = u1.ToString();
-                Assert.Equal("http://user:pass@example.com/", txt);
+                Assert.Equal("http://user:pass@example.com/path", txt);
 
                 var u2 = new Url("https", "example.com", -1, "user:pass", "path");
                 txt = u2.ToString();
-                Assert.Equal("https://user:pass@example.com/", txt);
+                Assert.Equal("https://user:pass@example.com/path", txt);
 
                 var u3 = new Url("httpx", "example.com", -1, "user:pass", "path");
                 txt = u3.ToString();
-                Assert.Equal("httpx://user:pass@example.com/", txt);
+                Assert.Equal("httpx://user:pass@example.com/path", txt);
 
             }
 
@@ -515,11 +524,42 @@ namespace Black.Beard.Rest.UnitTest
                 Assert.Equal(21, url.Port);
                 Assert.Equal("user", url.UserName);
                 Assert.Equal("pass", url.Password);
-                Assert.Equal(string.Empty, url.Path);
+                Assert.Equal("path/to/resource", url.Path);
             }
+
+            [Fact]
+            public void TestUrlWithQueryParams1()
+            {
+                var url = new Url("http://localhost.local/?key=value&another=param");
+                var query = url.QueryParams;
+                Assert.True(query.FirstOrDefault("key").HasValue);
+                Assert.True(query.FirstOrDefault("another").HasValue);
+            }
+
+            [Fact]
+            public void TestUrlWithMapQueryParams2()
+            {
+                var url = new Url("http://localhost.local/?key=value&another={param}");
+                url.Map("param", "value1");
+                var fullpath = url.PathAndQuery;
+                Assert.Equal("/?key=value&another=value1", fullpath);
+            }
+
+
+            [Fact]
+            public void TestUrlWithMapPath()
+            {
+                var url = new Url("http://localhost.local/{param}/?key=value&another={param}");
+                url.Map("param", "value1");
+                var fullpath = url.PathAndQuery;
+                Assert.Equal("/value1?key=value&another=value1", fullpath);
+            }
+
 
         }
 
     }
 }
+
+
 

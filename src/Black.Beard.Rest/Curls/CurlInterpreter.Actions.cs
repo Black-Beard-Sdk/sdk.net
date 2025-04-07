@@ -1,10 +1,6 @@
 ﻿
-using Bb.Http;
-using Bb.Urls;
 using RestSharp;
 using System.Diagnostics;
-using System.Net;
-using System.Reflection;
 
 namespace Bb.Curls
 {
@@ -34,7 +30,7 @@ namespace Bb.Curls
         internal static CurlInterpreterAction? Request(ArgumentSource arguments)
         {
 
-            Action<CurlInterpreterAction, CurlContext> action = null;
+            Action<CurlInterpreterAction, CurlContext>? action = null;
 
             if (arguments.ReadNext())
             {
@@ -271,49 +267,6 @@ namespace Bb.Curls
             return null;
 
         }
-
-        //internal static CurlInterpreterAction? CookieJar(ArgumentSource arguments)
-        //{
-
-        //    if (arguments.ReadNext())
-        //    {
-        //        var arg = arguments.Current.Split(':');
-        //        var a = new Argument(arg[1].Trim(), arg[0].Trim());
-
-        //        static void action(CurlInterpreterAction sender, CurlContext context)
-        //        {
-        //            CookieJar jar = null;
-        //            if (context.Request.CookieContainer == null)
-        //                context.Request.CookieContainer = new CookieContainer();
-
-        //            var arg = sender.First;
-        //            context.Request.CookieContainer.Add(new Uri(context.Request.Resource), new Cookie(arg.Name, arg.Value));
-        //        }
-
-        //        return new CurlInterpreterAction(action, a) { Priority = 2 };
-        //    }
-
-        //    arguments.Failed($"Failed to read cookie jar");
-        //    return null;
-        //    //if (arguments.ReadNext())
-        //    //{
-        //    //    var arg = arguments.Current.Split(':');
-        //    //    var a = new Argument(arg[1].Trim(), arg[0].Trim());
-        //    //    static void action(CurlInterpreterAction sender, CurlContext context)
-        //    //    {
-        //    //        CookieJar jar = null;
-        //    //        if (context.Request.CookieJar == null)
-        //    //            context.Request.CookieContainer.WithCookies(jar = new CookieJar());
-        //    //        var arg = sender.First;
-        //    //        jar.AddOrReplace(arg.Name, arg.Value, context.Request.Url.Root);
-        //    //    }
-        //    //    var r = new CurlInterpreterAction(action, a) { Priority = 2 };
-        //    //    return r;
-        //    //}
-        //    //arguments.Failed($"Failed to read header");
-        //    return null;
-        //}
-
 
         internal static CurlInterpreterAction? User(ArgumentSource arguments)
         {

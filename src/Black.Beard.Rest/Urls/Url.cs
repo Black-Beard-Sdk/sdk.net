@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using Microsoft.Extensions.Options;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Schema;
 
 namespace Bb.Urls
@@ -60,11 +62,13 @@ namespace Bb.Urls
 
             if (port.HasValue)
             {
-                this._builder.Port = port.Value;
+                this._builder.Port = GetPort(port.Value, scheme);
             }
+            else if (this._builder.Scheme == DEFAULT_SCHEME)
+                this._builder.Port = GetPort(80, scheme);
+            
             else if (this._builder.Scheme == DEFAULT_SECURED_SCHEME)
-                this._builder.Port = 443;
-
+                this._builder.Port = GetPort(443, scheme);
 
             if (!string.IsNullOrEmpty(userInfo))
             {
@@ -106,11 +110,11 @@ namespace Bb.Urls
         #endregion ctors
 
 
-        public string Scheme { get => this._builder.Scheme; set => this._builder.Scheme = value; }
+        public string Scheme { get => this._builder.Scheme ?? DEFAULT_SCHEME; set => this._builder.Scheme = value; }
 
         public string Host { get => this._builder.Host; set => this._builder.Host = value; }
 
-        public int Port { get => this._builder.Port; set => this._builder.Port = value; }
+        public int Port { get => this._builder.Port; set => this._builder.Port = GetPort(value, Scheme); }
 
         public string UserName
         {
@@ -153,7 +157,7 @@ namespace Bb.Urls
 
         public string Path
         {
-            get => ConcatenatePath(this._pathSegments);
+            get => CombinePath(this._pathSegments);
             set
             {
                 _pathSegments = ParsePathSegment(value);
@@ -190,6 +194,22 @@ namespace Bb.Urls
             }
         }
 
+        public string PathAndQuery
+        {
+            get
+            {
+
+                if (_pathSegments != null && _pathSegments.Count > 0)
+                    _builder.Path = CombinePath(_pathSegments);
+                else
+                    _builder.Path = string.Empty;
+                _builder.Query = QueryParams.ToString();
+                _builder.Fragment = Fragment;
+                return _builder.Uri.PathAndQuery;
+
+            }
+        }
+
         public Uri BaseAddress
         {
             get
@@ -198,7 +218,19 @@ namespace Bb.Urls
                 {
                     Scheme = _builder.Scheme,
                     Host = _builder.Host,
-                    //Port = _builder.Port
+                }.Uri;
+            }
+        }
+
+        public Uri RootAddress
+        {
+            get
+            {
+                return new UriBuilder
+                {
+                    Scheme = _builder.Scheme,
+                    Host = _builder.Host,
+                    Port = GetPort(_builder.Port, _builder.Scheme)
                 }.Uri;
             }
         }
@@ -214,7 +246,7 @@ namespace Bb.Urls
                 {
                     Scheme = _builder.Scheme,
                     Host = _builder.Host,
-                    Port = _builder.Port
+                    Port = GetPort(_builder.Port, _builder.Scheme)
                 }.ToString();
             }
         }
@@ -222,12 +254,12 @@ namespace Bb.Urls
         public Uri ToUri()
         {
             if (_pathSegments != null && _pathSegments.Count > 0)
-                _builder.Path = ConcatenatePath(_pathSegments);
+                _builder.Path = CombinePath(_pathSegments);
             else
                 _builder.Path = string.Empty;
+            _builder.Fragment = Fragment;
             return _builder.Uri;
         }
-
 
         #region Path
 
@@ -274,14 +306,14 @@ namespace Bb.Urls
 
         }
 
-        public static string ConcatenatePath(IEnumerable<Segment> paths)
+        public static string CombinePath(IEnumerable<Segment> paths)
         {
 
             if (paths == null || !paths.Any())
                 return string.Empty;
 
             return string.Join("/", paths.Select(x => x.Value));
-        
+
         }
 
         public Url CombinePath(params string[] paths)
@@ -375,6 +407,13 @@ namespace Bb.Urls
 
             // Uri.EscapeUriString mostly does what we want - encodes illegal characters only - but it has a quirk
             // in that % isn't illegal if it's the start of a %- encoded sequence https://stackoverflow.com/a/47636037/62600
+
+            //return s
+            //    .Replace("/", "%2F", StringComparison.Ordinal)
+            //    .Replace(@"\", "%5C", StringComparison.Ordinal)
+            //    .Replace("?", "%3F", StringComparison.Ordinal)
+            //    .Replace("#", "%23", StringComparison.Ordinal)
+            //    .Replace("@", "%40", StringComparison.Ordinal);
 
             // no % characters, so avoid the regex overhead
             if (!s.OrdinalContains("%"))
@@ -575,10 +614,11 @@ namespace Bb.Urls
         public override string ToString()
         {
             if (_pathSegments != null && _pathSegments.Count > 0)
-                _builder.Path = ConcatenatePath(_pathSegments);
+                _builder.Path = CombinePath(_pathSegments);
             else
                 _builder.Path = string.Empty;
             _builder.Query = QueryParams.ToString();
+            _builder.Fragment = Fragment;
             return _builder.ToString();
         }
 
@@ -629,16 +669,15 @@ namespace Bb.Urls
         public Url Map(string name, string value)
         {
 
-            var p = PathSegments.ToArray();
+            var p = PathSegments.Where(c => c.IsVariable).ToArray();
             foreach (var item in p)
-                if (item.IsVariable)
-                    if (item.Value == name)
-                        _pathSegments[_pathSegments.IndexOf(item)] = new Segment(value);
+                if (item.Value == name)
+                    _pathSegments[_pathSegments.IndexOf(item)] = new Segment(value);
 
-            var q = QueryParams.ToList();
+            var q = QueryParams.Where(c => c.Value.IsVariable).ToList();
             foreach (var item in q)
-                if (item.Name == name && item.Value.IsVariable)
-                    QueryParams.AddOrReplace(name, value, NullValueHandling.Ignore);
+                if (item.Value.Value == name)
+                    QueryParams.AddOrReplace(item.Name, value, NullValueHandling.Ignore);
 
             return this;
 
@@ -661,7 +700,7 @@ namespace Bb.Urls
         /// </summary>
         public Url Reset()
         {
-            _builder.Port = 80;
+            _builder.Port = -1;
             _builder.Scheme = string.Empty;
             _builder.UserName = string.Empty;
             _builder.Host = string.Empty;
@@ -688,11 +727,24 @@ namespace Bb.Urls
         #endregion
 
 
+        private static int GetPort(int port, string scheme)
+        {
+
+            if (scheme == Url.DEFAULT_SCHEME && port == 80)
+                return -1;
+
+            if (scheme == Url.DEFAULT_SECURED_SCHEME && port == 443)
+                return -1;
+
+            return port;
+
+        }
+
         public const string DEFAULT_SCHEME = "http";
         public const string DEFAULT_SECURED_SCHEME = "https";
         public const string DEFAULT_HOST = "localhost";
         public const int DEFAULT_PORT = 80;
-
+        internal const int StackallocThreshold = 512;
 
 
         private const int MAX_URL_LENGTH = 65519;

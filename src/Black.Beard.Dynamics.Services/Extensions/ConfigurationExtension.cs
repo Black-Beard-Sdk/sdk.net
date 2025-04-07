@@ -174,26 +174,26 @@ namespace Bb.Extensions
 
                 case "JSON":
                     config.AddJsonFile(f.FullName, optional: false, reloadOnChange: false);
-                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    Trace.TraceInformation($"configuration file {f.FullName} is loaded.");
                     break;
 
                 case "XML":
                     config.AddXmlFile(f.FullName, optional: false, reloadOnChange: false);
-                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    Trace.TraceInformation($"configuration file {f.FullName} is loaded.");
                     break;
 
                 case "INI":
                     config.AddIniFile(f.FullName, optional: false, reloadOnChange: false);
-                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    Trace.TraceInformation($"configuration file {f.FullName} is loaded.");
                     break;
 
                 case "PerKey":
                     config.AddKeyPerFile(f.FullName, optional: false, reloadOnChange: false);
-                    Trace.WriteLine($"configuration file {f.FullName} is loaded.");
+                    Trace.TraceInformation($"configuration file {f.FullName} is loaded.");
                     break;
 
                 default:
-                    Trace.WriteLine($"configuration file {f.FullName} is is not recognized.");
+                    Trace.TraceWarning($"configuration file {f.FullName} is is not recognized.");
                     break;
 
             }

@@ -539,7 +539,7 @@ namespace Bb.Policies
         {
 
             if (System.Diagnostics.Debugger.IsAttached && !string.IsNullOrEmpty(File))
-                System.Diagnostics.Trace.WriteLine(File);
+                System.Diagnostics.Trace.TraceInformation(File);
 
             var context = _context;
             return visitor.Visit(context);

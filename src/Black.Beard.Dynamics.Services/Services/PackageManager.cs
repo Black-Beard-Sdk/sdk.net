@@ -206,13 +206,13 @@ namespace Bb.Services
             {
             }
 
-            public void LogDebug(string data) => Trace.WriteLine(data);
-            public void LogVerbose(string data) => Trace.WriteLine(data);
+            public void LogDebug(string data) => Trace.TraceInformation(data);
+            public void LogVerbose(string data) => Trace.TraceInformation(data);
             public void LogInformation(string data) => Trace.TraceInformation(data);
-            public void LogMinimal(string data) => Trace.WriteLine(data);
+            public void LogMinimal(string data) => Trace.TraceInformation(data);
             public void LogWarning(string data) => Trace.TraceWarning(data);
             public void LogError(string data) => Trace.TraceError(data);
-            public void LogInformationSummary(string data) => Trace.WriteLine(data);
+            public void LogInformationSummary(string data) => Trace.TraceInformation(data);
             public void Log(NuGet.Common.LogLevel level, string data)
             {
                 switch (level)

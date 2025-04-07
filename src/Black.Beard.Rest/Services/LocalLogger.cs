@@ -112,8 +112,8 @@ namespace Bb.Services
                 if (Trace.Listeners.Count > 0)
                 {
 
-                    Trace.WriteLine(logMessage);
-                    Trace.WriteLine("-----------------------------------------------");
+                    Trace.TraceInformation(logMessage);
+                    Trace.TraceInformation("-----------------------------------------------");
 
                 }
 
