@@ -22,7 +22,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Remove="git.Expressions\Exceptions\DuplicatedArgumentNameException.cs" />
     <Compile Remove="Policies\PoliciesCategorizer.cs" />
     <Compile Remove="Policies\PoliciesResolveItems.cs" />
   </ItemGroup>
@@ -32,10 +31,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="git.Expressions\**" />
+    <EmbeddedResource Remove="git.Expressions\**" />
+    <None Remove="git.Expressions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-    <PackageReference Include="Black.Beard.Analysis" Version="1.0.137" />
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.187" />
-    <PackageReference Include="System.CodeDom" Version="9.0.3" />
+    <PackageReference Include="Black.Beard.Analysis" Version="1.0.140" />
+    <PackageReference Include="Black.Beard.CodeDom" Version="1.0.140" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.196" />
+    <PackageReference Include="Black.Beard.Expressions" Version="1.0.196" />
+    <PackageReference Include="System.CodeDom" Version="9.0.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />

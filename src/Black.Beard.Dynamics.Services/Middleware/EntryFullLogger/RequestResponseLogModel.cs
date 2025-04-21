@@ -1,6 +1,11 @@
-﻿namespace Bb.Middleware.EntryFullLogger
+﻿// Ignore Spelling: Utc, Middleware Ip
+
+namespace Bb.Middleware.EntryFullLogger
 {
 
+    /// <summary>
+    /// Represents a model for logging HTTP request and response details.
+    /// </summary>
     public class RequestResponseLogModel
     {
 
@@ -49,7 +54,7 @@
         /// Console.WriteLine($"Client IP: {logModel.ClientIp}");
         /// </code>
         /// </example>
-        public string ClientIp { get; set; }
+        public string? ClientIp { get; set; }
 
         /// <summary>
         /// Gets or sets the trace identifier for the request.
@@ -71,7 +76,7 @@
         /// <summary>
         /// Gets or sets the UTC timestamp of when the request was received.
         /// </summary>
-        /// <value>A <see cref="DateTime?"/> representing the request timestamp in UTC.</value>
+        /// <value>A <see cref="DateTime"/> representing the request timestamp in UTC.</value>
         /// <remarks>
         /// This property records the time the HTTP request was received by the server.
         /// </remarks>
@@ -138,7 +143,7 @@
         /// <summary>
         /// Gets or sets the UTC timestamp of when the response was sent.
         /// </summary>
-        /// <value>A <see cref="DateTime?"/> representing the response timestamp in UTC.</value>
+        /// <value>A <see cref="DateTime"/> representing the response timestamp in UTC.</value>
         /// <remarks>
         /// This property records the time the HTTP response was sent by the server.
         /// </remarks>
@@ -174,7 +179,7 @@
         /// <summary>
         /// Gets or sets the content type of the HTTP response.
         /// </summary>
-        public string ResponseContentType { get; set; }
+        public string? ResponseContentType { get; set; }
 
 
         /// <summary>
@@ -212,7 +217,7 @@
         /// Console.WriteLine($"Stack Trace: {logModel.ExceptionStackTrace}");
         /// </code>
         /// </example>
-        public string ExceptionStackTrace { get; set; }
+        public string? ExceptionStackTrace { get; set; }
 
 
         /// <summary>

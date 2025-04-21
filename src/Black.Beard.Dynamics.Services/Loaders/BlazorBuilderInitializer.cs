@@ -1,4 +1,6 @@
-﻿using Bb.ComponentModel;
+﻿// Ignore Spelling: Blazor
+
+using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 
 namespace Bb.Loaders
@@ -7,7 +9,7 @@ namespace Bb.Loaders
     /// <summary>
     /// Initializes the web application builder for Blazor components.
     /// </summary>
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScope.Transiant)]
     public class BlazorBuilderInitializer : InjectBuilder<WebApplicationBuilder>
     {
 

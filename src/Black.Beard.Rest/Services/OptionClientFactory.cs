@@ -1,12 +1,9 @@
 ﻿using Bb.Helpers;
 using Bb.Interfaces;
 using Bb.Urls;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RestSharp;
-using System;
-using System.Xml.Linq;
 
 namespace Bb.Services
 {
@@ -20,15 +17,26 @@ namespace Bb.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionClientFactory"/> class using a service provider.
         /// </summary>
+        /// <remarks>
+        /// This constructor initializes the factory with a default configuration and sets the debug mode based on whether a debugger is attached.
+        /// </remarks>
+        public OptionClientFactory()
+        {
+            this._services = null;
+            _configuration = new ClientRestOption();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OptionClientFactory"/> class using a service provider.
+        /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to resolve dependencies. Must not be null.</param>
         /// <remarks>
         /// This constructor initializes the factory with a default configuration and sets the debug mode based on whether a debugger is attached.
         /// </remarks>
-        public OptionClientFactory(IServiceProvider serviceProvider)
+        public OptionClientFactory(IServiceProvider? serviceProvider)
         {
             this._services = serviceProvider;
             _configuration = new ClientRestOption();
-            this.Debug = System.Diagnostics.Debugger.IsAttached;
         }
 
         /// <summary>
@@ -65,10 +73,20 @@ namespace Bb.Services
             RestClientOptions options = new RestClientOptions(n)
             {
                 Timeout = TimeSpan.FromSeconds(_configuration.Timeout),
+                ThrowOnAnyError = _configuration.ThrowOnAnyError,
+                AllowMultipleDefaultParametersWithSameName = _configuration.AllowMultipleDefaultParametersWithSameName,
+                AutomaticDecompression = _configuration.AutomaticDecompression,
+                DisableCharset = _configuration.DisableCharset,
+                Expect100Continue = _configuration.Expect100Continue,
+                ThrowOnDeserializationError = _configuration.ThrowOnDeSerializationError,
+                FailOnDeserializationError = _configuration.FailOnDeserializationError,
+                PreAuthenticate = _configuration.PreAuthenticate,
+                UseDefaultCredentials = _configuration.UseDefaultCredentials,
+                FollowRedirects = _configuration.FollowRedirects,
+                MaxRedirects = _configuration.MaxRedirects,
             };
 
-            if (Debug)
-                Trace(options);
+            TraceLog(options);
 
             if (_config.TryGetValue(n.ToString(), out var action))
                 action(options);
@@ -154,30 +172,31 @@ namespace Bb.Services
         /// <remarks>
         /// This method logs the client options using the configured logger, if available.
         /// </remarks>
-        private void Trace(RestClientOptions options)
+        private void TraceLog(RestClientOptions options)
         {
-            ILogger<RestClientOptions> logger = null;
-            if (_services != null)
+
+            if (_configuration.Trace || _configuration.Debug)
             {
-                var l = _services.GetService(typeof(ILogger<RestClientOptions>));
-                logger = (ILogger<RestClientOptions>)l;
+
+                ILogger<RestClientOptions>? logger = null;
+
+                if (_services != null)
+                    logger = _services.GetService(typeof(ILogger<RestClientOptions>)) as ILogger<RestClientOptions>;
+                else
+                    logger = new LocalLogger<RestClientOptions>();
+
+                if (logger != null)
+                    options.WithLog(logger);
+
             }
-            options.WithLog(logger);
+
         }
 
         private readonly Dictionary<string, Action<RestClientOptions>> _config
             = new Dictionary<string, Action<RestClientOptions>>();
-        private readonly IServiceProvider _services;
+        private readonly IServiceProvider? _services;
         private readonly ClientRestOption _configuration;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether debug mode is enabled.
-        /// </summary>
-        /// <value><c>true</c> if debug mode is enabled; otherwise, <c>false</c>.</value>
-        /// <remarks>
-        /// When debug mode is enabled, additional logging is performed.
-        /// </remarks>
-        public bool Debug { get; set; }
 
         /// <summary>
         /// Gets or sets the interceptor for the <see cref="RestClientOptions"/>.

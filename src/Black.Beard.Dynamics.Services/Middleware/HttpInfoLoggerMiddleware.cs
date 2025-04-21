@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
+﻿// Ignore Spelling: Middleware
+
+using Microsoft.AspNetCore.Http.Extensions;
+using System.Net;
 using System.Text;
 
 namespace Bb.Middleware
@@ -51,8 +54,8 @@ namespace Bb.Middleware
 
             using (_logger.BeginScope(new[]
             {
-                new KeyValuePair<string, object>("{url}", context.Request?.GetDisplayUrl()),
-                new KeyValuePair<string, object>("{RemoteIpAddress}", context.Connection.RemoteIpAddress),
+                new KeyValuePair<string, object>("{url}", context.Request?.GetDisplayUrl() ?? "http://?"),
+                new KeyValuePair<string, object>("{RemoteIpAddress}", context.Connection.RemoteIpAddress ?? IPAddress.None),
             }))
             {
 
@@ -121,41 +124,39 @@ namespace Bb.Middleware
             var form = TryToGetForm(r);
             if (form != null)
             {
-
                 sb.AppendLine($"Form: ");
-
-                if (form.Count > 0)
-                    foreach (var item in form)
-                    {
-                        sb.AppendLine($"Key ({item.Key}) ");
-                        var file = form.Files.Where(c => c.Name == item.Key).FirstOrDefault();
-                        if (file != null)
-                        {
-                            sb.AppendLine($"    File:");
-                            sb.AppendLine($"      Name: {file.Name}");
-                            sb.AppendLine($"      FileName: {file.FileName}");
-                            sb.AppendLine($"      Length: {file.Length}");
-                            foreach (var item2 in file.Headers)
-                                sb.AppendLine($"    Header : {item2.Key}: {item2.Value}");
-                        }
-                        else
-                            sb.AppendLine($"value ({item.Value}) ");
-                    }
-                else
-                    foreach (var item in form.Files)
-                    {
-                        sb.AppendLine($"    File:");
-                        sb.AppendLine($"      Name: {item.Name}");
-                        sb.AppendLine($"      FileName: {item.FileName}");
-                        sb.AppendLine($"      Length: {item.Length}");
-                        foreach (var item2 in item.Headers)
-                            sb.AppendLine($"    Header : {item2.Key}: {item2.Value}");
-                    }
-
+                WriteForm(sb, form);
             }
 
             return sb;
 
+        }
+
+        private static void WriteForm(StringBuilder sb, IFormCollection form)
+        {
+            if (form.Count > 0)
+                foreach (var item in form)
+                {
+                    sb.AppendLine($"Key ({item.Key}) ");
+                    var file = form.Files.FirstOrDefault(c => c.Name == item.Key);
+                    if (file != null)
+                        WriteFormFile(sb, file);
+                    else
+                        sb.AppendLine($"value ({item.Value}) ");
+                }
+            else
+                foreach (var item in form.Files)
+                    WriteFormFile(sb, item);
+        }
+
+        private static void WriteFormFile(StringBuilder sb, IFormFile item)
+        {
+            sb.AppendLine($"        File:");
+            sb.AppendLine($"        Name: {item.Name}");
+            sb.AppendLine($"        FileName: {item.FileName}");
+            sb.AppendLine($"        Length: {item.Length}");
+            foreach (var item2 in item.Headers)
+                sb.AppendLine($"        Header : {item2.Key}: {item2.Value}");
         }
 
         /// <summary>
@@ -168,7 +169,7 @@ namespace Bb.Middleware
         /// </remarks>
         private static IFormCollection? TryToGetForm(HttpRequest r)
         {
-            IFormCollection form = null;
+            IFormCollection? form = null;
             try
             {
                 if (r.HasFormContentType && r.Form != null)
@@ -188,7 +189,7 @@ namespace Bb.Middleware
         /// <remarks>
         /// This method captures details such as the status code and response headers.
         /// </remarks>
-        private StringBuilder LogResponse(HttpContext context)
+        private static StringBuilder LogResponse(HttpContext context)
         {
             return TraceResponse(context.Response);
         }
@@ -211,10 +212,6 @@ namespace Bb.Middleware
 
             foreach (var header in r.Headers)
                 sb.AppendLine($"Header: {header.Key}: {header.Value}");
-
-            // Si vous souhaitez logger les cookies de la réponse
-            //foreach (var cookie in r.Cookies)
-            //    sb.AppendLine($"Cookie: {cookie.Key}: {cookie.Value}");
 
             return sb;
 

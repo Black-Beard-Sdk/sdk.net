@@ -9,7 +9,7 @@ namespace Bb.Monitoring
     /// <summary>
     /// Load and initialize the logger
     /// </summary>
-    public static class Loggers
+    internal static class Loggers
     {
 
         static Loggers()
@@ -17,15 +17,14 @@ namespace Bb.Monitoring
             DirectoryToTrace = Directory.GetCurrentDirectory().Combine("Logs");
         }
 
+        /// <summary>
+        /// Initializes the logger configuration from the specified file.
+        /// </summary>
+        /// <param name="file">file that contains configuration</param>
         public static void InitializeLogger(FileInfo file)
         {
 
             string web_log_directory = "web_log_directory";
-
-            //// target folder where store logs
-            //DirectoryToTrace.CreateFolderIfNotExists();
-            //GlobalDiagnosticsContext.Set(web_log_directory, DirectoryToTrace);
-            //var configLogPath = Directory.GetCurrentDirectory().Combine("nlog.config");
 
             if (file.Exists)
             {
@@ -50,6 +49,9 @@ namespace Bb.Monitoring
 
         }
 
+        /// <summary>
+        /// Gets or sets the directory where logs are stored.
+        /// </summary>
         public static string DirectoryToTrace { get; set; }
 
     }

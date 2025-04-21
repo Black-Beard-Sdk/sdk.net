@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 namespace Bb.Vault
 {
 
-    [ExposeClass(ConstantsCore.Service, ExposedType = typeof(IVaultSecretResolver), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ConstantsCore.Service, ExposedType = typeof(IVaultSecretResolver), LifeCycle = IocScope.Singleton)]
     public class AzureAdVaultSecretResolver : IVaultSecretResolver
     {
 
@@ -38,27 +38,44 @@ namespace Bb.Vault
 
         public AzureAdVaultSecretResolver(IConfiguration configuration)
         {
-            var vaultUri = new Uri(configuration["AzureKeyVault:VaultUri"]);
-            var clientId = configuration["AzureKeyVault:ClientId"];
-            var clientSecret = configuration["AzureKeyVault:ClientSecret"];
-            var tenantId = configuration["AzureKeyVault:TenantId"];
 
-            var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-            _secretClient = new SecretClient(vaultUri, credential);
+            if (configuration.GetValue("AzureKeyVault:VaultUri", out string uri)
+             && configuration.GetValue("AzureKeyVault:ClientId", out string clientId)
+             && configuration.GetValue("AzureKeyVault:ClientSecret", out string clientSecret)
+             && configuration.GetValue("AzureKeyVault:TenantId", out string tenantId))
+                {
+                    var vaultUri = new Uri(uri);
+                    var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+                    _secretClient = new SecretClient(vaultUri, credential);
+                }
         }
 
-        public string GetSecret(params string[] name)
+        public string? GetSecret(params string[] path)
         {
-            if (name == null || name.Length == 0)
-                throw new ArgumentException("Secret name must be provided", nameof(name));
+            if (path == null || path.Length == 0)
+                throw new ArgumentException("Secret name must be provided", nameof(path));
 
-            var secretName = string.Join("/", name);
+            var secretName = string.Join("/", path);
             KeyVaultSecret secret = _secretClient.GetSecret(secretName);
 
             return secret.Value;
         }
 
-        private readonly SecretClient _secretClient;
+        private readonly SecretClient _secretClient;        
+
+    }
+
+    internal static class Extensions
+    {
+
+        public static bool GetValue(this IConfiguration configuration, string name, out string result)
+        {
+            var r = configuration[name];
+            if (string.IsNullOrEmpty(r))
+                throw new InvalidOperationException("Configuration is not set " + name);
+            result = r;
+            return true;
+        }
 
     }
 

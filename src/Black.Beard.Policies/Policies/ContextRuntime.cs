@@ -1,5 +1,5 @@
-﻿using Bb.Analysis.DiagTraces;
-using Bb.ComponentModel.Accessors;
+﻿using Bb.Accessors;
+using Bb.Analysis.DiagTraces;
 using Bb.Converters;
 using Bb.Expressions;
 using Bb.Policies.Asts;
@@ -146,7 +146,7 @@ namespace Bb.Policies
 
             else if (datas.GetType().IsClass)
             {
-                var properties = datas.GetType().GetAccessors(MemberStrategy.Instance);
+                var properties = datas.GetType().GetAccessors(MemberStrategys.Instance);
                 foreach (var item in properties)
                     Store(item.Name, item.GetValue(datas));
             }
@@ -220,7 +220,7 @@ namespace Bb.Policies
             else
             {
 
-                var accessor = source.GetType().GetAccessors(MemberStrategy.Instance);
+                var accessor = source.GetType().GetAccessors(MemberStrategys.Instance);
                 if (!accessor.TryGetValue(property, out var acc))
                     _diagnostics.AddInformation(textLocation, property, $"failed to resolve {property} in {pathSource.GetType()}");
 

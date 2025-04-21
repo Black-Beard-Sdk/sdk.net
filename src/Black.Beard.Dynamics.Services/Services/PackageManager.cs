@@ -14,7 +14,7 @@ namespace Bb.Services
     /// manage downloading of nuget packages
     /// </summary>
     /// <param name="logger"></param>
-    [ExposeClass(ConstantsCore.Service, LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ConstantsCore.Service, LifeCycle = IocScope.Singleton)]
     public class PackageManager(ILogger<PackageManager>? logger)
     {
 
@@ -77,9 +77,9 @@ namespace Bb.Services
         /// </example>
         public async Task Resolve(Package package)
         {
-            Version version = null;
+            Version? version = null;
             if (!string.IsNullOrEmpty(package.Version) && !Version.TryParse(package.Version, out version))
-                _logger?.LogWarning($"The version {package.Version} is not valid. Switch on latest version");
+                _logger?.LogWarning("The version {Version} is not valid. Switch on latest version", package.Version);
 
             await Resolve(package.Id, version);
         }
@@ -122,7 +122,7 @@ namespace Bb.Services
                 List<AssemblyMatched> filteredAssemblies = ass.Where(c => !c.IsSdk).ToList();
                 foreach (var assembly in filteredAssemblies)
                 {
-                    _logger?.LogInformation($"append assembly {assembly.AssemblyName}");
+                    _logger?.LogInformation("append assembly {AssemblyName}", assembly.AssemblyName);
                     _assemblies.Add(assembly);
                 }
             }
@@ -137,8 +137,8 @@ namespace Bb.Services
         /// </remarks>
         public AssemblyMatched[] Assemblies => _assemblies.ToArray();
 
-        private readonly ILogger<PackageManager> _logger = logger;
-        private List<AssemblyMatched> _assemblies = new List<AssemblyMatched>();
+        private readonly ILogger<PackageManager>? _logger = logger;
+        private readonly List<AssemblyMatched> _assemblies = new List<AssemblyMatched>();
         private string _target = Path.GetTempPath().Combine(Assembly.GetExecutingAssembly().GetName().Name, ".nuget");
         private readonly AddonsResolver _addon = new AddonsResolver();
 
@@ -151,13 +151,13 @@ namespace Bb.Services
                 _logger = logger;
             }
 
-            public void LogDebug(string data) => _logger.LogDebug(data);
-            public void LogVerbose(string data) => _logger.LogTrace(data);
-            public void LogInformation(string data) => _logger.LogInformation(data);
-            public void LogMinimal(string data) => _logger.LogInformation(data);
-            public void LogWarning(string data) => _logger.LogWarning(data);
-            public void LogError(string data) => _logger.LogError(data);
-            public void LogInformationSummary(string data) => _logger.LogInformation(data);
+            public void LogDebug(string data) => _logger?.LogDebug(data);
+            public void LogVerbose(string data) => _logger?.LogTrace(data);
+            public void LogInformation(string data) => _logger?.LogInformation(data);
+            public void LogMinimal(string data) => _logger?.LogInformation(data);
+            public void LogWarning(string data) => _logger?.LogWarning(data);
+            public void LogError(string data) => _logger?.LogError(data);
+            public void LogInformationSummary(string data) => _logger?.LogInformation(data);
             public void Log(NuGet.Common.LogLevel level, string data)
             {
                 switch (level)

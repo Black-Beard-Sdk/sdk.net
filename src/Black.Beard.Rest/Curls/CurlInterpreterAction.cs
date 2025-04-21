@@ -1,8 +1,13 @@
-﻿using Bb.Http;
+﻿
+using Bb.Http;
+using System.Collections.Generic;
 
 namespace Bb.Curls
 {
 
+    /// <summary>
+    /// Represents an action to be executed in the cURL interpreter context.
+    /// </summary>
     public partial class CurlInterpreterAction
     {
 
@@ -21,12 +26,24 @@ namespace Bb.Curls
             _configureAction = configureAction;
         }
 
-        public int Priority { get; internal set; }
+        /// <summary>
+        /// Get or set the next action to be executed
+        /// </summary>
+        public int Priority { get; internal set; } = 10;
 
+        /// <summary>
+        /// return the list of arguments
+        /// </summary>
         public ArgumentList Arguments { get; }
 
+        /// <summary>
+        /// Get the first argument in the list
+        /// </summary>
         public Argument First => Arguments.First();
 
+        /// <summary>
+        /// Get the first value in the list of arguments
+        /// </summary>
         public string FirstValue => Arguments.First().Value;
 
         /// <summary>
@@ -34,7 +51,7 @@ namespace Bb.Curls
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public Argument Get(string name) => Arguments.First(c => c.Name.Trim() == name);
+        public Argument Get(string name) => Arguments.First(c => c.Name?.Trim() == name);
 
         /// <summary>
         /// Get or set arguments
@@ -48,8 +65,7 @@ namespace Bb.Curls
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool Exists(string name) => Arguments.Any(c => c.Name.Trim() == name);
-
+        public bool Exists(string name) => Arguments.Any(c => c.Name?.Trim() == name);
 
         internal void Configure(CurlContext context)
         {
@@ -69,10 +85,8 @@ namespace Bb.Curls
             return this;
         }
 
-        internal CurlInterpreterAction _next;
-
-        private Action<CurlInterpreterAction, CurlContext> _configureAction;
-        private List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
+        private readonly Action<CurlInterpreterAction, CurlContext> _configureAction;
+        private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
 
     }
 

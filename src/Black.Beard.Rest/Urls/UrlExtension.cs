@@ -132,7 +132,6 @@ namespace Bb.Urls
         /// </summary>
         /// <param name="url">This URL.</param>
         /// <param name="segment">The segment to append</param>
-        /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
         public static Url WithPathSegment(this string url, string segment)
         {
@@ -332,7 +331,6 @@ namespace Bb.Urls
         /// </summary>
         /// <param name="uri">This System.Uri.</param>
         /// <param name="segment">The segment to append</param>
-        /// <param name="fullyEncode">If true, URL-encodes reserved characters such as '/', '+', and '%'. Otherwise, only encodes strictly illegal characters (including '%' but only when not followed by 2 hex characters).</param>
         /// <returns>A new Url object.</returns>
         public static Url WithPathSegment(this Uri uri, string segment)
         {
@@ -530,35 +528,48 @@ namespace Bb.Urls
         /// <summary>
         /// Retrieves an authentication token asynchronously using the specified credentials.
         /// </summary>
-        /// <param name="self">The the url on the server. Must not be null.</param>
-        /// <param name="path">The endpoint path for the token request. Must not be null or empty.</param>
+        /// <param name="self">The URL on the server. Must not be null.</param>
         /// <param name="client_id">The client ID for authentication. Must not be null or empty.</param>
         /// <param name="client_secret">The client secret for authentication. Can be null or empty.</param>
-        /// <param name="username">The username for authentication. Must not be null or empty.</param>
+        /// <param name="userName">The userName for authentication. Must not be null or empty.</param>
         /// <param name="password">The password for authentication. Must not be null or empty.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of <see cref="TokenResponse"/> containing the token details.</returns>
         /// <remarks>
         /// This method sends a POST request to the specified endpoint to retrieve an authentication token using the provided credentials.
         /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="self"/>, <paramref name="path"/>, <paramref name="client_id"/>, <paramref name="username"/>, or <paramref name="password"/> is null or empty.
-        /// </exception>
         /// <exception cref="Exception">
         /// Thrown if the token request fails or the response is not successful.
         /// </exception>
         /// <example>
         /// <code lang="C#">
-        /// var client = new RestClient("https://example.com");
-        /// var tokenResponse = await client.GetTokenAsync("/token", "myClientId", "myClientSecret", "myUsername", "myPassword");
+        /// var url = new Url("https://example.com/token");
+        /// var tokenResponse = await url.GetTokenAsync("myClientId", "myClientSecret", "myUsername", "myPassword");
+        /// Console.WriteLine(tokenResponse?.AccessToken);
         /// </code>
         /// </example>
-        public static async Task<TokenResponse?> GetTokenAsync(this Url self, string client_id, string client_secret, string username, string password)
+        public static async Task<TokenResponse?> GetTokenAsync(this Url self, string client_id, string client_secret, string userName, string password)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
-            return await client.GetTokenAsync(self.PathAndQuery, client_id, client_secret, username, password);
+            return await client.GetTokenAsync(self.PathAndQuery, client_id, client_secret, userName, password);
         }
 
-
+        /// <summary>
+        /// Executes a REST call asynchronously using the specified HTTP method and optional data format.
+        /// </summary>
+        /// <param name="self">The <see cref="Url"/> instance representing the endpoint. Must not be null.</param>
+        /// <param name="method">The HTTP method to use for the request. Must not be null.</param>
+        /// <param name="format">The optional <see cref="DataFormat"/> for the request. Defaults to JSON if not specified.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of <see cref="RestResponse"/>.</returns>
+        /// <remarks>
+        /// This method sends a REST request to the specified URL using the provided HTTP method and data format.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/resource");
+        /// var response = await url.CallAsync(Method.GET);
+        /// Console.WriteLine(response?.Content);
+        /// </code>
+        /// </example>
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format = null)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
@@ -566,6 +577,23 @@ namespace Bb.Urls
             return await client.ExecuteAsync(request);
         }
 
+        /// <summary>
+        /// Executes a REST call asynchronously using the specified HTTP method and request initializer.
+        /// </summary>
+        /// <param name="self">The <see cref="Url"/> instance representing the endpoint. Must not be null.</param>
+        /// <param name="method">The HTTP method to use for the request. Must not be null.</param>
+        /// <param name="initializer">An action to initialize the <see cref="RestRequest"/>. Must not be null.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of <see cref="RestResponse"/>.</returns>
+        /// <remarks>
+        /// This method sends a REST request to the specified URL using the provided HTTP method and allows customization of the request.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/resource");
+        /// var response = await url.CallAsync(Method.POST, request => request.AddJsonBody(new { key = "value" }));
+        /// Console.WriteLine(response?.Content);
+        /// </code>
+        /// </example>
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, Action<RestRequest> initializer)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);
@@ -574,6 +602,24 @@ namespace Bb.Urls
             return await client.ExecuteAsync(request);
         }
 
+        /// <summary>
+        /// Executes a REST call asynchronously using the specified HTTP method, data format, and request initializer.
+        /// </summary>
+        /// <param name="self">The <see cref="Url"/> instance representing the endpoint. Must not be null.</param>
+        /// <param name="method">The HTTP method to use for the request. Must not be null.</param>
+        /// <param name="format">The optional <see cref="DataFormat"/> for the request. Defaults to JSON if not specified.</param>
+        /// <param name="initializer">An action to initialize the <see cref="RestRequest"/>. Must not be null.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation, with a result of <see cref="RestResponse"/>.</returns>
+        /// <remarks>
+        /// This method sends a REST request to the specified URL using the provided HTTP method, data format, and allows customization of the request.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var url = new Url("https://example.com/resource");
+        /// var response = await url.CallAsync(Method.PUT, DataFormat.Json, request => request.AddJsonBody(new { key = "value" }));
+        /// Console.WriteLine(response?.Content);
+        /// </code>
+        /// </example>
         public static async Task<RestResponse?> CallAsync(this Url self, Method method, DataFormat? format, Action<RestRequest> initializer)
         {
             var client = GlobalSettings.UrlClientFactory.Create(self.BaseAddress);

@@ -1,4 +1,6 @@
-﻿namespace Bb.Models
+﻿// Ignore Spelling: Api
+
+namespace Bb.Models
 {
 
     /// <summary>
@@ -14,7 +16,7 @@
         /// </remarks>
         public RestClientOptions()
         {
-            this.Options = new List<ClientOptionConfiguration>();
+            this.Options = [];
         }
 
         /// <summary>

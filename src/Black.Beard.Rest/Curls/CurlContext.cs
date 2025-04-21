@@ -1,45 +1,44 @@
-﻿using Bb.Interfaces;
+﻿
 using Bb.Urls;
 using RestSharp;
 
 namespace Bb.Curls
 {
 
+    /// <summary>
+    /// Represents the context of a cURL request.
+    /// </summary>
     public class CurlContext
     {
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CurlContext"/> class.
         /// </summary>
-        /// <param name="cancellationTokenSource">The cancellation token to cancel operation.</param>
-        public CurlContext(CancellationTokenSource? cancellationTokenSource)
+        public CurlContext()
         {
-            _tokenSource = cancellationTokenSource ?? new CancellationTokenSource();
-            _token = _tokenSource.Token;
             this.Headers = new Headers();
         }
 
-
-        //public RestClient RestClient { get; internal set; }
-
-        // public HttpRequestMessage RequestMessage { get; internal set; }
-
-        public RestRequest Request { get; internal set; }
-
-        public RestResponse Result { get; private set; }
+        #region properties
 
         /// <summary>
-        /// Send an HTTP request as an asynchronous operation.
+        /// Gets or sets the HTTP request to be executed.
         /// </summary>
-        /// <returns></returns>
-        internal async Task<RestResponse> CallAsync(RestClient client)
-        {        
-            Result = await client.ExecuteAsync(Request, _token);
-            return Result;
-        }
+        public RestRequest Request { get; internal set; }
 
+        /// <summary>
+        /// return the list of headers
+        /// </summary>
         public Headers Headers { get; }
+
+        /// <summary>
+        /// Gets or sets the URL to be used for the HTTP request.
+        /// </summary>
         public Url Url { get; internal set; }
+
+        #endregion properties
+  
+
 
         internal void Add(KeyValuePair<string, string> item)
         {
@@ -59,6 +58,7 @@ namespace Bb.Curls
 
         }
 
+
         internal CurlContext Apply(List<CurlInterpreterAction> list)
         {
 
@@ -71,65 +71,7 @@ namespace Bb.Curls
             return this;
         }
 
-        internal async Task<RestResponse> CallAsync(object urlClientFactory)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Dictionary<string, string> _parameters = new Dictionary<string, string>();
-        private readonly CancellationTokenSource _tokenSource;
-        private readonly CancellationToken _token;
-
-    }
-
-    public class Headers
-    {
-
-        public bool TryGetFirst(string header, out string result)
-        {
-
-            result = null;
-
-            if (_headers.TryGetValue(header, out var result1))
-                result = result1.FirstOrDefault();
-
-            return result != null;
-
-        }
-
-        public bool Contains(string header)
-        {
-            return _headers.ContainsKey(header);
-        }
-
-        public void AddOrReplace(string header, string value)
-        {
-
-
-            if (!_headers.TryGetValue(header, out var result))
-                _headers.Add(header, new HashSet<string>() { value });
-
-            else
-            {
-                result.Clear();
-                result.Add(value);
-            }
-
-        }
-
-        public void Add(string header, string value)
-        {
-
-            if (!_headers.TryGetValue(header, out var result))
-                _headers.Add(header, new HashSet<string>() { value });
-
-            else
-                result.Add(value);
-
-        }
-
-
-        private Dictionary<string, HashSet<string>> _headers = new Dictionary<string, HashSet<string>>();
+        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
     }
 

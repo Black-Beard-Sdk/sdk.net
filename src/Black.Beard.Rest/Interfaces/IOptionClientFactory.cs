@@ -24,8 +24,6 @@ namespace Bb.Interfaces
         : INamedFactory<string, RestClientOptions>
     {
 
-
-
         /// <summary>
         /// Gets or sets an interceptor for modifying the <see cref="RestClientOptions"/> before use.
         /// </summary>

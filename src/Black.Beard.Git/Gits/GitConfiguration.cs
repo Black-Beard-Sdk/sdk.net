@@ -1,7 +1,11 @@
-﻿using System;
+﻿
+
+// Ignore Spelling: Gits
+
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Bb.Configuration.Git
+namespace Bb.Gits
 {
 
     /// <summary>
@@ -119,7 +123,7 @@ namespace Bb.Configuration.Git
         /// Console.WriteLine($"Repository status: {status}");
         /// </code>
         /// </example>
-        public GitStatus Initialized(string localRoot)
+        public static GitStatus Initialized(string localRoot)
         {
 
             var t0 = localRoot.AsDirectory();
@@ -145,21 +149,5 @@ namespace Bb.Configuration.Git
 
     }
 
-    public enum GitStatus
-    {
-        FolderNotCreated,
-        FolderNotEmpty,
-        Initialized,
-        NotInitialized
-    }
-
 }
 
-
-
-
-//var pwd = _configuration["gitPassword"];
-//var securePwd = new SecureString();
-//foreach (char c in pwd)
-//    securePwd.AppendChar(c);
-//securePwd.MakeReadOnly(); // Marque la chaîne comme étant en lecture seule

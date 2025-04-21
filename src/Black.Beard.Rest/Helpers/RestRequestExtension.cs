@@ -6,25 +6,68 @@ using RestSharp.Authenticators;
 
 namespace Bb.Helpers
 {
-
     /// <summary>
-    /// Extension methods for the <see cref="RestRequest"/> class.
+    /// Provides extension methods for configuring and enhancing <see cref="RestRequest"/> and <see cref="RestClientOptions"/>.
     /// </summary>
     public static class RestRequestExtension
     {
-
+        /// <summary>
+        /// Adds a bearer token to the request headers.
+        /// </summary>
+        /// <param name="self">The <see cref="RestRequest"/> instance to configure. Must not be null.</param>
+        /// <param name="token">The <see cref="TokenResponse"/> containing the access token. Must not be null.</param>
+        /// <returns>The configured <see cref="RestRequest"/> instance.</returns>
+        /// <remarks>
+        /// This method adds an "Authorization" header with the bearer token to the request.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var request = new RestRequest("api/resource", Method.GET);
+        /// request.WithBearer(new TokenResponse { AccessToken = "your-token" });
+        /// </code>
+        /// </example>
         public static RestRequest WithBearer(this RestRequest self, TokenResponse token)
         {
             self.AddHeader("Authorization", $"Bearer {token.AccessToken}");
             return self;
         }
 
+        /// <summary>
+        /// Adds a "Content-Type" header to the request.
+        /// </summary>
+        /// <param name="self">The <see cref="RestRequest"/> instance to configure. Must not be null.</param>
+        /// <param name="contentType">The <see cref="ContentType"/> to set. Must not be null.</param>
+        /// <returns>The configured <see cref="RestRequest"/> instance.</returns>
+        /// <remarks>
+        /// This method sets the "Content-Type" header for the request.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var request = new RestRequest("api/resource", Method.POST);
+        /// request.WithContentType(ContentType.Json);
+        /// </code>
+        /// </example>
         public static RestRequest WithContentType(this RestRequest self, ContentType contentType)
         {
             self.AddHeader("Content-Type", contentType);
             return self;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="RestRequest"/> with the specified method, path, and optional data format.
+        /// </summary>
+        /// <param name="method">The HTTP method for the request. Must not be null.</param>
+        /// <param name="path">The resource path for the request. Must not be null or empty.</param>
+        /// <param name="format">The optional <see cref="DataFormat"/> for the request. Defaults to JSON if not specified.</param>
+        /// <returns>A new <see cref="RestRequest"/> instance.</returns>
+        /// <remarks>
+        /// This method simplifies the creation of a new REST request with the specified parameters.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var request = Method.GET.NewRequest("api/resource");
+        /// </code>
+        /// </example>
         public static RestRequest NewRequest(this Method method, string path, DataFormat? format = null)
         {
             var request = new RestRequest(path, method) { RequestFormat = format.HasValue ? format.Value : DataFormat.Json };
@@ -51,7 +94,8 @@ namespace Bb.Helpers
         /// </example>
         public static RestClientOptions InterceptRequest(this RestClientOptions self, Action<HttpRequestMessage> interceptor)
         {
-            self.Interceptors.Add(new RequestMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            if (interceptor != null)
+                self.Interceptors.Add(new RequestMessageInterceptor(interceptor));
             return self;
         }
 
@@ -75,7 +119,8 @@ namespace Bb.Helpers
         /// </example>
         public static RestClientOptions InterceptResponse(this RestClientOptions self, Action<HttpResponseMessage> interceptor)
         {
-            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            if (interceptor != null)
+                self.Interceptors.Add(new ResponseMessageInterceptor(interceptor));
             return self;
         }
 
@@ -110,8 +155,7 @@ namespace Bb.Helpers
             };
 
             bag = cookies;
-
-            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor));
 
             return self;
         }
@@ -137,7 +181,5 @@ namespace Bb.Helpers
             self.Authenticator = new HttpBasicAuthenticator(userName, password);
             return self;
         }
-
     }
-
 }

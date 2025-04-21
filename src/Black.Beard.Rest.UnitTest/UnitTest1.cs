@@ -16,6 +16,7 @@ namespace Black.Beard.Rest.UnitTest
     public class UnitTest1
     {
 
+
         [Fact]
         public async Task TestHttpGet()
         {
@@ -31,7 +32,8 @@ namespace Black.Beard.Rest.UnitTest
             {                               
 
                 var result = await $"curl -X GET {url}"
-                    .CallRestAsync();
+                    .AsCurl()
+                    .CallAsync();
                 var m = result.Content.Deserialize<MessageResult>();
 
                 Assert.Equal(m.Message, "Ok");
@@ -56,7 +58,8 @@ namespace Black.Beard.Rest.UnitTest
             {
 
                 var result = await $"curl -X POST {url}"
-                    .CallRestAsync();
+                    .AsCurl()
+                    .CallAsync();
                 var m = result.Content.Deserialize<MessageResult>();
 
                 Assert.Equal(m.Message, "Ok");
@@ -81,10 +84,11 @@ namespace Black.Beard.Rest.UnitTest
             {
 
                 var result = await $"curl -X PUT {url}"
-                    .CallRestAsync();
+                    .AsCurl()
+                    .CallAsync();
                 var m = result.Content.Deserialize<MessageResult>();
 
-                Assert.Equal(m.Message, "Ok");
+                Assert.Equal("Ok", m.Message);
 
             }
 

@@ -10,18 +10,22 @@ namespace Black.Beard.Rest.UnitTest
     internal static class Services
     {
 
-        public static WebService GetWebService(int port, Action<WebService> initializer = null)
+        public static WebService GetWebService(int port, Action<WebService>? initializer = null)
         {
 
             var name = Assembly.GetExecutingAssembly().GetName().Name;
-            // create folder for config, schemas and .nugets
+            // create folder for config, schema and .nugets
             var conf = StaticContainer.Set(new GlobalConfiguration())
                 .SetRoot(name.GetTempPath())
-                .WithRelatedDirectory(GlobalConfiguration.Configuration, "Configs")
-                .WithRelatedDirectory(GlobalConfiguration.Schema, "Schemas")
-                .WithRelatedDirectory(GlobalConfiguration.Nuget, ".nugets")
-                .WithRelatedDirectory(GlobalConfiguration.Logs, "logs")
+                .WithRelatedDirectory(GlobalConfiguration.Configuration,    ".configs")
+                .WithRelatedDirectory(GlobalConfiguration.Schema,           ".schemas")
+                .WithRelatedDirectory(GlobalConfiguration.Nuget,            ".nugets")
+                .WithRelatedDirectory(GlobalConfiguration.Logs,             ".logs")
                 ;
+
+            // Environment.CurrentDirectory
+            // Assembly.GetEntryAssembly().GetDirectory().FullName
+            // Assembly.GetExecutingAssembly().GetDirectory().FullName
 
             conf.AppendDocument(GlobalConfiguration.Configuration,
                 new StartupConfiguration()
@@ -29,16 +33,12 @@ namespace Black.Beard.Rest.UnitTest
                     Packages = ["Black.Beard.ComponentModel"],
                 });
 
-            InitializerExtension.LoadAssemblies(null);
+            InitializerExtension.LoadAssemblies();
 
             var web = new WebService()
                             .WithHTTP(port)
-                            .UseStartup<Startup>(c =>
-                            {
-                                //c.UseCertificate = "";
-                                //c.UseSourceCertificate =  Bb.Loaders.SourceCertificate.File;
-                                //c.UsePasswordCertificate = "password";
-                            });
+                            .UseStartup<Startup>();
+
             web.Build();
 
             initializer?.Invoke(web);

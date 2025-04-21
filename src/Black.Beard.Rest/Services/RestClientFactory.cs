@@ -16,15 +16,17 @@ namespace Bb.Services
         /// Initializes a new instance of the <see cref="RestClientFactory"/> class.
         /// </summary>
         /// <param name="optionFactory">The <see cref="IOptionClientFactory"/> instance used to create client options. Must not be null.</param>
+        /// <param name="factory">The <see cref="IHttpClientFactory"/> instance used to create client http.</param>
         /// <remarks>
         /// This constructor initializes the factory with the specified option factory for creating <see cref="RestClientOptions"/>.
         /// </remarks>
         /// <exception cref="NullReferenceException">
         /// Thrown if <paramref name="optionFactory"/> is null.
         /// </exception>
-        public RestClientFactory(IOptionClientFactory optionFactory)
+        public RestClientFactory(IOptionClientFactory? optionFactory, IHttpClientFactory? factory)
         {
-            _optionFactory = optionFactory ?? throw new NullReferenceException(nameof(optionFactory));
+            _optionFactory = optionFactory ?? GlobalSettings.OptionFactory ?? throw new ArgumentNullException("optionFactory");
+            _factory = factory;
         }
 
         /// <summary>
@@ -45,9 +47,7 @@ namespace Bb.Services
         public RestClient Create(Uri baseUrl)
         {
             var url = new Url(baseUrl).Root;
-
-            if (!_clients.TryGetValue(url, out var client))
-                _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
+            RestClient client = CreateImpl(url);
             return client;
         }
 
@@ -69,9 +69,7 @@ namespace Bb.Services
         public RestClient Create(string name)
         {
             var url = new Url(name).Root;
-
-            if (!_clients.TryGetValue(url, out var client))
-                _clients.TryAdd(url, client = new RestClient(_optionFactory.Create(url)));
+            RestClient client = CreateImpl(url);
             return client;
         }
 
@@ -93,21 +91,29 @@ namespace Bb.Services
         public RestClient Create(Url name)
         {
             var url = name.Root;
-            var client = _clients.GetOrAdd(url, c => new RestClient(_optionFactory.Create(url)));
+            RestClient client = CreateImpl(url);
             return client;
         }
 
-        /// <summary>
-        /// A thread-safe dictionary for storing and reusing <see cref="RestClient"/> instances.
-        /// </summary>
-        private readonly ConcurrentDictionary<string, RestClient> _clients
-            = new ConcurrentDictionary<string, RestClient>();
 
-        /// <summary>
-        /// The <see cref="IOptionClientFactory"/> instance used to create client options.
-        /// </summary>
+        private RestClient CreateImpl(string url)
+        {
+
+            RestClient client;
+
+            var options = _optionFactory.Create(url);
+
+            if (_factory == null)
+                client = new RestClient(options, null, null, true);
+            else
+                client = new RestClient(_factory.CreateClient(url), options, true);
+
+            return client; 
+
+        }
+
         private readonly IOptionClientFactory _optionFactory;
-
+        private readonly IHttpClientFactory? _factory;
     }
 
 }

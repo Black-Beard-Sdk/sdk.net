@@ -103,7 +103,7 @@ namespace Bb.Policies
             };
 #endif
             _pathStorages = new Stack<DisposingStorage>();
-            PrivatedIndex.Reset();
+            PrivatesIndex.Reset();
             //_resultReset = new List<MethodCallExpression>();
             _indexMethod = 0;
 

@@ -11,13 +11,13 @@
         /// <summary>
         /// Retrieves a secret value based on the provided names.
         /// </summary>
-        /// <param name="name">An array of strings representing the names or keys to locate the secret. Must not be null or empty.</param>
+        /// <param name="path">An array of strings representing the names or keys to locate the secret. Must not be null or empty.</param>
         /// <returns>The secret value as a <see cref="string"/>.</returns>
         /// <remarks>
         /// This method resolves and retrieves a secret value from a vault or secure storage using the provided names or keys.
         /// </remarks>
         /// <exception cref="ArgumentNullException">
-        /// Thrown if the provided <paramref name="name"/> is null or empty.
+        /// Thrown if the provided <paramref name="path"/> is null or empty.
         /// </exception>
         /// <example>
         /// <code lang="C#">
@@ -26,7 +26,7 @@
         /// Console.WriteLine($"Retrieved secret: {secret}");
         /// </code>
         /// </example>
-        string GetSecret(params string[] name);
+        string? GetSecret(params string[] path);
 
     }
 

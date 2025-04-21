@@ -4,6 +4,10 @@ using System.Text;
 
 namespace Bb.Helpers
 {
+
+    /// <summary>
+    /// Log extensions for HTTP requests and responses.
+    /// </summary>
     public static class LogConfigurationExtension
     {
 
@@ -92,7 +96,7 @@ namespace Bb.Helpers
         /// </example>
         public static LogConfiguration<HttpRequestMessage> LogBody(this LogConfiguration<HttpRequestMessage> self)
         {
-            self.AddRule(async (message, logger, cancellationToken) => await LogBody(message.Content, logger, cancellationToken));
+            self.AddRule(async (message, logger, cancellationToken) => await LogBody(message.Content, "request", logger, cancellationToken));
             return self;
         }
 
@@ -154,7 +158,7 @@ namespace Bb.Helpers
         /// </example>
         public static LogConfiguration<HttpResponseMessage> LogBody(this LogConfiguration<HttpResponseMessage> self)
         {
-            self.AddRule(async (message, logger, cancellationToken) => await LogBody(message.Content, logger, cancellationToken));
+            self.AddRule(async (message, logger, cancellationToken) => await LogBody(message.Content, "response", logger, cancellationToken));
             return self;
         }
 
@@ -164,27 +168,36 @@ namespace Bb.Helpers
             logger.AppendLine("[Headers]");
             if (self != null)
                 foreach (KeyValuePair<string, IEnumerable<string>> header in self)
-                    //if (header.Key != "Autorization" || (!header.Key.Contains("api") && !header.Key.Contains("key")))
                     logger.AppendLine($"{header.Key}: {string.Join(", ", header.Value)}");
 
             await Task.CompletedTask;
 
         }
 
-        static async ValueTask LogBody(this HttpContent self, StringBuilder logger, CancellationToken cancellationToken)
+        static async ValueTask LogBody(this HttpContent? self, string way, StringBuilder logger, CancellationToken cancellationToken)
         {
-            logger.AppendLine("[Content]");
             if (self != null)
+            {
                 try
                 {
                     string content = await self.ReadAsStringAsync(cancellationToken);
+
                     if (!string.IsNullOrEmpty(content))
+                    {
+                        logger.AppendLine($"[Content]");
                         logger.AppendLine(content);
+                    }
+                    else
+                        logger.AppendLine($"[Content] : No body available.");
                 }
                 catch (Exception ex)
                 {
-                    logger.AppendLine(string.Format("Failed to read {way} body: {Message}", ex.Message));
+                    logger.AppendLine(string.Format("Failed to read {way} body: {Message}", way, ex.Message));
                 }
+            }
+            else
+                logger.AppendLine($"[Content] : No body available.");
+
             await Task.CompletedTask;
         }
 

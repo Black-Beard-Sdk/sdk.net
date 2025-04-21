@@ -5,13 +5,19 @@ using System.Xml.Schema;
 
 namespace Bb.Urls
 {
+
+    /// <summary>
+    /// Represents a URL with various components such as scheme, host, port, user info, path segments, query parameters, and fragment.
+    /// </summary>
     public class Url
     {
 
 
         #region ctors
 
-
+        /// <summary>
+        /// Creates a new instance of the Url class.
+        /// </summary>
         public Url()
         {
             this._builder = new UriBuilder()
@@ -27,7 +33,12 @@ namespace Bb.Urls
             };
         }
 
-        public Url(UriBuilder builder, Uri uri = null)
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified UriBuilder and Uri.
+        /// </summary>
+        /// <param name="builder">UriBuilder to use for create url</param>
+        /// <param name="uri">root uri</param>
+        public Url(UriBuilder builder, Uri? uri = null)
         {
             this._builder = builder;
             if (uri == null)
@@ -36,24 +47,46 @@ namespace Bb.Urls
             this.Query = uri.Query;
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified Uri.
+        /// </summary>
+        /// <param name="uri">root uri</param>
         public Url(Uri uri) :
             this(new UriBuilder(uri), uri)
         {
 
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified URL string.
+        /// </summary>
+        /// <param name="url">string uri</param>
         public Url(string url)
           : this(new Uri(url))
         {
 
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified Uri and path segments.
+        /// </summary>
+        /// <param name="uri">root uri</param>
+        /// <param name="paths">path to specify after host</param>
         public Url(Uri uri, string[] paths)
             : this(uri)
         {
             PathSegments = ParsePathSegment(paths);
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified scheme, host, port, user info, and path segments.
+        /// </summary>
+        /// <param name="scheme">Scheme to use. by default the value is http</param>
+        /// <param name="host">host of the server</param>
+        /// <param name="port">server's port</param>
+        /// <param name="userInfo">user info like user:password</param>
+        /// <param name="paths">path to specify after host</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public Url(string scheme, string host, int? port, string? userInfo, params string[] paths)
             : this()
         {
@@ -89,18 +122,34 @@ namespace Bb.Urls
 
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified scheme, host, port, and user info.
+        /// </summary>
+        /// <param name="scheme">Scheme to use. by default the value is http</param>
+        /// <param name="host">host of the server</param>
+        /// <param name="port">server's port</param>
         public Url(string scheme, string host, int? port)
             : this(scheme, host, port, null)
         {
 
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified scheme, host, and port.
+        /// </summary>
+        /// <param name="scheme">Scheme to use. by default the value is http</param>
+        /// <param name="host">host of the server</param>
         public Url(string scheme, string host)
             : this(scheme, host, null)
         {
 
         }
 
+        /// <summary>
+        /// Creates a new instance of the Url class with the specified host and port.
+        /// </summary>        
+        /// <param name="host">host of the server</param>
+        /// <param name="port">server's port</param>
         public Url(string host, int port)
             : this(Url.DEFAULT_SCHEME, host, port, null)
         {
@@ -109,13 +158,24 @@ namespace Bb.Urls
 
         #endregion ctors
 
-
+        /// <summary>
+        /// Default scheme for the URL. Defaults to "http".
+        /// </summary>
         public string Scheme { get => this._builder.Scheme ?? DEFAULT_SCHEME; set => this._builder.Scheme = value; }
 
+        /// <summary>
+        /// Returns the host as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string Host { get => this._builder.Host; set => this._builder.Host = value; }
 
+        /// <summary>
+        /// Returns the port as an integer. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public int Port { get => this._builder.Port; set => this._builder.Port = GetPort(value, Scheme); }
 
+        /// <summary>
+        /// Returns the userName as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string UserName
         {
             get => this._builder.UserName;
@@ -129,6 +189,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the password as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string Password
         {
             get => this._builder.Password;
@@ -142,6 +205,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the fragment as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string Fragment
         {
             get => this._builder.Fragment;
@@ -155,6 +221,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the path as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string Path
         {
             get => CombinePath(this._pathSegments);
@@ -164,6 +233,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the path segments as a collection. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public IEnumerable<Segment> PathSegments
         {
             get => _pathSegments;
@@ -173,6 +245,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the query string as a string. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public string Query
         {
             get => this._query.ToString();
@@ -182,6 +257,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the query parameters as a collection. This is a lazy-loaded property, meaning it will only be initialized when accessed.
+        /// </summary>
         public QueryParamCollection QueryParams
         {
             get
@@ -194,6 +272,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the URL as a string, including the scheme, host, port, path, query parameters, and fragment.
+        /// </summary>
         public string PathAndQuery
         {
             get
@@ -210,6 +291,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the base address of the URL, excluding the path and query string.
+        /// </summary>
         public Uri BaseAddress
         {
             get
@@ -222,6 +306,9 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// i.e. "https://www.site.com:8080" in "https://www.site.com:8080/path" (everything before the path).
+        /// </summary>
         public Uri RootAddress
         {
             get
@@ -251,6 +338,10 @@ namespace Bb.Urls
             }
         }
 
+        /// <summary>
+        /// Returns the URL as a Uri object.
+        /// </summary>
+        /// <returns></returns>
         public Uri ToUri()
         {
             if (_pathSegments != null && _pathSegments.Count > 0)
@@ -284,6 +375,11 @@ namespace Bb.Urls
             return this;
         }
 
+        /// <summary>
+        /// Parses a path segment string into a list of segments.
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         public static List<Segment> ParsePathSegment(params string[] paths)
         {
 
@@ -306,6 +402,11 @@ namespace Bb.Urls
 
         }
 
+        /// <summary>
+        /// Combines multiple path segments into the URL.
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         public static string CombinePath(IEnumerable<Segment> paths)
         {
 
@@ -316,6 +417,11 @@ namespace Bb.Urls
 
         }
 
+        /// <summary>
+        /// Combines multiple path segments into the URL.
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
         public Url CombinePath(params string[] paths)
         {
             if (_pathSegments == null)
@@ -341,7 +447,7 @@ namespace Bb.Urls
         /// <example>
         /// <code lang="C#">
         /// var decoded = Url.Decode("key%3Dvalue%26key2%3Dvalue2", false);
-        /// Console.WriteLine(decoded); // Output: key=value&key2=value2
+        /// Console.WriteLine(decoded); // Output: key=value&amp;key2=value2
         /// </code>
         /// </example>
         public static string Decode(string s, bool interpretPlusAsSpace)
@@ -363,7 +469,7 @@ namespace Bb.Urls
         /// </remarks>
         /// <example>
         /// <code lang="C#">
-        /// var encoded = Url.Encode("key=value&key2=value2");
+        /// var encoded = Url.Encode("key=value&amp;key2=value2");
         /// Console.WriteLine(encoded); // Output: key%3Dvalue%26key2%3Dvalue2
         /// </code>
         /// </example>
@@ -408,13 +514,6 @@ namespace Bb.Urls
             // Uri.EscapeUriString mostly does what we want - encodes illegal characters only - but it has a quirk
             // in that % isn't illegal if it's the start of a %- encoded sequence https://stackoverflow.com/a/47636037/62600
 
-            //return s
-            //    .Replace("/", "%2F", StringComparison.Ordinal)
-            //    .Replace(@"\", "%5C", StringComparison.Ordinal)
-            //    .Replace("?", "%3F", StringComparison.Ordinal)
-            //    .Replace("#", "%23", StringComparison.Ordinal)
-            //    .Replace("@", "%40", StringComparison.Ordinal);
-
             // no % characters, so avoid the regex overhead
             if (!s.OrdinalContains("%"))
             {
@@ -430,14 +529,17 @@ namespace Bb.Urls
                 var a = c.Groups[1].Value; // group 1 is a sequence with no %- encoding - encode illegal characters
                 var b = c.Groups[2].Value; // group 2 is a valid 3-character %- encoded sequence - leave it alone!
                 return Uri.EscapeDataString(a) + b;
-            });
+            }, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+
         }
-
-
-
 
         #region Fragment
 
+        /// <summary>
+        /// Sets the URL fragment fluently.
+        /// </summary>
+        /// <param name="pathSegments"></param>
+        /// <returns></returns>
         public Url WithPathSegment(params string[] pathSegments)
         {
             if (_pathSegments == null)
@@ -446,6 +548,11 @@ namespace Bb.Urls
             return this;
         }
 
+        /// <summary>
+        /// Adds multiple path segments to the URL.
+        /// </summary>
+        /// <param name="pathSegments"></param>
+        /// <returns></returns>
         public Url WithPathSegment(IEnumerable<string> pathSegments)
         {
             if (_pathSegments == null)
@@ -484,7 +591,7 @@ namespace Bb.Urls
         /// <param name="value">Value of query parameter</param>
         /// <param name="nullValueHandling">Indicates how to handle null values. Defaults to Remove (any existing)</param>
         /// <returns>The Url object with the query parameter added</returns>
-        public Url WithQueryParam(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public Url WithQueryParam(string name, object? value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
             QueryParams.AddOrReplace(name, value, nullValueHandling);
             return this;
@@ -531,7 +638,7 @@ namespace Bb.Urls
                 return WithQueryParam(s);
 
             foreach (var kv in values.ToKeyValuePairs())
-                WithQueryParam(kv.Key, kv.Value, nullValueHandling);
+                WithQueryParam(kv.Name, kv.Value, nullValueHandling);
 
             return this;
         }
@@ -610,7 +717,10 @@ namespace Bb.Urls
 
 
 
-
+        /// <summary>
+        /// Returns a string representation of the URL, including the scheme, host, port, path, query parameters, and fragment.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (_pathSegments != null && _pathSegments.Count > 0)
@@ -623,7 +733,10 @@ namespace Bb.Urls
         }
 
 
-
+        /// <summary>
+        /// Creates a new instance of the Url class with the same properties as the current instance.
+        /// </summary>
+        /// <returns></returns>
         public Url Clone()
         {
             return new Url(this.ToString());
@@ -716,12 +829,28 @@ namespace Bb.Urls
 
         #region implicit operators
 
+        /// <summary>
+        /// Implicitly converts a Url object to a Uri object.
+        /// </summary>
+        /// <param name="url">url to convert to uri</param>
         public static implicit operator Uri(Url url) => url.ToUri();
 
+        /// <summary>
+        /// Implicitly converts a Url object to a Uri object.
+        /// </summary>
+        /// <param name="uri">uri to convert to url</param>
         public static implicit operator Url(Uri uri) => new Url(uri.ToString());
 
+        /// <summary>
+        /// Implicitly converts a Url object to a string representation.
+        /// </summary>
+        /// <param name="url">url to convert to string</param>
         public static implicit operator string(Url url) => url.ToString();
 
+        /// <summary>
+        /// Implicitly converts a string to a Url object.
+        /// </summary>
+        /// <param name="url">string to convert to Url</param>
         public static implicit operator Url(string url) => new Url(url);
 
         #endregion
@@ -740,12 +869,28 @@ namespace Bb.Urls
 
         }
 
+        /// <summary>
+        /// Default scheme for HTTP URLs.
+        /// </summary>
         public const string DEFAULT_SCHEME = "http";
-        public const string DEFAULT_SECURED_SCHEME = "https";
-        public const string DEFAULT_HOST = "localhost";
-        public const int DEFAULT_PORT = 80;
-        internal const int StackallocThreshold = 512;
 
+        /// <summary>
+        /// Default secured scheme for HTTP URLs.
+        /// </summary>
+        public const string DEFAULT_SECURED_SCHEME = "https";
+
+        /// <summary>
+        /// Default host for URLs is localhost.
+        /// </summary>
+        public const string DEFAULT_HOST = "localhost";
+
+        /// <summary>
+        /// Default port for HTTP URLs is 80.
+        /// </summary>
+        public const int DEFAULT_PORT = 80;
+
+
+        internal const int StackallocThreshold = 512;
 
         private const int MAX_URL_LENGTH = 65519;
         private readonly UriBuilder _builder;

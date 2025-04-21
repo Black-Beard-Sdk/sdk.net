@@ -1,4 +1,5 @@
-﻿using Bb.Urls;
+﻿
+using Bb.Urls;
 using RestSharp;
 
 namespace Bb.Interfaces

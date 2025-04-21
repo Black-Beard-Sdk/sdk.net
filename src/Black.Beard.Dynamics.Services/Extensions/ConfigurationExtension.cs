@@ -3,6 +3,9 @@ using Bb.ComponentModel.Loaders;
 using Bb.ComponentModel;
 using System.Reflection;
 using System.Diagnostics;
+using Bb.ComponentModel.Attributes;
+using Bb.Configurations;
+using Bb.Services;
 
 namespace Bb.Extensions
 {
@@ -13,15 +16,12 @@ namespace Bb.Extensions
     public static class ConfigurationExtension
     {
 
-        static ConfigurationExtension()
-        {
-
-        }
-
         /// <summary>
         /// Load configuration and discover all methods for loading configuration
         /// </summary>
-        /// <param name="builder"><see cref="WebApplicationBuilder"/> </param>
+        /// <param name="builder"><see cref="IConfigurationBuilder"/> </param>
+        /// <param name="filter">filter to validate files</param>
+        /// <param name="pattern">pattern globing</param>
         /// <example>
         /// <code lang="Csharp">
         /// var builder = WebApplication.CreateBuilder(args).LoadConfiguration();
@@ -73,51 +73,30 @@ namespace Bb.Extensions
         /// </code>
         /// </example>
         /// <returns></returns>
-        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, params string[] paths)
+        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, Func<FileInfo, bool>? filter = null, string? pattern = null)
         {
-
-            builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.LoadConfiguration(paths, null, null);                   // Load all files in the paths.
-                config.ConfigureApplication(hostingContext, builder);   // Resolve all injection class for loading configuration
-            });
-
+            builder.Configuration.LoadConfiguration(filter, pattern);
+            builder.Configuration.ConfigureApplication(builder);
             return builder;
-
         }
 
-        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, string[] paths, Func<FileInfo, bool> filter)
+        /// <summary>
+        /// Load configurations file, secret keys, environment variables, ...
+        /// </summary>
+        /// <param name="builder">application builder <see href="IConfigurationBuilder" /></param>
+        /// <param name="filter">filter to validate files</param>
+        /// <param name="pattern">pattern globing</param>
+        /// <returns><see href="IConfigurationBuilder" /></returns>
+        private static IConfigurationBuilder LoadConfiguration(this IConfigurationBuilder builder, Func<FileInfo, bool>? filter, string? pattern = null)
         {
 
-            builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.LoadConfiguration(paths, filter, null);                   // Load all files in the paths.
-                config.ConfigureApplication(hostingContext, builder);   // Resolve all injection class for loading configuration
-            });
+            builder.LoadConfigurationFiles(pattern, filter); // Load all files in the paths.
 
-            return builder;
+            Assembly? assembly = Assembly.GetEntryAssembly();
+            if (assembly != null)
+                builder.AddUserSecrets(assembly);
 
-        }
-
-        public static WebApplicationBuilder LoadConfiguration(this WebApplicationBuilder builder, string[] paths, Func<FileInfo, bool> filter, string pattern)
-        {
-
-            builder.WebHost.ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.LoadConfiguration(paths, filter, pattern);                   // Load all files in the paths.
-                config.ConfigureApplication(hostingContext, builder);   // Resolve all injection class for loading configuration
-            });
-
-            return builder;
-
-        }
-
-        public static IConfigurationBuilder LoadConfiguration(this IConfigurationBuilder builder, string[] paths, Func<FileInfo, bool> filter, string pattern)
-        {
-
-            builder.LoadConfigurationFile(paths, pattern, filter)   // Load all files in the paths.
-                  .AddUserSecrets(Assembly.GetEntryAssembly())
-                  .AddEnvironmentVariables()
+            builder.AddEnvironmentVariables()
                   .AddCommandLine(Environment.GetCommandLineArgs())
                   ;
 
@@ -127,19 +106,19 @@ namespace Bb.Extensions
 
         #region Load configuration from files
 
-        private static IConfigurationBuilder LoadConfigurationFile(this IConfigurationBuilder config,
-            string[] paths,
-            string pattern,
-            Func<FileInfo, bool> filter)
+        private static IConfigurationBuilder LoadConfigurationFiles(this IConfigurationBuilder config,
+            string? pattern,
+            Func<FileInfo, bool>? filter)
         {
 
-            var files = new ConfigurationLoader(pattern).AddFolders(paths);
+            ContentFolder contentFolder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Configuration];
+            ConfigurationLoader files = new ConfigurationLoader(pattern).AddFolders(contentFolder.GetPaths());
 
             foreach (var file in files)
             {
 
                 var c = file.Count();
-                FileInfo f = null;
+                FileInfo? f = null;
                 if (c == 1)
                     f = file.FirstOrDefault().FileInfo;
 
@@ -156,7 +135,7 @@ namespace Bb.Extensions
 
                 }
 
-                if (f != null)
+                if (f != null && (filter == null || filter(f)))
                     Load(config, f);
 
             }
@@ -202,11 +181,12 @@ namespace Bb.Extensions
         #endregion Load configuration from files
 
 
-        private static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebHostBuilderContext hostingContext, WebApplicationBuilder builder)
+        private static IConfigurationBuilder ConfigureApplication(this IConfigurationBuilder config, WebApplicationBuilder builder)
         {
 
             var s = new LocalServiceProvider(builder.Services.BuildServiceProvider())
-                .Add(typeof(WebHostBuilderContext), hostingContext);
+                //.Add(typeof(WebHostBuilderContext), hostingContext)
+                ;
 
             // search in all loaded assemblies the class with the attribute ExposeClassAttribute and exposing IInjectBuilder<IConfigurationBuilder>
             config.AutoConfigure(s, ConstantsCore.Initialization);

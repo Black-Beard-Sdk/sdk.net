@@ -1,4 +1,5 @@
 ﻿using Bb.ComponentModel.Loaders;
+using static Refs.Microsoft.Extensions;
 
 namespace Bb.Extensions
 {
@@ -21,18 +22,14 @@ namespace Bb.Extensions
         /// <code lang="C#">
         /// var builder = WebApplication.CreateBuilder(args);
         /// builder.ConfigureTrace();
-        /// var app = builder.Build();
-        /// app.Run();
+        /// var application = builder.Build();
+        /// application.Run();
         /// </code>
         /// </example>
         public static WebApplicationBuilder ConfigureTrace(this WebApplicationBuilder builder)
         {
-            builder.WebHost.ConfigureLogging(logging =>
-            {
-                var services = builder.Services.BuildServiceProvider();
-                var i = logging.AutoConfigure(services);
-            });
-
+            var services = builder.Services.BuildServiceProvider();
+            var i = builder.Logging.AutoConfigure(services);
             return builder;
         }
     }

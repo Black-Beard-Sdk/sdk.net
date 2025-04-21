@@ -1,4 +1,6 @@
-﻿using Bb.Interceptors;
+﻿// Ignore Spelling: Auth Jwt
+
+using Bb.Interceptors;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -38,7 +40,7 @@ namespace Bb.Helpers
         /// </example>
         public static RestClientOptions InterceptRequest(this RestClientOptions self, Action<HttpRequestMessage> interceptor)
         {
-            self.Interceptors.Add(new RequestMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            self.Interceptors.Add(new RequestMessageInterceptor(interceptor ?? throw new ArgumentNullException(nameof(interceptor))));
             return self;
         }
 
@@ -62,7 +64,7 @@ namespace Bb.Helpers
         /// </example>
         public static RestClientOptions InterceptResponse(this RestClientOptions self, Action<HttpResponseMessage> interceptor)
         {
-            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new ArgumentNullException(nameof(interceptor))));
             return self;
         }
 
@@ -98,7 +100,7 @@ namespace Bb.Helpers
 
             bag = cookies;
 
-            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new NullReferenceException(nameof(interceptor))));
+            self.Interceptors.Add(new ResponseMessageInterceptor(interceptor ?? throw new InvalidOperationException(nameof(interceptor))));
 
             return self;
         }
@@ -112,7 +114,7 @@ namespace Bb.Helpers
         /// Configures the <see cref="RestClientOptions"/> to use basic HTTP authentication.
         /// </summary>
         /// <param name="self">The <see cref="RestClientOptions"/> instance to configure. Must not be null.</param>
-        /// <param name="username">The username for authentication. Must not be null or empty.</param>
+        /// <param name="userName">The userName for authentication. Must not be null or empty.</param>
         /// <param name="password">The password for authentication. Must not be null or empty.</param>
         /// <returns>The configured <see cref="RestClientOptions"/> instance.</returns>
         /// <remarks>
@@ -121,27 +123,46 @@ namespace Bb.Helpers
         /// <example>
         /// <code lang="C#">
         /// var options = new RestClientOptions();
-        /// options.WithBasicHttp("username", "password");
+        /// options.WithBasicHttp("userName", "password");
         /// </code>
         /// </example>
-        public static RestClientOptions WithBasicHttp(this RestClientOptions self, string username, string password)
+        public static RestClientOptions WithBasicHttp(this RestClientOptions self, string userName, string password)
         {
-            self.Authenticator = new HttpBasicAuthenticator(username, password);
+            self.Authenticator = new HttpBasicAuthenticator(userName, password);
             return self;
         }
 
+        /// <summary>
+        /// Use jwt token
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
         public static RestClientOptions WithJwt(this RestClientOptions self, string accessToken)
         {
             self.Authenticator = new JwtAuthenticator(accessToken);
             return self;
         }
 
+        /// <summary>
+        /// Use authentication Oauth1
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="consumerKey"></param>
+        /// <param name="consumerSecret"></param>
+        /// <returns></returns>
         public static RestClientOptions WithAuth1(this RestClientOptions self, string consumerKey, string consumerSecret)
         {
             self.Authenticator = OAuth1Authenticator.ForRequestToken(consumerKey, consumerSecret);
             return self;
         }
 
+        /// <summary>
+        /// Use authentication Oauth2
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="accessToken">access token to use </param>
+        /// <returns></returns>
         public static RestClientOptions WithOAuth2(this RestClientOptions self, string accessToken)
         {
             var authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(accessToken, "Bearer");
@@ -154,7 +175,13 @@ namespace Bb.Helpers
 
         #region logs
 
-        public static RestClientOptions WithLog(this RestClientOptions self, ILogger logger = null)
+        /// <summary>
+        /// Adds logging capabilities to the <see cref="RestClientOptions"/> instance.
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="logger">logger to use</param>
+        /// <returns></returns>
+        public static RestClientOptions WithLog(this RestClientOptions self, ILogger? logger = null)
         {
 
             var request = new LogConfiguration<HttpRequestMessage>()
@@ -168,9 +195,16 @@ namespace Bb.Helpers
             return self;
         }
 
+        /// <summary>
+        /// Adds logging capabilities to the <see cref="RestClientOptions"/> instance.
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="requestAction">Request action</param>
+        /// <param name="logger">logger to use</param>
+        /// <returns></returns>
         public static RestClientOptions WithLog(this RestClientOptions self,
             Action<LogConfiguration<HttpRequestMessage>> requestAction,
-            ILogger logger = null)
+            ILogger? logger = null)
         {
             var request = new LogConfiguration<HttpRequestMessage>();
             requestAction?.Invoke(request);
@@ -179,10 +213,18 @@ namespace Bb.Helpers
             return self;
         }
 
+        /// <summary>
+        /// Adds logging capabilities to the <see cref="RestClientOptions"/> instance.
+        /// </summary>
+        /// <param name="self"><see cref="RestClientOptions"/></param>
+        /// <param name="requestAction">Request action</param>
+        /// <param name="responseAction"></param>
+        /// <param name="logger">logger to use</param>
+        /// <returns></returns>
         public static RestClientOptions WithLog(this RestClientOptions self,
             Action<LogConfiguration<HttpRequestMessage>> requestAction,
             Action<LogConfiguration<HttpResponseMessage>> responseAction,
-            ILogger logger = null)
+            ILogger? logger = null)
         {
 
             var request = new LogConfiguration<HttpRequestMessage>();

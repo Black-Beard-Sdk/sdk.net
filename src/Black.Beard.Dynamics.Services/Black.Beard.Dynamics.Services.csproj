@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Loaders\ConfigureWebApplicationBuilder.cs" />
     <Compile Remove="Services\IConnector.cs" />
     <Compile Remove="Services\NLogInitializer.cs" />
   </ItemGroup>
@@ -19,11 +20,11 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Black.Beard.Analysis" Version="1.0.137" />
+    <PackageReference Include="Black.Beard.Analysis" Version="1.0.140" />
 
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.187" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.187" />
-    <PackageReference Include="Black.Beard.Globalization" Version="1.0.187" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.196" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.196" />
+    <PackageReference Include="Black.Beard.Globalization" Version="1.0.196" />
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders" Version="2.0.59" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />
@@ -32,9 +33,9 @@
     
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
 
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
     
     <PackageReference Include="NLog" Version="5.4.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />

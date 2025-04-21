@@ -13,7 +13,7 @@ namespace Bb.Loaders
     /// <summary>
     /// Initializes NLog for a web application builder.
     /// </summary>
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScope.Transiant)]
     public class WebApplicationBuilderInitializerNLog : InjectBuilder<WebApplicationBuilder>
     {
 
@@ -44,11 +44,11 @@ namespace Bb.Loaders
             if (paths.Length > 0)
                 file = GetFile(paths);
 
+            // resolve and ensure the configuration file exits
             file ??= CreateDefaultFile(ref paths);
-
             Loggers.InitializeLogger(file);
 
-            if (!HasListener())
+            if (!HasListener()) // all traces System.Diagnostics are redirect on NLog
                 Trace.Listeners.Add(new NLogTraceListener());
 
             var options = new NLogAspNetCoreOptions()

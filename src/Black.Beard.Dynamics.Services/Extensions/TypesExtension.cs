@@ -1,7 +1,9 @@
-﻿using Bb.ComponentModel;
+﻿// Ignore Spelling: Ioc
+
+using Bb.ComponentModel;
 using Bb.ComponentModel.Factories;
 using Bb.ComponentModel.Loaders;
-using Bb.Loaders.SiteExtensions;
+using Bb.Loaders.Extensions;
 
 namespace Bb.Extensions
 {

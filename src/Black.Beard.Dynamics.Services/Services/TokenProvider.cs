@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿// Ignore Spelling: api
+using Microsoft.Extensions.Caching.Memory;
 using System.Runtime.CompilerServices;
 using System.Collections.Concurrent;
 using Microsoft.IdentityModel.Tokens;
@@ -42,7 +43,7 @@ namespace Bb.Services
         /// }
         /// </code>
         /// </example>
-        public static IPrincipal ValidateToken(string token, string secretKey, string validIssuer, string validAudience)
+        public static IPrincipal? ValidateToken(string token, string secretKey, string validIssuer, string validAudience)
         {
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -59,17 +60,11 @@ namespace Bb.Services
                 IssuerSigningKey = new SymmetricSecurityKey(key)
             };
 
-            try
-            {
-                SecurityToken validatedToken;
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-                return principal;
-            }
-            catch (Exception)
-            {
-                // Gestion des exceptions de validation du jeton
-                return null;
-            }
+            SecurityToken validatedToken;
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+
+            return principal;
+
         }
 
         /// <summary>
@@ -102,52 +97,51 @@ namespace Bb.Services
         /// var token = await tokenProvider.GetTokenAsync("myApiKey");
         /// </code>
         /// </example>
-        public async Task<string> GetTokenAsync(string apiKey)
+        public async Task<string?> GetTokenAsync(string? apiKey)
         {
 
-            if (_cache.TryGetValue(apiKey, out string token))   // Check cache first.
+            if (apiKey == null)
+                return null;
+
+            if (_cache.TryGetValue(apiKey, out string? token))   // Check cache first.
+                return token;
+
+            // Get a lock for the apikey
+            var lockObj = _lockObjects.GetOrAdd(apiKey, _ => new SemaphoreSlim(1, 1));
+
+            try
             {
 
-                // Get a lock for the apikey
-                var lockObj = _lockObjects.GetOrAdd(apiKey, _ => new SemaphoreSlim(1, 1));
+                await lockObj.WaitAsync();
 
-                try
-                {
-
-                    await lockObj.WaitAsync();
-
-                    if (_cache.TryGetValue(apiKey, out token))
-                        return token;
-
-                    token = await Fetch(apiKey);
-
+                if (_cache.TryGetValue(apiKey, out token))
                     return token;
 
-                }
-                finally
-                {
+                token = await Fetch(apiKey);
 
-                    lockObj.Release();
-                    _ = Task.Run(() =>
-                    {
-                        try
-                        {
-                            if (_lockObjects.TryRemove(apiKey, out var semaphore))
-                                semaphore.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"Failed to cleanup: {ex.Message}");
-                        }
-                    });
-
-
-                }
-
+            }
+            finally
+            {
+                lockObj.Release();
+                _ = Task.Run(() => Unlock(apiKey));
             }
 
             return token;
 
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void Unlock(string apiKey)
+        {
+            try
+            {
+                if (_lockObjects.TryRemove(apiKey, out var semaphore))
+                    semaphore.Dispose();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to cleanup: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -182,8 +176,6 @@ namespace Bb.Services
         private readonly IMemoryCache _cache;
         private readonly TokenResolver _resolver;
         private readonly ConcurrentDictionary<string, SemaphoreSlim> _lockObjects;
-        private HashSet<string> strings = new HashSet<string>();
-        private volatile object _lock = new object();
 
     }
 

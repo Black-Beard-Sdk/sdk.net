@@ -1,4 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿// Ignore Spelling: Api
+
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Bb.Services
@@ -44,7 +46,7 @@ namespace Bb.Services
         /// <param name="apiKey">The raw data to use as seed for generating identifiers. Must not be null or empty.</param>
         /// <param name="salt">third part for concatenate to rawData before generate login and password</param>
         /// <param name="loginLength">after hash is computed select only length character for login</param>
-        /// <param name="pwdLength">after hash is computed select only length character for password</param>
+        /// <param name="passwordLength">after hash is computed select only length character for password</param>
         /// <returns>A tuple containing the generated login and password.</returns>
         /// <remarks>
         /// This method first generates a login by hashing the raw data using SHA256.
@@ -62,10 +64,10 @@ namespace Bb.Services
         /// Console.WriteLine($"Generated password: {{cnx[2]}");
         /// </code>
         /// </example>
-        public static string[] GenerateIdentifiers(this string apiKey, int loginLength = 25, int pwdLength = 35, string? salt = null)
+        public static string[] GenerateIdentifiers(this string apiKey, int loginLength = 25, int passwordLength = 35, string? salt = null)
         {
             var login = ResolveLogin(apiKey, loginLength, salt);
-            return [apiKey, login, GeneratePassword(login, pwdLength, apiKey)];
+            return [apiKey, login, GeneratePassword(login, passwordLength, apiKey)];
         }
 
         /// <summary>

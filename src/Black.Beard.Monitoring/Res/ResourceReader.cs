@@ -4,9 +4,9 @@
 namespace Bb.Res
 {
 
-    public static class ResourceReader
-    {
 
+    internal static class ResourceReader
+    {
 
         public static string ReadEmbeddedResource(this string resourceName)
         {

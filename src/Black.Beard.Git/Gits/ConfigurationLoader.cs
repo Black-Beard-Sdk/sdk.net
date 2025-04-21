@@ -1,14 +1,14 @@
-﻿using LibGit2Sharp;
-using Bb;
+﻿// Ignore Spelling: Gits
+
+using LibGit2Sharp;
 using System;
 using LibGit2Sharp.Handlers;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
 
 
-namespace Bb.Configuration.Git
+namespace Bb.Gits
 {
 
 
@@ -58,28 +58,24 @@ namespace Bb.Configuration.Git
         /// Console.WriteLine($"Local branch: {branchName}");
         /// </code>
         /// </example>
-        public string GetLocalBranchName(string localFolder)
+        public string? GetLocalBranchName(string localFolder)
         {
 
-            using (var repo = new Repository(localFolder))
+            using var repo = new Repository(localFolder);
+
+            // var l = repo.Commits.Last();
+            var b = repo.Branches.FirstOrDefault(c => (!c.IsRemote && c.IsTracking));
+
+            if (b != null)
             {
+                var t1 = "origin/";
+                var t = b.TrackedBranch.FriendlyName;
 
-                var l = repo.Commits.Last();
+                if (t.StartsWith(t1))
+                    t = t[t1.Length..];
 
-                var b = repo.Branches
-                    .Where(c => (!c.IsRemote && c.IsTracking))
-                    .FirstOrDefault();
-                if (b != null)
-                {
-                    var t1 = "origin/";
-                    var t = b.TrackedBranch.FriendlyName;
+                return t;
 
-                    if (t.StartsWith(t1))
-                        t = t.Substring(t1.Length);
-
-                    return t;
-
-                }
             }
 
             return null;
@@ -105,30 +101,29 @@ namespace Bb.Configuration.Git
         /// loader.GetStatus(@"C:\MyRepo");
         /// </code>
         /// </example>
-        public void GetStatus(string localFolder)
+        public static void GetStatus(string localFolder)
         {
 
-            using (var repo = new Repository(localFolder))
+            using var repo = new Repository(localFolder);
+
+            foreach (Commit c in repo.Commits.Take(1))
             {
 
-                foreach (Commit c in repo.Commits.Take(1))
+                Console.WriteLine(string.Format("commit {0}", c.Id));
+
+                if (c.Parents.Count() > 1)
                 {
-
-                    Console.WriteLine(string.Format("commit {0}", c.Id));
-
-                    if (c.Parents.Count() > 1)
-                    {
-                        Console.WriteLine("Merge: {0}",
-                            string.Join(" ", c.Parents.Select(p => p.Id.Sha.Substring(0, 7)).ToArray()));
-                    }
-
-                    Console.WriteLine(string.Format("Author: {0} <{1}>", c.Author.Name, c.Author.Email));
-                    Console.WriteLine("Date:   {0}", c.Author.When.ToString(RFC2822Format, CultureInfo.InvariantCulture));
-                    Console.WriteLine();
-                    Console.WriteLine(c.Message);
-                    Console.WriteLine();
+                    Console.WriteLine("Merge: {0}",
+                        string.Join(" ", [.. c.Parents.Select(p => p.Id.Sha[..7])]));
                 }
+
+                Console.WriteLine(string.Format("Author: {0} <{1}>", c.Author.Name, c.Author.Email));
+                Console.WriteLine("Date:   {0}", c.Author.When.ToString(RFC2822Format, CultureInfo.InvariantCulture));
+                Console.WriteLine();
+                Console.WriteLine(c.Message);
+                Console.WriteLine();
             }
+
         }
 
 
@@ -208,49 +203,17 @@ namespace Bb.Configuration.Git
         }
 
         #region private
-
-        private bool Fetch(string localFolder)
-        {
-            try
-            {
-
-                string logMessage = string.Empty;
-                using (var repo = new Repository(localFolder))
-                {
-                    FetchOptions options = GetFetchOptions();
-                    foreach (Remote remote in repo.Network.Remotes)
-                    {
-                        IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                        Commands.Fetch(repo, remote.Name, refSpecs, options, logMessage);
-                    }
-                }
-
-                if (string.IsNullOrEmpty(logMessage))
-                    Console.WriteLine(logMessage);
-
-                return true;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to pull : {ex.Message}");
-            }
-
-            return false;
-
-        }
+        
 
         private bool Pull(string localFolder)
         {
             try
             {
-                using (var repo = new Repository(localFolder))
-                {
-                    var pullOptions = GetPullOptions();
-                    var identity = new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail);
-                    var signature = new Signature(identity, DateTimeOffset.Now);
-                    Commands.Pull(repo, signature, pullOptions);
-                }
+                using var repo = new Repository(localFolder);
+                var pullOptions = GetPullOptions();
+                var identity = new Identity(GitConfiguration.GitUserName, GitConfiguration.GitEmail);
+                var signature = new Signature(identity, DateTimeOffset.Now);
+                Commands.Pull(repo, signature, pullOptions);
 
                 return true;
 
@@ -281,9 +244,9 @@ namespace Bb.Configuration.Git
 
         }
 
-        private FetchOptions GetFetchOptions(string branch = "main")
+        private FetchOptions GetFetchOptions()
         {
-            FetchOptions options = new FetchOptions()
+            FetchOptions options = new()
             {
                 CredentialsProvider = GetCredential()
             };

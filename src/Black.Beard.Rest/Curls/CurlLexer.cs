@@ -3,7 +3,7 @@
 namespace Bb.Curls
 {
     /// <summary>
-    /// Lexer that tokenize curl command line
+    /// Lexer that tokenize a cURL command line.
     /// </summary>
     public class CurlLexer
     {
@@ -11,7 +11,7 @@ namespace Bb.Curls
         /// <summary>
         /// Initializes a new instance of the <see cref="CurlLexer"/> class.
         /// </summary>
-        /// <param name="args">The arguments.</param>
+        /// <param name="args">The cURL command line arguments to tokenize.</param>
         public CurlLexer(string args)
         {
             _args = args.Trim();
@@ -22,54 +22,68 @@ namespace Bb.Curls
         }
 
         /// <summary>
-        /// return true if the line can read next token
+        /// Advances to the next token in the cURL command line.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><c>true</c> if a token is available; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method reads the next token from the command line, handling quoted strings and escaped characters.
+        /// </remarks>
+        /// <example>
+        /// <code lang="C#">
+        /// var lexer = new CurlLexer("curl -X GET 'https://api.example.com'");
+        /// while (lexer.Next())
+        /// {
+        ///     Console.WriteLine(lexer.Current);
+        /// }
+        /// </code>
+        /// </example>
         public bool Next()
         {
-
             _sb.Clear();
             if (_index >= _max) return false;
 
-            while (_index < _max && !char.IsWhiteSpace(_current = _args[_index++]))
+            while (_index < _max)
             {
+                _current = _args[_index++];
+                if (!char.IsWhiteSpace(_current))
+                {
+                    if (_current == '\'')
+                        ParseTextChain('\'');
 
-                if (_current == '\'')
-                    ParseTextChain('\'');
+                    else if (_current == '"')
+                        ParseTextChain('"');
 
-                else if (_current == '"')
-                    ParseTextChain('"');
+                    else
+                        _sb.Append(_current);
 
+                    _old = _current;
+                }
                 else
-                    _sb.Append(_current);
-
-                _old = _current;
-
+                    break;
             }
 
-            if (_sb.ToString() == "\\")
+
+            if (_sb.ToString() == "\\" && _index <= _max)
             {
-
-                if (_index <= _max)
-                {
-
-                    _current = _args[_index++];
-                    if (_current == '\n')
-                        _sb.Clear();
-
-                }
-
+                _current = _args[_index++];
+                if (_current == '\n')
+                    _sb.Clear();
             }
 
             return true;
-
         }
 
+        /// <summary>
+        /// Parses a quoted text chain from the command line.
+        /// </summary>
+        /// <param name="charset">The character used to delimit the quoted text (e.g., single or double quotes).</param>
+        /// <remarks>
+        /// This method handles escaped characters within the quoted text.
+        /// </remarks>
         private void ParseTextChain(char charset)
         {
             while (_index <= _max)
             {
-
                 _current = _args[_index++];
 
                 if (_current == charset)
@@ -81,35 +95,33 @@ namespace Bb.Curls
                     }
                     else
                         return;
-
                 }
                 else
                     _sb.Append(_current);
 
                 _old = _current;
-
             }
         }
 
         /// <summary>
-        /// Gets the current token
+        /// Gets the current token from the command line.
         /// </summary>
-        /// <value>
-        /// The current.
-        /// </value>
+        /// <value>The current token as a string.</value>
         public string Current => _sb.ToString();
 
+        /// <summary>
+        /// Gets the current position in the command line being tokenized.
+        /// </summary>
+        /// <value>The current position as an integer.</value>
         public int CurrentPosition => _index;
 
-        private readonly string _args;
         private int _index;
-        private readonly int _max;
-        private readonly StringBuilder _sb;
-
         private char _current;
         private char _old;
 
+        private readonly string _args;
+        private readonly int _max;
+        private readonly StringBuilder _sb;
+        
     }
-
-
 }

@@ -1,14 +1,45 @@
-﻿using RestSharp;
+﻿// Ignore Spelling: Utf Charset Applicationx Urlencoded Util
+
+using RestSharp;
 
 namespace Bb.Util
 {
-
-
-    public class ContentTypes
+    /// <summary>
+    /// Provides predefined content types for use in HTTP requests.
+    /// </summary>
+    /// <remarks>
+    /// This class contains commonly used content types such as JSON and URL-encoded forms. 
+    /// These constants can be used to set the "Content-Type" header in HTTP requests.
+    /// </remarks>
+    public static class ContentTypes
     {
+        /// <summary>
+        /// Represents the content type for URL-encoded forms.
+        /// </summary>
+        /// <value>
+        /// A <see cref="ContentType"/> with the value "application/x-www-form-urlencoded".
+        /// </value>
+        /// <example>
+        /// <code lang="C#">
+        /// var request = new RestRequest("api/resource", Method.POST);
+        /// request.AddHeader("Content-Type", ContentTypes.ApplicationxWwwFormUrlencoded);
+        /// </code>
+        /// </example>
+        public static ContentType ApplicationxWwwFormUrlencoded { get; } = "application/x-www-form-urlencoded";
 
-        public static ContentType ApplicationxWwwFormUrlencoded = "application/x-www-form-urlencoded";
-        public static ContentType ApplicationJson = "application/json";
+        /// <summary>
+        /// Represents the content type for JSON data.
+        /// </summary>
+        /// <value>
+        /// A <see cref="ContentType"/> with the value "application/json".
+        /// </value>
+        /// <example>
+        /// <code lang="C#">
+        /// var request = new RestRequest("api/resource", Method.POST);
+        /// request.AddHeader("Content-Type", ContentTypes.ApplicationJson);
+        /// </code>
+        /// </example>
+        public static ContentType ApplicationJson { get; } = "application/json";
 
         //// https://www.iana.org/assignments/media-types/media-types.xhtml        
         //public static ContentType _3gpdash_qoe_report_xml = "application/3gpdash-qoe-report+xml";
@@ -1588,9 +1619,9 @@ namespace Bb.Util
 
         //}
 
-
-        public const string CharsetUtf8 = "; charset=UTF-8";
-
+        /// <summary>
+        /// Contains common content types used in HTTP headers.
+        /// </summary>
+        public static string CharsetUtf8 { get; } = "; charset=UTF-8";
     }
-
 }

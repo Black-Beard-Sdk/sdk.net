@@ -1,0 +1,19 @@
+{
+    "prompts": [
+         {
+            "id": "optimize_code",
+            "description": "Optimize the provided code for performance and readability.",
+            "template": "Analyze the provided code and suggest optimizations for performance and readability. Ensure no functionality is lost. ..."
+        },
+        {
+            "id": "documentation",
+            "description": "Generate documentation for C# code following specific rules.",
+            "template": "In the referenced document, generate documentation in English for C# code following these rules:\n\nFor each object (class, interface, etc.):\n\nDocument the object header by analyzing its methods and properties.\n\nFor methods and properties only if no documentation is already present, apply the following:\n\nDo not modify the method implementation, only add XML documentation.\n\nInclude a concise description of the method’s behavior in a <remarks> block.\n\nSpecify constraints and details for each parameter in <param> tags.\n\nList all possible exceptions that can be thrown in <exception> tags.\n\nIf the method is public, include a properly formatted example inside an <example> tag using <code lang=\"C#\">. Ensure code formatting is correct, and replace < characters in generics with &gt;.\n\nIf the method returns a value (i.e., not void), describe the return value in a <returns> tag and include a <see> reference if applicable.\n\nFor each property, add documentation describing its usage and reference where it is used in the project."
+        },
+        {
+            "id": "generate_readme",
+            "description": "Synthesize methods and generate a professional README.md for the project.",
+            "template": "Traverse all files in the {project}, extract all methods, and create a synthesis of all functions. For each method, write a concise summary in English followed by a clear code example.\n\nGenerate a concise and professional README.md file for the project {project}. The markdown should include:\n\n- A main title with a NuGet logo/badge.\n- A short introduction (2-3 sentences) explaining the general purpose of the package.\n- A list of 4-5 key points describing the main benefits.\n- Installation instructions (Package Manager, .NET CLI, Package Reference).\n- Prerequisites (supported .NET versions).\n- A structured organization of the main features with sections.\n- A section on multi-platform compatibility.\n- A note on the license.\n\nThe markdown must use professional formatting with:\n\n- Hierarchical headings (#, ##, ###, etc.).\n- Bullet points for lists.\n- Syntax-highlighted C# code blocks for examples.\n- **Bold**, *italic*, and ***bold and italic*** text for emphasis.\n- ~~Strikethrough~~ and `inline code` where appropriate.\n\nInclude links formatted as:\n  - [Link text](https://www.example.com)\n  - [Link with title](https://www.example.com \"Link title\")\n  - <https://www.example.com> (Direct URL).\n\nInclude images formatted as:\n  - ![Alt text](image-url.jpg)\n  - ![Alt text](image-url.jpg \"Optional title\").\n\nEnsure the README.md is professional, well-structured, and includes clear examples in ```csharp blocks to illustrate the most important features."
+        }
+    ]
+}

@@ -1,5 +1,9 @@
 ﻿namespace Bb.Interceptors
 {
+
+    /// <summary>
+    /// Represents an interceptor that allows you to execute custom logic before sending an HTTP request.
+    /// </summary>
     public class RequestMessageInterceptor : RestSharp.Interceptors.Interceptor
     {
 

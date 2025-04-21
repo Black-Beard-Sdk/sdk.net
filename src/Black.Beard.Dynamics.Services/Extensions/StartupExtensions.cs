@@ -27,7 +27,7 @@ namespace Bb.Extensions
         /// </example>
         public static bool TestExist<T>(this IServiceCollection self)
         {
-            return self.Where(c => c.ServiceType == typeof(T)).Any();
+            return self.Any(c => c.ServiceType == typeof(T));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Bb.Extensions
         /// Configures the web application using a specified startup class.
         /// </summary>
         /// <typeparam name="TStartup">The type of the startup class.</typeparam>
-        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <param name="application">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
         /// <param name="startup">The instance of the startup class. Must not be null.</param>
         /// <param name="serviceProvider">The local service provider to resolve dependencies. Must not be null.</param>
         /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
@@ -75,21 +75,21 @@ namespace Bb.Extensions
         /// <example>
         /// <code lang="C#">
         /// var builder = WebApplication.CreateBuilder(args);
-        /// var app = builder.Build();
+        /// var application = builder.Build();
         /// var startup = new MyStartup();
-        /// app.UseStartupConfigure(startup, new LocalServiceProvider());
-        /// app.Run();
+        /// application.UseStartupConfigure(startup, new LocalServiceProvider());
+        /// application.Run();
         /// </code>
         /// </example>
-        public static WebApplication UseStartupConfigure<TStartup>(this WebApplication app, TStartup startup, LocalServiceProvider serviceProvider)
+        public static WebApplication UseStartupConfigure<TStartup>(this WebApplication application, TStartup startup, LocalServiceProvider serviceProvider)
         {
             var configureMethod = typeof(TStartup).GetMethod("Configure");
             if (configureMethod != null)
             {
                 var args = ResolveParameters(serviceProvider, configureMethod);
-                configureMethod.Invoke(startup, new object[] { app, app.Environment });
+                configureMethod.Invoke(startup, new object[] { application, application.Environment });
             }
-            return app;
+            return application;
         }
 
         /// <summary>
@@ -104,10 +104,10 @@ namespace Bb.Extensions
         /// <exception cref="InvalidOperationException">
         /// Thrown if a required service cannot be resolved.
         /// </exception>
-        private static object[] ResolveParameters(LocalServiceProvider serviceProvider, System.Reflection.MethodInfo configureServicesMethod)
+        private static object?[] ResolveParameters(LocalServiceProvider serviceProvider, System.Reflection.MethodInfo configureServicesMethod)
         {
             var parameters = configureServicesMethod.GetParameters();
-            List<object> args = new List<object>(parameters.Length);
+            List<object?> args = new List<object?>(parameters.Length);
             foreach (var item in parameters)
             {
                 object? srv = serviceProvider.GetService(item.ParameterType);

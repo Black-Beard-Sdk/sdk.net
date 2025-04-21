@@ -5,7 +5,7 @@
     /// Provides extension methods for fluently configuring and modifying <see cref="Url"/> objects.
     /// </summary>
     /// <remarks>
-    /// The <see cref="Url2Extension"/> class contains helper methods for setting various components of a <see cref="Url"/> object, such as user information, host, port, and scheme. These methods enable a fluent API for constructing and modifying URLs.
+    /// The <see cref="UrlExtension"/> class contains helper methods for setting various components of a <see cref="Url"/> object, such as user information, host, port, and scheme. These methods enable a fluent API for constructing and modifying URLs.
     /// </remarks>
     /// <example>
     /// <code lang="C#">
@@ -112,11 +112,11 @@
         /// </remarks>
         /// <example>
         /// <code lang="C#">
-        /// var url = new Url("http://example.com").WithHttps();
+        /// var url = new Url("http://example.com").WithHTTPS();
         /// Console.WriteLine(url.ToString()); // Output: https://example.com
         /// </code>
         /// </example>
-        public static Url WithHttps(this Url self)
+        public static Url WithHTTPS(this Url self)
         {
             self.Scheme = "https";
             return self;

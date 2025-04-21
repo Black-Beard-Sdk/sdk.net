@@ -46,7 +46,7 @@ namespace Bb.Diagnostics
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetMeterName(Type type)
+        public static string? GetMeterName(Type type)
         {
             var n = type.GetField("Name");
             var constantName = n.GetValue(null);

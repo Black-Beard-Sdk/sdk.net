@@ -21,7 +21,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.187" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.196" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.14" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.7.0" />
     <PackageReference Include="VaultSharp" Version="1.17.5.1" />

@@ -59,8 +59,11 @@ namespace Bb.Services
             Prepare(c =>
             {
                 var i = Resolve<T>();
-                action?.Invoke(i);
-                c.UseStartup(i, _services);
+                if (i != null)
+                {
+                    action?.Invoke(i);
+                    c.UseStartup(i, _services);
+                }
             });
 
             Configure(c =>
@@ -85,7 +88,7 @@ namespace Bb.Services
         /// var instance = webService.Resolve&lt;MyService&gt;();
         /// </code>
         /// </example>
-        protected T Resolve<T>()
+        protected T? Resolve<T>()
                where T : class
         {
             if (_dicStartup.TryGetValue(typeof(T), out object? value))
@@ -570,7 +573,7 @@ namespace Bb.Services
 
                 if (disposing)
                 {
-                    
+
                     if (_currentTask != null)
                     {
                         var t = _app.StopAsync();
@@ -596,8 +599,7 @@ namespace Bb.Services
         /// </remarks>
         public void Dispose()
         {
-            // Ne changez pas ce code. Placez le code de nettoyage dans la méthode 'Dispose(bool disposing)'
-            Dispose(disposing: true);
+            Dispose(disposing: true).ConfigureAwait(true);
             GC.SuppressFinalize(this);
         }
 

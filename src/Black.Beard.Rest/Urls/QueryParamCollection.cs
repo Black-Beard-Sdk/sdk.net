@@ -14,14 +14,14 @@ namespace Bb.Urls
         /// Returns a new instance of QueryParamCollection
         /// </summary>
         /// <param name="query">Optional query string to parse.</param>
-        public QueryParamCollection(string query = null)
+        public QueryParamCollection(string? query = null)
         {
             if (query == null)
                 return;
 
             _values.AddRange(
                 from kv in query.TrimStart('?').ToKeyValuePairs()
-                select (kv.Key, new QueryParamValue(kv.Value)));
+                select (kv.Name, new QueryParamValue(kv.Value)));
 
         }
 
@@ -48,7 +48,7 @@ namespace Bb.Urls
         /// <param name="name">Name of the parameter.</param>
         /// <param name="value">Value of the parameter. If it's a collection, multiple parameters of the same name are added.</param>
         /// <param name="nullValueHandling">Describes how to handle null values.</param>
-        public void Add(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public void Add(string name, object? value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
 
             if (value == null && nullValueHandling == NullValueHandling.Remove)
@@ -59,12 +59,9 @@ namespace Bb.Urls
 
             foreach (var val in SplitCollection(value).ToList())
             {
-
                 if (val == null && nullValueHandling != NullValueHandling.NameOnly)
                     continue;
-                
                 _values.Add(name, new QueryParamValue(val));
-
             }
 
         }
@@ -77,9 +74,8 @@ namespace Bb.Urls
         /// </summary>
         /// <param name="name">Name of the parameter.</param>
         /// <param name="value">Value of the parameter. If it's a collection, multiple parameters of the same name are added/replaced.</param>
-        /// <param name="isEncoded">If true, assume value(s) already URL-encoded.</param>
         /// <param name="nullValueHandling">Describes how to handle null values.</param>
-        public void AddOrReplace(string name, object value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
+        public void AddOrReplace(string name, object? value, NullValueHandling nullValueHandling = NullValueHandling.Remove)
         {
 
             if (!Contains(name))
@@ -122,20 +118,19 @@ namespace Bb.Urls
 
         }
 
-        private IEnumerable<object> SplitCollection(object value)
+        private IEnumerable<object> SplitCollection(object? value)
         {
             
             if (value == null)
-                yield return null;
+                yield break;
 
             else if (value is string s)
                 yield return s;
 
             else if (value is IEnumerable en)
-            {
                 foreach (var item in en.Cast<object>().SelectMany(SplitCollection).ToList())
                     yield return item;
-            }
+            
             else
                 yield return value;
 

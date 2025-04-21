@@ -10,17 +10,23 @@
 
   <PropertyGroup>
     <SkippedInstrumentations></SkippedInstrumentations>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Activities\**" />
     <Compile Remove="Monitorings\**" />
+    <Content Remove="Activities\**" />
     <Content Remove="Monitorings\**" />
+    <EmbeddedResource Remove="Activities\**" />
     <EmbeddedResource Remove="Monitorings\**" />
+    <None Remove="Activities\**" />
     <None Remove="Monitorings\**" />
   </ItemGroup>
   
   <ItemGroup>
     <Compile Remove="ConfigLoggerInitializer.cs" />
+    <Compile Remove="Monitoring\LoggerTraceListener.cs" />
   </ItemGroup>
   
   <ItemGroup>
@@ -53,8 +59,8 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.1" />
 
     <PackageReference Include="Black.Beard.Helpers" Version="2.0.59" />
-    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.187" />
-    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.187" />
+    <PackageReference Include="Black.Beard.ComponentModel.Attributes" Version="1.0.196" />
+    <PackageReference Include="Black.Beard.ComponentModel" Version="1.0.196" />
     <PackageReference Include="Black.Beard.Helpers.ContentLoaders.Files" Version="2.0.59" />
     
   </ItemGroup>

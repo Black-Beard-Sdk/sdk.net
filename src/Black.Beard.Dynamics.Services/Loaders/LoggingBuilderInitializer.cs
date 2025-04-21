@@ -9,7 +9,7 @@ namespace Bb.Loaders
     /// <summary>
     /// Initializes the logging builder for a web application.
     /// </summary>
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<ILoggingBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<ILoggingBuilder>), LifeCycle = IocScope.Transiant)]
     public class LoggingBuilderInitializer : InjectBuilder<ILoggingBuilder>
     {
 

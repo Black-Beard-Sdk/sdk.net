@@ -1,4 +1,6 @@
-﻿using Bb.ComponentModel;
+﻿// Ignore Spelling: Middleware
+
+using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 
 namespace Bb.Middleware.EntryFullLogger
@@ -7,7 +9,7 @@ namespace Bb.Middleware.EntryFullLogger
     /// <summary>
     /// Represents a logger for HTTP request and response details.
     /// </summary>
-    [ExposeClass(Context = ConstantsCore.Service, ExposedType = typeof(IRequestResponseLogger), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(Context = ConstantsCore.Service, ExposedType = typeof(IRequestResponseLogger), LifeCycle = IocScope.Singleton)]
     public class RequestResponseLogger : IRequestResponseLogger
     {
 

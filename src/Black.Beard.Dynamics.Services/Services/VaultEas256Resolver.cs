@@ -30,7 +30,7 @@ namespace Bb.Services
         /// var secret = resolver.GetSecret("path", "to", "secret");
         /// </code>
         /// </example>
-        public string GetSecret(params string[] path)
+        public string? GetSecret(params string[] path)
         {
             if (string.IsNullOrEmpty(_secret))
                 throw new InvalidOperationException($"The secret must be provided. Initialize value {_secretNameConfiguration}.");
@@ -56,7 +56,7 @@ namespace Bb.Services
         /// <remarks>
         /// This field holds the secret value retrieved from the configuration using the key <see cref="_secretNameConfiguration"/>.
         /// </remarks>
-        private readonly string _secret = configuration[_secretNameConfiguration];
+        private readonly string? _secret = configuration[_secretNameConfiguration];
 
     }
 

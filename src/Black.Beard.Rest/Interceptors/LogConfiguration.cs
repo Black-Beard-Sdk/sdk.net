@@ -5,8 +5,12 @@ using System.Threading;
 namespace Bb.Interceptors
 {
 
-
+    /// <summary>
+    /// Represents a configuration for logging messages of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class LogConfiguration<T>
+        where T :class
     {
 
         /// <summary>
@@ -42,8 +46,7 @@ namespace Bb.Interceptors
         /// </example>
         public void AddRule(Func<T, StringBuilder, CancellationToken, ValueTask> rule)
         {
-            if (rule == null)
-                throw new ArgumentNullException(nameof(rule));
+            ArgumentNullException.ThrowIfNull(rule);
             _rules.Add(rule);
         }
 
@@ -70,10 +73,8 @@ namespace Bb.Interceptors
         /// </example>
         public async ValueTask Log(T message, StringBuilder logger, CancellationToken cancellationToken)
         {
-            if (message == null)
-                throw new ArgumentNullException(nameof(message));
-            if (logger == null)
-                throw new ArgumentNullException(nameof(logger));
+            ArgumentNullException.ThrowIfNull(message);
+            ArgumentNullException.ThrowIfNull(logger);
 
             foreach (var rule in _rules)
                 await rule(message, logger, cancellationToken);
@@ -91,7 +92,7 @@ namespace Bb.Interceptors
         /// <summary>
         /// The list of logging rules for messages of type <typeparamref name="T"/>.
         /// </summary>
-        private List<Func<T, StringBuilder, CancellationToken, ValueTask>> _rules;
+        private readonly List<Func<T, StringBuilder, CancellationToken, ValueTask>> _rules;
 
     }
 

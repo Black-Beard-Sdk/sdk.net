@@ -1,4 +1,7 @@
-﻿using Bb.Middleware;
+﻿
+// Ignore Spelling: Middleware
+
+using Bb.Middleware;
 
 namespace Bb.Extensions
 {

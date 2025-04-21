@@ -1,19 +1,26 @@
-﻿using Bb.Interfaces;
+﻿// Ignore Spelling: Apikey Api
+
+using Bb.Interfaces;
 using Bb.Models;
 using Bb.Services;
 using Bb.Urls;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
+using System.Linq;
 
 namespace Bb.Extensions
 {
 
+    /// <summary>
+    /// Class containing extension methods for configuring API key authentication and REST client services in a web application.
+    /// </summary>
     public static class ApikeyExtension
     {
 
         /// <summary>
         /// Adds API key authentication middleware to the application.
         /// </summary>
-        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <param name="application">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
         /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
         /// <remarks>
         /// This method adds middleware to validate API key authentication. If the API key is valid, it adds an authorization header to the request.
@@ -32,27 +39,33 @@ namespace Bb.Extensions
         /// app.Run();
         /// </code>
         /// </example>
-        public static WebApplication WithApiKeyAuthentication(this WebApplication app)
+        public static WebApplication WithApiKeyAuthentication(this WebApplication application)
         {
 
-            var apiName = app.Configuration.GetValue<string>("ApiKey") ?? "X-API-KEY";
+            var apiName = application.Configuration.GetValue<string>("ApiKey") ?? "X-API-KEY";
 
-            app.Use(async (context, next) =>
+            application.Use(async (context, next) =>
             {
 
-                if (!context.Request.Headers.TryGetValue(apiName, out var extractedApiKey))
+                if (!context.Request.Headers.TryGetValue(apiName, out StringValues extractedApiKey))
                 {
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsync("API Key was not provided.");
                     return;
                 }
 
-                var tokenProvider = app.Services.GetRequiredService<TokenProvider>();
-
+                var tokenProvider = application.Services.GetRequiredService<TokenProvider>();
                 try
                 {
                     var token = await tokenProvider.GetTokenAsync(extractedApiKey);
-                    context.Request.Headers.Add("Authorization", $"Bearer {token}");
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        var headers = context.Request.Headers;
+                        if (headers.ContainsKey(Authorization))
+                            headers[Authorization] = $"Bearer {token}";
+                        else
+                            headers.TryAdd(Authorization, $"Bearer {token}");
+                    }
                     await next();
                 }
                 catch (UnauthorizedAccessException ex)
@@ -63,11 +76,11 @@ namespace Bb.Extensions
                 catch (Exception ex)
                 {
                     context.Response.StatusCode = 500;
-                    await context.Response.WriteAsync($"Erreur lors de l'authentification: {ex.Message}");
+                    await context.Response.WriteAsync($"authentication error : {ex.Message}");
                 }
             });
 
-            return app;
+            return application;
 
         }
 
@@ -130,13 +143,8 @@ namespace Bb.Extensions
 
                 service.Configure(string.Empty, option =>
                 {
-
-                    if (_configs.TryGetValue(option.BaseUrl.ToString(), out var c))
-                    {
+                    if (option.BaseUrl != null && _configs.TryGetValue(option.BaseUrl.ToString(), out var c))
                         option.Timeout = TimeSpan.FromSeconds(c.Timeout);
-                    }
-
-
                 });
 
                 return service;
@@ -145,13 +153,16 @@ namespace Bb.Extensions
             services.AddSingleton<IRestClientFactory, RestClientFactory>((serviceProvider) =>
             {
                 var factoryOption = serviceProvider.GetRequiredService<IOptionClientFactory>();
-                var factory = new RestClientFactory(factoryOption);
+                var factoryClient = serviceProvider.GetService<IHttpClientFactory>();
+                var factory = new RestClientFactory(factoryOption, factoryClient);
                 return factory;
             });
 
             return services;
 
         }
+
+        private const string Authorization = "Authorization";
 
     }
 

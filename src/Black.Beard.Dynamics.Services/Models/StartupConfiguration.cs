@@ -1,4 +1,6 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿// Ignore Spelling: Blazor Fallback
+
+using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel;
 using Bb.Loaders.Extensions;
 
@@ -9,10 +11,13 @@ namespace Bb.Models
     /// <summary>
     /// Represents the startup configuration for the application.
     /// </summary>
-    [ExposeClass(ConstantsCore.Configuration, LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(ConstantsCore.Configuration, LifeCycle = IocScope.Singleton)]
     public class StartupConfiguration
     {
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartupConfiguration"/> class.
+        /// </summary>
         public StartupConfiguration()
         {
             BearerOptions = new List<BearerOption>();
@@ -84,7 +89,7 @@ namespace Bb.Models
         /// <remarks>
         /// This property holds the configuration for the HTTPS certificate used by the application.
         /// </remarks>
-        public Certificate HttpsCertificate { get; set; }
+        public Certificate HTTPSCertificate { get; set; }
 
         /// <summary>
         /// Gets or sets the list of bearer token options.

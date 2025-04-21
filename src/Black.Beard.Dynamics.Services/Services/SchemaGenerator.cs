@@ -8,7 +8,7 @@ namespace Site.Services
 {
 
     /// <summary>
-    /// Generates JSON schemas for specified types and saves them to a directory.
+    /// Generates JSON schema for specified types and saves them to a directory.
     /// </summary>
     public class SchemaGenerator
     {
@@ -16,7 +16,7 @@ namespace Site.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="SchemaGenerator"/> class.
         /// </summary>
-        /// <param name="path">The directory path where schemas will be saved. Must not be null or empty.</param>
+        /// <param name="path">The directory path where schema will be saved. Must not be null or empty.</param>
         /// <param name="idTemplate">The template for generating schema IDs. Must not be null or empty.</param>
         /// <remarks>
         /// This constructor sets up the schema generator by creating the specified directory if it does not exist.
@@ -91,8 +91,7 @@ namespace Site.Services
             string name = type.Name;
 
             var a = type.GetCustomAttribute<ExposeClassAttribute>();
-            if (a != null)
-                if (!string.IsNullOrEmpty(a.Name))
+            if (a != null && !string.IsNullOrEmpty(a.Name))
                     a.Name = name;
 
             var filename = GetFilename(name);

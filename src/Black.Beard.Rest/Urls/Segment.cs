@@ -74,7 +74,9 @@
             }
         }
 
-
+        /// <summary>
+        /// Gets a value indicating whether the segment is considered malicious.
+        /// </summary>
         public bool IsMalicious { get; }
 
         /// <summary>
@@ -124,6 +126,10 @@
         }
 
 
+        /// <summary>
+        /// Implicitly converts a <see cref="Segment"/> to a string.
+        /// </summary>
+        /// <param name="segment"></param>
         public static implicit operator string(Segment segment)
         {
             return segment.EncodedValue;

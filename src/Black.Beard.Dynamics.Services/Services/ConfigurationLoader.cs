@@ -1,14 +1,19 @@
 ﻿using System.Collections;
 
-namespace Bb.Extensions
+namespace Bb.Services
 {
 
+    /// <summary>
+    /// Provides functionality to load and manage configuration files grouped by their names.
+    /// </summary>
+    /// <remarks>
+    /// This class allows loading configuration files from specified directories, filtering them based on patterns and conditions, 
+    /// and grouping them by their names for easy access.
+    /// </remarks>
     public class ConfigurationLoader : IEnumerable<IGrouping<string, ConfigurationFile>>
     {
-
         static ConfigurationLoader()
         {
-
             _environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
                 ?? null;
         }
@@ -26,9 +31,8 @@ namespace Bb.Extensions
         /// var loader = new ConfigurationLoader("*.config", file => file.Length > 0);
         /// </code>
         /// </example>
-        public ConfigurationLoader(string pattern, Func<FileInfo, bool> filter = null)
+        public ConfigurationLoader(string? pattern, Func<FileInfo, bool>? filter = null)
         {
-
             if (string.IsNullOrEmpty(pattern))
                 pattern = $"*.json";
 
@@ -36,7 +40,6 @@ namespace Bb.Extensions
             _pattern = pattern;
 
             _files = new Dictionary<string, ConfigurationFile>();
-
         }
 
         /// <summary>
@@ -52,9 +55,8 @@ namespace Bb.Extensions
         /// <exception cref="ArgumentNullException">
         /// Thrown if the directory or pattern is null.
         /// </exception>
-        private static List<ConfigurationFile> GetFiles(Func<FileInfo, bool> filter, DirectoryInfo item, string pattern)
+        private static List<ConfigurationFile> GetFiles(Func<FileInfo, bool>? filter, DirectoryInfo item, string pattern)
         {
-
             List<ConfigurationFile> items = new List<ConfigurationFile>();
             item.Refresh();
 
@@ -67,7 +69,6 @@ namespace Bb.Extensions
                         items.Add(a);
                 }
             return items;
-
         }
 
         /// <summary>
@@ -148,13 +149,11 @@ namespace Bb.Extensions
         /// </example>
         internal ConfigurationLoader AddFolders(params string[] paths)
         {
-
             if (paths == null)
                 return this;
 
             foreach (var item1 in paths)
             {
-
                 var contentRootPath = item1.AsDirectory();
 
                 var f = GetFiles(_filter, contentRootPath, _pattern);
@@ -162,28 +161,47 @@ namespace Bb.Extensions
                 foreach (var item in f)
                     if (!_files.ContainsKey(item.Name))
                         _files.Add(item.FileInfo.FullName, item);
-
             }
 
             return this;
-
         }
 
         private static string? _environmentName;
-        private Dictionary<string, ConfigurationFile> _files;
-        private readonly Func<FileInfo, bool> _filter;
+        private readonly Dictionary<string, ConfigurationFile> _files;
+        private readonly Func<FileInfo, bool>? _filter;
         private readonly string _pattern;
-
     }
 
     /// <summary>
     /// Represents a configuration file with its associated properties.
     /// </summary>
+    /// <remarks>
+    /// This structure holds information about a configuration file, including its name, file information, and associated environment.
+    /// </remarks>
     public struct ConfigurationFile
     {
+        /// <summary>
+        /// Gets or sets the name of the configuration file.
+        /// </summary>
+        /// <remarks>
+        /// The name is computed based on the file's base name.
+        /// </remarks>
         public string Name;
+
+        /// <summary>
+        /// Gets or sets the file information of the configuration file.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the file's metadata and path.
+        /// </remarks>
         public FileInfo FileInfo;
+
+        /// <summary>
+        /// Gets or sets the environment associated with the configuration file.
+        /// </summary>
+        /// <remarks>
+        /// The environment is extracted from the file's name, if available.
+        /// </remarks>
         public string? Environment;
     }
-
 }

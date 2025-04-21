@@ -19,7 +19,7 @@
     /// }
     /// </code>
     /// </example>
-    public interface INamedFactory<TKey, TResult> : IFactory
+    public interface INamedFactory<in TKey, out TResult> : IFactory
     {
         /// <summary>
         /// Creates an instance of type <typeparamref name="TResult"/> using the specified key.

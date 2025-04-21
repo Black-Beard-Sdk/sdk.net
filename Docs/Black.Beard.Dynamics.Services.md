@@ -5,19 +5,17 @@
 
 - [ApiKeyGenerator](#T-Bb-Services-ApiKeyGenerator 'Bb.Services.ApiKeyGenerator')
   - [GenerateApiKey(length)](#M-Bb-Services-ApiKeyGenerator-GenerateApiKey-System-Int32- 'Bb.Services.ApiKeyGenerator.GenerateApiKey(System.Int32)')
-  - [GenerateIdentifiers(apiKey,salt,loginLength,pwdLength)](#M-Bb-Services-ApiKeyGenerator-GenerateIdentifiers-System-String,System-Int32,System-Int32,System-String- 'Bb.Services.ApiKeyGenerator.GenerateIdentifiers(System.String,System.Int32,System.Int32,System.String)')
+  - [GenerateIdentifiers(apiKey,salt,loginLength,passwordLength)](#M-Bb-Services-ApiKeyGenerator-GenerateIdentifiers-System-String,System-Int32,System-Int32,System-String- 'Bb.Services.ApiKeyGenerator.GenerateIdentifiers(System.String,System.Int32,System.Int32,System.String)')
   - [GeneratePassword(rawData,lengthPassword,salt)](#M-Bb-Services-ApiKeyGenerator-GeneratePassword-System-String,System-Int32,System-String- 'Bb.Services.ApiKeyGenerator.GeneratePassword(System.String,System.Int32,System.String)')
   - [ResolveLogin(rawData,lengthLogin,salt)](#M-Bb-Services-ApiKeyGenerator-ResolveLogin-System-String,System-Int32,System-String- 'Bb.Services.ApiKeyGenerator.ResolveLogin(System.String,System.Int32,System.String)')
 - [ApikeyExtension](#T-Bb-Extensions-ApikeyExtension 'Bb.Extensions.ApikeyExtension')
   - [AddRestClient(services)](#M-Bb-Extensions-ApikeyExtension-AddRestClient-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Extensions.ApikeyExtension.AddRestClient(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
   - [AddTokenProvider(services)](#M-Bb-Extensions-ApikeyExtension-AddTokenProvider-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Extensions.ApikeyExtension.AddTokenProvider(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
-  - [WithApiKeyAuthentication(app)](#M-Bb-Extensions-ApikeyExtension-WithApiKeyAuthentication-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.Extensions.ApikeyExtension.WithApiKeyAuthentication(Microsoft.AspNetCore.Builder.WebApplication)')
+  - [WithApiKeyAuthentication(application)](#M-Bb-Extensions-ApikeyExtension-WithApiKeyAuthentication-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.Extensions.ApikeyExtension.WithApiKeyAuthentication(Microsoft.AspNetCore.Builder.WebApplication)')
 - [Assemblies](#T-Bb-Loaders-Extensions-Assemblies 'Bb.Loaders.Extensions.Assemblies')
   - [AdditionalAssemblies](#P-Bb-Loaders-Extensions-Assemblies-AdditionalAssemblies 'Bb.Loaders.Extensions.Assemblies.AdditionalAssemblies')
   - [WebAssemblies](#P-Bb-Loaders-Extensions-Assemblies-WebAssemblies 'Bb.Loaders.Extensions.Assemblies.WebAssemblies')
   - [ContainPage(assembly)](#M-Bb-Loaders-Extensions-Assemblies-ContainPage-System-Reflection-Assembly- 'Bb.Loaders.Extensions.Assemblies.ContainPage(System.Reflection.Assembly)')
-  - [ContainPage2(assembly)](#M-Bb-Loaders-Extensions-Assemblies-ContainPage2-System-Reflection-Assembly- 'Bb.Loaders.Extensions.Assemblies.ContainPage2(System.Reflection.Assembly)')
-  - [ContainPage2(assembly,textToSearch)](#M-Bb-Loaders-Extensions-Assemblies-ContainPage2-System-Reflection-Assembly,System-String- 'Bb.Loaders.Extensions.Assemblies.ContainPage2(System.Reflection.Assembly,System.String)')
 - [BearerOption](#T-Bb-Models-BearerOption 'Bb.Models.BearerOption')
   - [IssuerSigningKey](#P-Bb-Models-BearerOption-IssuerSigningKey 'Bb.Models.BearerOption.IssuerSigningKey')
   - [Name](#P-Bb-Models-BearerOption-Name 'Bb.Models.BearerOption.Name')
@@ -42,23 +40,31 @@
   - [LoadCertificateFromStore(subjectName)](#M-Bb-Services-CertificateHelpers-LoadCertificateFromStore-System-String- 'Bb.Services.CertificateHelpers.LoadCertificateFromStore(System.String)')
   - [SaveCertificateToFile(certificate,filePath,password)](#M-Bb-Services-CertificateHelpers-SaveCertificateToFile-System-Security-Cryptography-X509Certificates-X509Certificate2,System-String,System-String- 'Bb.Services.CertificateHelpers.SaveCertificateToFile(System.Security.Cryptography.X509Certificates.X509Certificate2,System.String,System.String)')
   - [StoreCertificate(certificate)](#M-Bb-Services-CertificateHelpers-StoreCertificate-System-Security-Cryptography-X509Certificates-X509Certificate2- 'Bb.Services.CertificateHelpers.StoreCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2)')
+- [CertificateNotFoundException](#T-Bb-Exceptions-CertificateNotFoundException 'Bb.Exceptions.CertificateNotFoundException')
+  - [#ctor()](#M-Bb-Exceptions-CertificateNotFoundException-#ctor 'Bb.Exceptions.CertificateNotFoundException.#ctor')
+  - [#ctor(message)](#M-Bb-Exceptions-CertificateNotFoundException-#ctor-System-String- 'Bb.Exceptions.CertificateNotFoundException.#ctor(System.String)')
+  - [#ctor(message,inner)](#M-Bb-Exceptions-CertificateNotFoundException-#ctor-System-String,System-Exception- 'Bb.Exceptions.CertificateNotFoundException.#ctor(System.String,System.Exception)')
 - [ClientOptionConfiguration](#T-Bb-Models-ClientOptionConfiguration 'Bb.Models.ClientOptionConfiguration')
   - [Name](#P-Bb-Models-ClientOptionConfiguration-Name 'Bb.Models.ClientOptionConfiguration.Name')
 - [ConfigurationExtension](#T-Bb-Extensions-ConfigurationExtension 'Bb.Extensions.ConfigurationExtension')
-  - [LoadConfiguration(builder)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String[])')
-- [ConfigurationFile](#T-Bb-Extensions-ConfigurationFile 'Bb.Extensions.ConfigurationFile')
-- [ConfigurationLoader](#T-Bb-Extensions-ConfigurationLoader 'Bb.Extensions.ConfigurationLoader')
+  - [LoadConfiguration(builder,filter,pattern)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-Func{System-IO-FileInfo,System-Boolean},System-String- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.Func{System.IO.FileInfo,System.Boolean},System.String)')
+  - [LoadConfiguration(builder,filter,pattern)](#M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-Extensions-Configuration-IConfigurationBuilder,System-Func{System-IO-FileInfo,System-Boolean},System-String- 'Bb.Extensions.ConfigurationExtension.LoadConfiguration(Microsoft.Extensions.Configuration.IConfigurationBuilder,System.Func{System.IO.FileInfo,System.Boolean},System.String)')
+- [ConfigurationFile](#T-Bb-Services-ConfigurationFile 'Bb.Services.ConfigurationFile')
+  - [Environment](#F-Bb-Services-ConfigurationFile-Environment 'Bb.Services.ConfigurationFile.Environment')
+  - [FileInfo](#F-Bb-Services-ConfigurationFile-FileInfo 'Bb.Services.ConfigurationFile.FileInfo')
+  - [Name](#F-Bb-Services-ConfigurationFile-Name 'Bb.Services.ConfigurationFile.Name')
 - [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader')
-  - [#ctor(pattern,filter)](#M-Bb-Extensions-ConfigurationLoader-#ctor-System-String,System-Func{System-IO-FileInfo,System-Boolean}- 'Bb.Extensions.ConfigurationLoader.#ctor(System.String,System.Func{System.IO.FileInfo,System.Boolean})')
+- [ConfigurationLoader](#T-Bb-Services-ConfigurationLoader 'Bb.Services.ConfigurationLoader')
   - [#ctor()](#M-Bb-Loaders-ConfigurationLoader-#ctor 'Bb.Loaders.ConfigurationLoader.#ctor')
+  - [#ctor(pattern,filter)](#M-Bb-Services-ConfigurationLoader-#ctor-System-String,System-Func{System-IO-FileInfo,System-Boolean}- 'Bb.Services.ConfigurationLoader.#ctor(System.String,System.Func{System.IO.FileInfo,System.Boolean})')
   - [Configuration](#P-Bb-Loaders-ConfigurationLoader-Configuration 'Bb.Loaders.ConfigurationLoader.Configuration')
   - [ConfigurationPath](#P-Bb-Loaders-ConfigurationLoader-ConfigurationPath 'Bb.Loaders.ConfigurationLoader.ConfigurationPath')
-  - [AddFolders(paths)](#M-Bb-Extensions-ConfigurationLoader-AddFolders-System-String[]- 'Bb.Extensions.ConfigurationLoader.AddFolders(System.String[])')
-  - [ComputeEnvironmentName(name)](#M-Bb-Extensions-ConfigurationLoader-ComputeEnvironmentName-System-String- 'Bb.Extensions.ConfigurationLoader.ComputeEnvironmentName(System.String)')
-  - [ComputeName(name)](#M-Bb-Extensions-ConfigurationLoader-ComputeName-System-String- 'Bb.Extensions.ConfigurationLoader.ComputeName(System.String)')
-  - [GetEnumerator()](#M-Bb-Extensions-ConfigurationLoader-GetEnumerator 'Bb.Extensions.ConfigurationLoader.GetEnumerator')
-  - [GetFiles(filter,item,pattern)](#M-Bb-Extensions-ConfigurationLoader-GetFiles-System-Func{System-IO-FileInfo,System-Boolean},System-IO-DirectoryInfo,System-String- 'Bb.Extensions.ConfigurationLoader.GetFiles(System.Func{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,System.String)')
   - [Execute(context)](#M-Bb-Loaders-ConfigurationLoader-Execute-Microsoft-AspNetCore-Builder-WebApplicationBuilder- 'Bb.Loaders.ConfigurationLoader.Execute(Microsoft.AspNetCore.Builder.WebApplicationBuilder)')
+  - [AddFolders(paths)](#M-Bb-Services-ConfigurationLoader-AddFolders-System-String[]- 'Bb.Services.ConfigurationLoader.AddFolders(System.String[])')
+  - [ComputeEnvironmentName(name)](#M-Bb-Services-ConfigurationLoader-ComputeEnvironmentName-System-String- 'Bb.Services.ConfigurationLoader.ComputeEnvironmentName(System.String)')
+  - [ComputeName(name)](#M-Bb-Services-ConfigurationLoader-ComputeName-System-String- 'Bb.Services.ConfigurationLoader.ComputeName(System.String)')
+  - [GetEnumerator()](#M-Bb-Services-ConfigurationLoader-GetEnumerator 'Bb.Services.ConfigurationLoader.GetEnumerator')
+  - [GetFiles(filter,item,pattern)](#M-Bb-Services-ConfigurationLoader-GetFiles-System-Func{System-IO-FileInfo,System-Boolean},System-IO-DirectoryInfo,System-String- 'Bb.Services.ConfigurationLoader.GetFiles(System.Func{System.IO.FileInfo,System.Boolean},System.IO.DirectoryInfo,System.String)')
 - [HttpContextExtension](#T-Bb-Extensions-HttpContextExtension 'Bb.Extensions.HttpContextExtension')
   - [IsDebug](#P-Bb-Extensions-HttpContextExtension-IsDebug 'Bb.Extensions.HttpContextExtension.IsDebug')
   - [SetResponse(context,data)](#M-Bb-Extensions-HttpContextExtension-SetResponse-Microsoft-AspNetCore-Http-HttpContext,System-Object- 'Bb.Extensions.HttpContextExtension.SetResponse(Microsoft.AspNetCore.Http.HttpContext,System.Object)')
@@ -80,7 +86,7 @@
 - [IRequestResponseLogger](#T-Bb-Middleware-EntryFullLogger-IRequestResponseLogger 'Bb.Middleware.EntryFullLogger.IRequestResponseLogger')
   - [Log(logCreator)](#M-Bb-Middleware-EntryFullLogger-IRequestResponseLogger-Log-Bb-Middleware-EntryFullLogger-IRequestResponseLogModelCreator- 'Bb.Middleware.EntryFullLogger.IRequestResponseLogger.Log(Bb.Middleware.EntryFullLogger.IRequestResponseLogModelCreator)')
 - [IVaultSecretResolver](#T-Bb-Interfaces-IVaultSecretResolver 'Bb.Interfaces.IVaultSecretResolver')
-  - [GetSecret(name)](#M-Bb-Interfaces-IVaultSecretResolver-GetSecret-System-String[]- 'Bb.Interfaces.IVaultSecretResolver.GetSecret(System.String[])')
+  - [GetSecret(path)](#M-Bb-Interfaces-IVaultSecretResolver-GetSecret-System-String[]- 'Bb.Interfaces.IVaultSecretResolver.GetSecret(System.String[])')
 - [InitializerExtension](#T-Bb-Extensions-InitializerExtension 'Bb.Extensions.InitializerExtension')
   - [AppendFoldersToDiscovers(paths,startupConfiguration)](#M-Bb-Extensions-InitializerExtension-AppendFoldersToDiscovers-System-String[],Bb-Models-StartupConfiguration- 'Bb.Extensions.InitializerExtension.AppendFoldersToDiscovers(System.String[],Bb.Models.StartupConfiguration)')
   - [Initialize(self)](#M-Bb-Extensions-InitializerExtension-Initialize-Microsoft-AspNetCore-Builder-WebApplicationBuilder- 'Bb.Extensions.InitializerExtension.Initialize(Microsoft.AspNetCore.Builder.WebApplicationBuilder)')
@@ -100,11 +106,11 @@
   - [Execute(context)](#M-Bb-Loaders-LoggingBuilderInitializer-Execute-Microsoft-Extensions-Logging-ILoggingBuilder- 'Bb.Loaders.LoggingBuilderInitializer.Execute(Microsoft.Extensions.Logging.ILoggingBuilder)')
 - [LoggingExtension](#T-Bb-Extensions-LoggingExtension 'Bb.Extensions.LoggingExtension')
   - [ConfigureTrace(builder)](#M-Bb-Extensions-LoggingExtension-ConfigureTrace-Microsoft-AspNetCore-Builder-WebApplicationBuilder- 'Bb.Extensions.LoggingExtension.ConfigureTrace(Microsoft.AspNetCore.Builder.WebApplicationBuilder)')
-- [OptionsEnum](#T-Bb-Loaders-SiteExtensions-OptionsEnum 'Bb.Loaders.SiteExtensions.OptionsEnum')
-  - [Configuration](#F-Bb-Loaders-SiteExtensions-OptionsEnum-Configuration 'Bb.Loaders.SiteExtensions.OptionsEnum.Configuration')
-- [OptionsServices](#T-Bb-Loaders-SiteExtensions-OptionsServices 'Bb.Loaders.SiteExtensions.OptionsServices')
-  - [#ctor(services)](#M-Bb-Loaders-SiteExtensions-OptionsServices-#ctor-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Loaders.SiteExtensions.OptionsServices.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
-  - [Items(services,option)](#M-Bb-Loaders-SiteExtensions-OptionsServices-Items-System-IServiceProvider,Bb-Loaders-SiteExtensions-OptionsEnum- 'Bb.Loaders.SiteExtensions.OptionsServices.Items(System.IServiceProvider,Bb.Loaders.SiteExtensions.OptionsEnum)')
+- [OptionsEnum](#T-Bb-Loaders-Extensions-OptionsEnum 'Bb.Loaders.Extensions.OptionsEnum')
+  - [Configuration](#F-Bb-Loaders-Extensions-OptionsEnum-Configuration 'Bb.Loaders.Extensions.OptionsEnum.Configuration')
+- [OptionsServices](#T-Bb-Loaders-Extensions-OptionsServices 'Bb.Loaders.Extensions.OptionsServices')
+  - [#ctor(services)](#M-Bb-Loaders-Extensions-OptionsServices-#ctor-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Loaders.Extensions.OptionsServices.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
+  - [Items(services,option)](#M-Bb-Loaders-Extensions-OptionsServices-Items-System-IServiceProvider,Bb-Loaders-Extensions-OptionsEnum- 'Bb.Loaders.Extensions.OptionsServices.Items(System.IServiceProvider,Bb.Loaders.Extensions.OptionsEnum)')
 - [Package](#T-Bb-Models-Package 'Bb.Models.Package')
   - [#ctor()](#M-Bb-Models-Package-#ctor 'Bb.Models.Package.#ctor')
   - [Id](#P-Bb-Models-Package-Id 'Bb.Models.Package.Id')
@@ -120,10 +126,10 @@
   - [WithReference(type)](#M-Bb-Services-PackageManager-WithReference-System-Type- 'Bb.Services.PackageManager.WithReference(System.Type)')
 - [Packages](#T-Bb-Models-Packages 'Bb.Models.Packages')
   - [op_Implicit(packages)](#M-Bb-Models-Packages-op_Implicit-Bb-Models-Package[]-~Bb-Models-Packages 'Bb.Models.Packages.op_Implicit(Bb.Models.Package[])~Bb.Models.Packages')
-- [PolicyExtension](#T-Bb-PolicyExtension 'Bb.PolicyExtension')
-  - [AddPolicy(builder,filePath,filter,configureAction)](#M-Bb-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}- 'Bb.PolicyExtension.AddPolicy(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String,System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean},System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions})')
-  - [ConfigurePolicy(app)](#M-Bb-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.PolicyExtension.ConfigurePolicy(Microsoft.AspNetCore.Builder.WebApplication)')
-  - [GetAuthorizePoliciesFromAssemblies()](#M-Bb-PolicyExtension-GetAuthorizePoliciesFromAssemblies 'Bb.PolicyExtension.GetAuthorizePoliciesFromAssemblies')
+- [PolicyExtension](#T-Bb-Extensions-PolicyExtension 'Bb.Extensions.PolicyExtension')
+  - [AddPolicy(builder,filePath,filter,configureAction)](#M-Bb-Extensions-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}- 'Bb.Extensions.PolicyExtension.AddPolicy(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.String,System.Func{Bb.Policies.Asts.PolicyRule,System.Boolean},System.Action{Microsoft.AspNetCore.Authorization.AuthorizationOptions})')
+  - [ConfigurePolicy(application)](#M-Bb-Extensions-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication- 'Bb.Extensions.PolicyExtension.ConfigurePolicy(Microsoft.AspNetCore.Builder.WebApplication)')
+  - [GetAuthorizePoliciesFromAssemblies()](#M-Bb-Extensions-PolicyExtension-GetAuthorizePoliciesFromAssemblies 'Bb.Extensions.PolicyExtension.GetAuthorizePoliciesFromAssemblies')
 - [RequestResponseLogModel](#T-Bb-Middleware-EntryFullLogger-RequestResponseLogModel 'Bb.Middleware.EntryFullLogger.RequestResponseLogModel')
   - [#ctor()](#M-Bb-Middleware-EntryFullLogger-RequestResponseLogModel-#ctor 'Bb.Middleware.EntryFullLogger.RequestResponseLogModel.#ctor')
   - [ClientIp](#P-Bb-Middleware-EntryFullLogger-RequestResponseLogModel-ClientIp 'Bb.Middleware.EntryFullLogger.RequestResponseLogModel.ClientIp')
@@ -160,6 +166,7 @@
 - [RequestResponseLoggerMiddleware](#T-Bb-Middleware-RequestResponseLoggerMiddleware 'Bb.Middleware.RequestResponseLoggerMiddleware')
   - [#ctor(next,options,logger)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-#ctor-Microsoft-AspNetCore-Http-RequestDelegate,Microsoft-Extensions-Options-IOptions{Bb-Middleware-EntryFullLogger-RequestResponseLoggerOption},Bb-Middleware-EntryFullLogger-IRequestResponseLogger- 'Bb.Middleware.RequestResponseLoggerMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Options.IOptions{Bb.Middleware.EntryFullLogger.RequestResponseLoggerOption},Bb.Middleware.EntryFullLogger.IRequestResponseLogger)')
   - [FormatHeaders(headers)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-FormatHeaders-Microsoft-AspNetCore-Http-IHeaderDictionary- 'Bb.Middleware.RequestResponseLoggerMiddleware.FormatHeaders(Microsoft.AspNetCore.Http.IHeaderDictionary)')
+  - [FormatQueries(queryString)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-FormatQueries-System-String- 'Bb.Middleware.RequestResponseLoggerMiddleware.FormatQueries(System.String)')
   - [InvokeAsync(httpContext,logCreator)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-InvokeAsync-Microsoft-AspNetCore-Http-HttpContext,Bb-Middleware-EntryFullLogger-IRequestResponseLogModelCreator- 'Bb.Middleware.RequestResponseLoggerMiddleware.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext,Bb.Middleware.EntryFullLogger.IRequestResponseLogModelCreator)')
   - [LogError(log,exception)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-LogError-Bb-Middleware-EntryFullLogger-RequestResponseLogModel,System-Exception- 'Bb.Middleware.RequestResponseLoggerMiddleware.LogError(Bb.Middleware.EntryFullLogger.RequestResponseLogModel,System.Exception)')
   - [ReadBodyFromRequest(request)](#M-Bb-Middleware-RequestResponseLoggerMiddleware-ReadBodyFromRequest-Microsoft-AspNetCore-Http-HttpRequest- 'Bb.Middleware.RequestResponseLoggerMiddleware.ReadBodyFromRequest(Microsoft.AspNetCore.Http.HttpRequest)')
@@ -196,16 +203,23 @@
   - [File](#F-Bb-Models-SourceCertificate-File 'Bb.Models.SourceCertificate.File')
   - [Store](#F-Bb-Models-SourceCertificate-Store 'Bb.Models.SourceCertificate.Store')
 - [Startup](#T-Bb-Extensions-Startup 'Bb.Extensions.Startup')
-  - [Configure(app,env)](#M-Bb-Extensions-Startup-Configure-Microsoft-AspNetCore-Builder-WebApplication,Microsoft-AspNetCore-Hosting-IWebHostEnvironment- 'Bb.Extensions.Startup.Configure(Microsoft.AspNetCore.Builder.WebApplication,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)')
+  - [#ctor(configuration,service)](#M-Bb-Extensions-Startup-#ctor-Microsoft-Extensions-Configuration-IConfiguration,Bb-Services-WebService- 'Bb.Extensions.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Bb.Services.WebService)')
+  - [_configuration](#F-Bb-Extensions-Startup-_configuration 'Bb.Extensions.Startup._configuration')
+  - [_service](#F-Bb-Extensions-Startup-_service 'Bb.Extensions.Startup._service')
+  - [Configuration](#P-Bb-Extensions-Startup-Configuration 'Bb.Extensions.Startup.Configuration')
+  - [Configure(application,environment)](#M-Bb-Extensions-Startup-Configure-Microsoft-AspNetCore-Builder-WebApplication,Microsoft-AspNetCore-Hosting-IWebHostEnvironment- 'Bb.Extensions.Startup.Configure(Microsoft.AspNetCore.Builder.WebApplication,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)')
   - [ConfigureServices(builder,services)](#M-Bb-Extensions-Startup-ConfigureServices-Microsoft-AspNetCore-Builder-WebApplicationBuilder,Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Extensions.Startup.ConfigureServices(Microsoft.AspNetCore.Builder.WebApplicationBuilder,Microsoft.Extensions.DependencyInjection.IServiceCollection)')
   - [LoadCertificate()](#M-Bb-Extensions-Startup-LoadCertificate 'Bb.Extensions.Startup.LoadCertificate')
+  - [LoadFromFile(certificate)](#M-Bb-Extensions-Startup-LoadFromFile-Bb-Models-Certificate- 'Bb.Extensions.Startup.LoadFromFile(Bb.Models.Certificate)')
+  - [LoadFromFile2(certificate)](#M-Bb-Extensions-Startup-LoadFromFile2-Bb-Models-Certificate- 'Bb.Extensions.Startup.LoadFromFile2(Bb.Models.Certificate)')
   - [ManageBearer(services)](#M-Bb-Extensions-Startup-ManageBearer-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Extensions.Startup.ManageBearer(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
   - [ManageCertificate(webHost)](#M-Bb-Extensions-Startup-ManageCertificate-Microsoft-AspNetCore-Builder-ConfigureWebHostBuilder- 'Bb.Extensions.Startup.ManageCertificate(Microsoft.AspNetCore.Builder.ConfigureWebHostBuilder)')
 - [StartupConfiguration](#T-Bb-Models-StartupConfiguration 'Bb.Models.StartupConfiguration')
+  - [#ctor()](#M-Bb-Models-StartupConfiguration-#ctor 'Bb.Models.StartupConfiguration.#ctor')
   - [AssemblyNames](#P-Bb-Models-StartupConfiguration-AssemblyNames 'Bb.Models.StartupConfiguration.AssemblyNames')
   - [BearerOptions](#P-Bb-Models-StartupConfiguration-BearerOptions 'Bb.Models.StartupConfiguration.BearerOptions')
   - [Folders](#P-Bb-Models-StartupConfiguration-Folders 'Bb.Models.StartupConfiguration.Folders')
-  - [HttpsCertificate](#P-Bb-Models-StartupConfiguration-HttpsCertificate 'Bb.Models.StartupConfiguration.HttpsCertificate')
+  - [HTTPSCertificate](#P-Bb-Models-StartupConfiguration-HTTPSCertificate 'Bb.Models.StartupConfiguration.HTTPSCertificate')
   - [LogExceptions](#P-Bb-Models-StartupConfiguration-LogExceptions 'Bb.Models.StartupConfiguration.LogExceptions')
   - [LogInfo](#P-Bb-Models-StartupConfiguration-LogInfo 'Bb.Models.StartupConfiguration.LogInfo')
   - [MapBlazorHub](#P-Bb-Models-StartupConfiguration-MapBlazorHub 'Bb.Models.StartupConfiguration.MapBlazorHub')
@@ -218,7 +232,7 @@
 - [StartupExtensions](#T-Bb-Extensions-StartupExtensions 'Bb.Extensions.StartupExtensions')
   - [ResolveParameters(serviceProvider,configureServicesMethod)](#M-Bb-Extensions-StartupExtensions-ResolveParameters-Bb-ComponentModel-Factories-LocalServiceProvider,System-Reflection-MethodInfo- 'Bb.Extensions.StartupExtensions.ResolveParameters(Bb.ComponentModel.Factories.LocalServiceProvider,System.Reflection.MethodInfo)')
   - [TestExist\`\`1(self)](#M-Bb-Extensions-StartupExtensions-TestExist``1-Microsoft-Extensions-DependencyInjection-IServiceCollection- 'Bb.Extensions.StartupExtensions.TestExist``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)')
-  - [UseStartupConfigure\`\`1(app,startup,serviceProvider)](#M-Bb-Extensions-StartupExtensions-UseStartupConfigure``1-Microsoft-AspNetCore-Builder-WebApplication,``0,Bb-ComponentModel-Factories-LocalServiceProvider- 'Bb.Extensions.StartupExtensions.UseStartupConfigure``1(Microsoft.AspNetCore.Builder.WebApplication,``0,Bb.ComponentModel.Factories.LocalServiceProvider)')
+  - [UseStartupConfigure\`\`1(application,startup,serviceProvider)](#M-Bb-Extensions-StartupExtensions-UseStartupConfigure``1-Microsoft-AspNetCore-Builder-WebApplication,``0,Bb-ComponentModel-Factories-LocalServiceProvider- 'Bb.Extensions.StartupExtensions.UseStartupConfigure``1(Microsoft.AspNetCore.Builder.WebApplication,``0,Bb.ComponentModel.Factories.LocalServiceProvider)')
   - [UseStartup\`\`1(builder,startup,serviceProvider)](#M-Bb-Extensions-StartupExtensions-UseStartup``1-Microsoft-AspNetCore-Builder-WebApplicationBuilder,``0,Bb-ComponentModel-Factories-LocalServiceProvider- 'Bb.Extensions.StartupExtensions.UseStartup``1(Microsoft.AspNetCore.Builder.WebApplicationBuilder,``0,Bb.ComponentModel.Factories.LocalServiceProvider)')
 - [TokenProvider](#T-Bb-Services-TokenProvider 'Bb.Services.TokenProvider')
   - [#ctor(cache,resolver)](#M-Bb-Services-TokenProvider-#ctor-Microsoft-Extensions-Caching-Memory-IMemoryCache,Bb-Services-TokenResolver- 'Bb.Services.TokenProvider.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache,Bb.Services.TokenResolver)')
@@ -226,28 +240,20 @@
   - [GetTokenAsync(apiKey)](#M-Bb-Services-TokenProvider-GetTokenAsync-System-String- 'Bb.Services.TokenProvider.GetTokenAsync(System.String)')
   - [ValidateToken(token,secretKey,validIssuer,validAudience)](#M-Bb-Services-TokenProvider-ValidateToken-System-String,System-String,System-String,System-String- 'Bb.Services.TokenProvider.ValidateToken(System.String,System.String,System.String,System.String)')
 - [TokenResolver](#T-Bb-Services-TokenResolver 'Bb.Services.TokenResolver')
-  - [#ctor(restfactory,configuration)](#M-Bb-Services-TokenResolver-#ctor-Bb-Interfaces-IRestClientFactory,Bb-Models-StartupConfiguration- 'Bb.Services.TokenResolver.#ctor(Bb.Interfaces.IRestClientFactory,Bb.Models.StartupConfiguration)')
-  - [GeTokenAsync(username,password)](#M-Bb-Services-TokenResolver-GeTokenAsync-System-String,System-String- 'Bb.Services.TokenResolver.GeTokenAsync(System.String,System.String)')
+  - [#ctor(restFactory,configuration)](#M-Bb-Services-TokenResolver-#ctor-Bb-Interfaces-IRestClientFactory,Bb-Models-StartupConfiguration- 'Bb.Services.TokenResolver.#ctor(Bb.Interfaces.IRestClientFactory,Bb.Models.StartupConfiguration)')
+  - [GeTokenAsync(userName,password)](#M-Bb-Services-TokenResolver-GeTokenAsync-System-String,System-String- 'Bb.Services.TokenResolver.GeTokenAsync(System.String,System.String)')
   - [Initialize()](#M-Bb-Services-TokenResolver-Initialize 'Bb.Services.TokenResolver.Initialize')
-- [TranslateService](#T-Site-Services-TranslateService 'Site.Services.TranslateService')
-  - [#ctor()](#M-Site-Services-TranslateService-#ctor 'Site.Services.TranslateService.#ctor')
-  - [AvailableCultures](#P-Site-Services-TranslateService-AvailableCultures 'Site.Services.TranslateService.AvailableCultures')
-  - [Translate(key,arguments)](#M-Site-Services-TranslateService-Translate-Bb-Translations-TranslatedKeyLabel,Bb-Translations-TranslatedKeyLabel[]- 'Site.Services.TranslateService.Translate(Bb.Translations.TranslatedKeyLabel,Bb.Translations.TranslatedKeyLabel[])')
-  - [Translate(culture,key,arguments)](#M-Site-Services-TranslateService-Translate-System-Globalization-CultureInfo,Bb-Translations-TranslatedKeyLabel,Bb-Translations-TranslatedKeyLabel[]- 'Site.Services.TranslateService.Translate(System.Globalization.CultureInfo,Bb.Translations.TranslatedKeyLabel,Bb.Translations.TranslatedKeyLabel[])')
 - [TypesExtension](#T-Bb-Extensions-TypesExtension 'Bb.Extensions.TypesExtension')
   - [AppendConfiguration(configuration,serviceProvider)](#M-Bb-Extensions-TypesExtension-AppendConfiguration-Microsoft-Extensions-Configuration-ConfigurationManager,Bb-ComponentModel-Factories-LocalServiceProvider- 'Bb.Extensions.TypesExtension.AppendConfiguration(Microsoft.Extensions.Configuration.ConfigurationManager,Bb.ComponentModel.Factories.LocalServiceProvider)')
   - [SetAllIoc(builder,filter)](#M-Bb-Extensions-TypesExtension-SetAllIoc-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-Func{System-Type,System-String,System-Boolean}- 'Bb.Extensions.TypesExtension.SetAllIoc(Microsoft.AspNetCore.Builder.WebApplicationBuilder,System.Func{System.Type,System.String,System.Boolean})')
+- [Unix](#T-Bb-Services-CertificateHelpers-Unix 'Bb.Services.CertificateHelpers.Unix')
+  - [LoadCertificateFromUnixStore(subjectName)](#M-Bb-Services-CertificateHelpers-Unix-LoadCertificateFromUnixStore-System-String- 'Bb.Services.CertificateHelpers.Unix.LoadCertificateFromUnixStore(System.String)')
+  - [SetCertificateInStore(certificate)](#M-Bb-Services-CertificateHelpers-Unix-SetCertificateInStore-System-Security-Cryptography-X509Certificates-X509Certificate2- 'Bb.Services.CertificateHelpers.Unix.SetCertificateInStore(System.Security.Cryptography.X509Certificates.X509Certificate2)')
 - [VaultEas256Resolver](#T-Bb-Services-VaultEas256Resolver 'Bb.Services.VaultEas256Resolver')
   - [#ctor(configuration)](#M-Bb-Services-VaultEas256Resolver-#ctor-Microsoft-Extensions-Configuration-IConfiguration- 'Bb.Services.VaultEas256Resolver.#ctor(Microsoft.Extensions.Configuration.IConfiguration)')
   - [_secret](#F-Bb-Services-VaultEas256Resolver-_secret 'Bb.Services.VaultEas256Resolver._secret')
   - [_secretNameConfiguration](#F-Bb-Services-VaultEas256Resolver-_secretNameConfiguration 'Bb.Services.VaultEas256Resolver._secretNameConfiguration')
   - [GetSecret(path)](#M-Bb-Services-VaultEas256Resolver-GetSecret-System-String[]- 'Bb.Services.VaultEas256Resolver.GetSecret(System.String[])')
-- [WebApplicationBuilderInitializerNLog](#T-Bb-Loaders-WebApplicationBuilderInitializerNLog 'Bb.Loaders.WebApplicationBuilderInitializerNLog')
-  - [CreateDefaultFile(paths)](#M-Bb-Loaders-WebApplicationBuilderInitializerNLog-CreateDefaultFile-System-String[]@- 'Bb.Loaders.WebApplicationBuilderInitializerNLog.CreateDefaultFile(System.String[]@)')
-  - [Execute(builder)](#M-Bb-Loaders-WebApplicationBuilderInitializerNLog-Execute-Microsoft-AspNetCore-Builder-WebApplicationBuilder- 'Bb.Loaders.WebApplicationBuilderInitializerNLog.Execute(Microsoft.AspNetCore.Builder.WebApplicationBuilder)')
-  - [GetFile(paths)](#M-Bb-Loaders-WebApplicationBuilderInitializerNLog-GetFile-System-String[]- 'Bb.Loaders.WebApplicationBuilderInitializerNLog.GetFile(System.String[])')
-  - [GetFile(dir)](#M-Bb-Loaders-WebApplicationBuilderInitializerNLog-GetFile-System-IO-DirectoryInfo- 'Bb.Loaders.WebApplicationBuilderInitializerNLog.GetFile(System.IO.DirectoryInfo)')
-  - [HasListener()](#M-Bb-Loaders-WebApplicationBuilderInitializerNLog-HasListener 'Bb.Loaders.WebApplicationBuilderInitializerNLog.HasListener')
 - [WebApplicationBuilderIocInitializer](#T-Bb-Loaders-WebApplicationBuilderIocInitializer 'Bb.Loaders.WebApplicationBuilderIocInitializer')
   - [Execute(builder)](#M-Bb-Loaders-WebApplicationBuilderIocInitializer-Execute-Microsoft-AspNetCore-Builder-WebApplicationBuilder- 'Bb.Loaders.WebApplicationBuilderIocInitializer.Execute(Microsoft.AspNetCore.Builder.WebApplicationBuilder)')
 - [WebService](#T-Bb-Services-WebService 'Bb.Services.WebService')
@@ -275,6 +281,8 @@
   - [WithHTTPS(port)](#M-Bb-Services-WebService-WithHTTPS-System-Nullable{System-Int32}- 'Bb.Services.WebService.WithHTTPS(System.Nullable{System.Int32})')
   - [WithHTTPS(host,port)](#M-Bb-Services-WebService-WithHTTPS-System-String,System-Nullable{System-Int32}- 'Bb.Services.WebService.WithHTTPS(System.String,System.Nullable{System.Int32})')
 - [Windows](#T-Bb-Services-CertificateHelpers-Windows 'Bb.Services.CertificateHelpers.Windows')
+  - [LoadCertificateFromWindowsStore(subjectName)](#M-Bb-Services-CertificateHelpers-Windows-LoadCertificateFromWindowsStore-System-String- 'Bb.Services.CertificateHelpers.Windows.LoadCertificateFromWindowsStore(System.String)')
+  - [SetCertificateInStore(certificate)](#M-Bb-Services-CertificateHelpers-Windows-SetCertificateInStore-System-Security-Cryptography-X509Certificates-X509Certificate2- 'Bb.Services.CertificateHelpers.Windows.SetCertificateInStore(System.Security.Cryptography.X509Certificates.X509Certificate2)')
 
 <a name='T-Bb-Services-ApiKeyGenerator'></a>
 ## ApiKeyGenerator `type`
@@ -324,7 +332,7 @@ This method creates a random string using a mix of alphanumeric and special char
 The randomness is based on the standard .NET Random class.
 
 <a name='M-Bb-Services-ApiKeyGenerator-GenerateIdentifiers-System-String,System-Int32,System-Int32,System-String-'></a>
-### GenerateIdentifiers(apiKey,salt,loginLength,pwdLength) `method`
+### GenerateIdentifiers(apiKey,salt,loginLength,passwordLength) `method`
 
 ##### Summary
 
@@ -341,7 +349,7 @@ A tuple containing the generated login and password.
 | apiKey | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The raw data to use as seed for generating identifiers. Must not be null or empty. |
 | salt | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | third part for concatenate to rawData before generate login and password |
 | loginLength | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | after hash is computed select only length character for login |
-| pwdLength | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | after hash is computed select only length character for password |
+| passwordLength | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | after hash is computed select only length character for password |
 
 ##### Exceptions
 
@@ -431,6 +439,10 @@ This method computes the SHA256 hash of the raw data and returns it as a hexadec
 
 Bb.Extensions
 
+##### Summary
+
+Class containing extension methods for configuring API key authentication and REST client services in a web application.
+
 <a name='M-Bb-Extensions-ApikeyExtension-AddRestClient-Microsoft-Extensions-DependencyInjection-IServiceCollection-'></a>
 ### AddRestClient(services) `method`
 
@@ -491,7 +503,7 @@ var serviceProvider = services.BuildServiceProvider();
 This method registers the necessary services for token management, including memory caching and token resolution.
 
 <a name='M-Bb-Extensions-ApikeyExtension-WithApiKeyAuthentication-Microsoft-AspNetCore-Builder-WebApplication-'></a>
-### WithApiKeyAuthentication(app) `method`
+### WithApiKeyAuthentication(application) `method`
 
 ##### Summary
 
@@ -505,7 +517,7 @@ The configured [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication '
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| app | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
+| application | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
 
 ##### Exceptions
 
@@ -616,65 +628,6 @@ Console.WriteLine($"Contains routes: {containsRoutes}");
 ##### Remarks
 
 This method checks if the assembly references "Microsoft.AspNetCore.Components" and contains types decorated with [RouteAttribute](#T-Microsoft-AspNetCore-Components-RouteAttribute 'Microsoft.AspNetCore.Components.RouteAttribute').
-
-<a name='M-Bb-Loaders-Extensions-Assemblies-ContainPage2-System-Reflection-Assembly-'></a>
-### ContainPage2(assembly) `method`
-
-##### Summary
-
-Determines if the specified assembly contains types with route attributes, based on a specific referenced assembly name.
-
-##### Returns
-
-`true` if the assembly contains types with route attributes; otherwise, `false`.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| assembly | [System.Reflection.Assembly](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Reflection.Assembly 'System.Reflection.Assembly') | The [Assembly](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Reflection.Assembly 'System.Reflection.Assembly') to check. Must not be null. |
-
-##### Example
-
-```C#
-var assembly = Assembly.GetExecutingAssembly();
-bool containsRoutes = assembly.ContainPage2();
-Console.WriteLine($"Contains routes: {containsRoutes}");
-```
-
-##### Remarks
-
-This method checks if the assembly references the assembly containing [ExposeClassAttribute](#T-Bb-ComponentModel-Attributes-ExposeClassAttribute 'Bb.ComponentModel.Attributes.ExposeClassAttribute') and contains types decorated with [RouteAttribute](#T-Microsoft-AspNetCore-Components-RouteAttribute 'Microsoft.AspNetCore.Components.RouteAttribute').
-
-<a name='M-Bb-Loaders-Extensions-Assemblies-ContainPage2-System-Reflection-Assembly,System-String-'></a>
-### ContainPage2(assembly,textToSearch) `method`
-
-##### Summary
-
-Determines if the specified assembly contains types with route attributes, based on a specific text to search in referenced assembly names.
-
-##### Returns
-
-`true` if the assembly contains types with route attributes; otherwise, `false`.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| assembly | [System.Reflection.Assembly](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Reflection.Assembly 'System.Reflection.Assembly') | The [Assembly](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Reflection.Assembly 'System.Reflection.Assembly') to check. Must not be null. |
-| textToSearch | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The text to search for in the referenced assembly names. Must not be null or empty. |
-
-##### Example
-
-```C#
-var assembly = Assembly.GetExecutingAssembly();
-bool containsRoutes = assembly.ContainPage2("Microsoft.AspNetCore.Components");
-Console.WriteLine($"Contains routes: {containsRoutes}");
-```
-
-##### Remarks
-
-This method checks if the assembly references an assembly whose name starts with the specified text and contains types decorated with [RouteAttribute](#T-Microsoft-AspNetCore-Components-RouteAttribute 'Microsoft.AspNetCore.Components.RouteAttribute').
 
 <a name='T-Bb-Models-BearerOption'></a>
 ## BearerOption `type`
@@ -1014,6 +967,10 @@ This property indicates whether the certificate is loaded from a file, a store, 
 
 Bb.Services
 
+##### Summary
+
+Provides helper methods for managing X.509 certificates, including loading, saving, creating, and storing certificates.
+
 <a name='M-Bb-Services-CertificateHelpers-CreateSelfSignedCertificate-System-String,System-String-'></a>
 ### CreateSelfSignedCertificate(subjectName,password) `method`
 
@@ -1141,6 +1098,12 @@ Stores a certificate in the certificate store.
 | ---- | ---- | ----------- |
 | certificate | [System.Security.Cryptography.X509Certificates.X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') | The certificate to store. Must not be null. |
 
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.PlatformNotSupportedException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.PlatformNotSupportedException 'System.PlatformNotSupportedException') | Thrown if the current platform is not supported for storing certificates. |
+
 ##### Example
 
 ```C#
@@ -1150,6 +1113,92 @@ CertificateHelpers.StoreCertificate(certificate);
 ##### Remarks
 
 This method adds the certificate to the appropriate certificate store based on the platform.
+
+<a name='T-Bb-Exceptions-CertificateNotFoundException'></a>
+## CertificateNotFoundException `type`
+
+##### Namespace
+
+Bb.Exceptions
+
+##### Summary
+
+Represents an exception that is thrown when a required certificate cannot be found.
+
+##### Remarks
+
+This exception is used to indicate issues related to missing certificates in the application.
+
+<a name='M-Bb-Exceptions-CertificateNotFoundException-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Initializes a new instance of the [CertificateNotFoundException](#T-Bb-Exceptions-CertificateNotFoundException 'Bb.Exceptions.CertificateNotFoundException') class.
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-Bb-Exceptions-CertificateNotFoundException-#ctor-System-String-'></a>
+### #ctor(message) `constructor`
+
+##### Summary
+
+Initializes a new instance of the [CertificateNotFoundException](#T-Bb-Exceptions-CertificateNotFoundException 'Bb.Exceptions.CertificateNotFoundException') class with a specified error message.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| message | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The message that describes the error. |
+
+##### Example
+
+```C#
+throw new CertificateNotFoundException("Certificate with ID 1234 not found.");
+```
+
+##### Remarks
+
+Use this constructor to provide a custom error message when the exception is thrown.
+
+<a name='M-Bb-Exceptions-CertificateNotFoundException-#ctor-System-String,System-Exception-'></a>
+### #ctor(message,inner) `constructor`
+
+##### Summary
+
+Initializes a new instance of the [CertificateNotFoundException](#T-Bb-Exceptions-CertificateNotFoundException 'Bb.Exceptions.CertificateNotFoundException') class with a specified error message and a reference to the inner exception that is the cause of this exception.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| message | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The message that describes the error. |
+| inner | [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | The exception that is the cause of the current exception. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if `message` is null. |
+
+##### Example
+
+```C#
+try
+{
+    // Some operation that may fail
+}
+catch (Exception ex)
+{
+    throw new CertificateNotFoundException("Certificate operation failed.", ex);
+}
+```
+
+##### Remarks
+
+Use this constructor to provide additional context about the error by including an inner exception.
 
 <a name='T-Bb-Models-ClientOptionConfiguration'></a>
 ## ClientOptionConfiguration `type`
@@ -1192,8 +1241,8 @@ Bb.Extensions
 
 Extension methods for configuring types in a web application.
 
-<a name='M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String[]-'></a>
-### LoadConfiguration(builder) `method`
+<a name='M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-Func{System-IO-FileInfo,System-Boolean},System-String-'></a>
+### LoadConfiguration(builder,filter,pattern) `method`
 
 ##### Summary
 
@@ -1207,7 +1256,9 @@ Load configuration and discover all methods for loading configuration
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| builder | [Microsoft.AspNetCore.Builder.WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') | [WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') |
+| builder | [Microsoft.AspNetCore.Builder.WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') | [IConfigurationBuilder](#T-Microsoft-Extensions-Configuration-IConfigurationBuilder 'Microsoft.Extensions.Configuration.IConfigurationBuilder') |
+| filter | [System.Func{System.IO.FileInfo,System.Boolean}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.IO.FileInfo,System.Boolean}') | filter to validate files |
+| pattern | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | pattern globing |
 
 ##### Example
 
@@ -1215,7 +1266,7 @@ Load configuration and discover all methods for loading configuration
 var builder = WebApplication.CreateBuilder(args).LoadConfiguration();
 ```
 
-If you want adding configuration, append a new class with the attribute [](#!-ExposeClassAttribute 'ExposeClassAttribute') and implement 
+If you want adding configuration, append a new class with the attribute [ExposeClassAttribute](#T-Bb-ComponentModel-Attributes-ExposeClassAttribute 'Bb.ComponentModel.Attributes.ExposeClassAttribute') and implement 
 the interface [IInjectBuilder\`1](#T-Bb-ComponentModel-IInjectBuilder`1 'Bb.ComponentModel.IInjectBuilder`1')
 
 ```Csharp
@@ -1261,23 +1312,72 @@ If you want deactivate a configuration loader, you can add a key in your configu
 },
 ```
 
-<a name='T-Bb-Extensions-ConfigurationFile'></a>
+<a name='M-Bb-Extensions-ConfigurationExtension-LoadConfiguration-Microsoft-Extensions-Configuration-IConfigurationBuilder,System-Func{System-IO-FileInfo,System-Boolean},System-String-'></a>
+### LoadConfiguration(builder,filter,pattern) `method`
+
+##### Summary
+
+Load configurations file, secret keys, environment variables, ...
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| builder | [Microsoft.Extensions.Configuration.IConfigurationBuilder](#T-Microsoft-Extensions-Configuration-IConfigurationBuilder 'Microsoft.Extensions.Configuration.IConfigurationBuilder') | application builder |
+| filter | [System.Func{System.IO.FileInfo,System.Boolean}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.IO.FileInfo,System.Boolean}') | filter to validate files |
+| pattern | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | pattern globing |
+
+<a name='T-Bb-Services-ConfigurationFile'></a>
 ## ConfigurationFile `type`
 
 ##### Namespace
 
-Bb.Extensions
+Bb.Services
 
 ##### Summary
 
 Represents a configuration file with its associated properties.
 
-<a name='T-Bb-Extensions-ConfigurationLoader'></a>
-## ConfigurationLoader `type`
+##### Remarks
 
-##### Namespace
+This structure holds information about a configuration file, including its name, file information, and associated environment.
 
-Bb.Extensions
+<a name='F-Bb-Services-ConfigurationFile-Environment'></a>
+### Environment `constants`
+
+##### Summary
+
+Gets or sets the environment associated with the configuration file.
+
+##### Remarks
+
+The environment is extracted from the file's name, if available.
+
+<a name='F-Bb-Services-ConfigurationFile-FileInfo'></a>
+### FileInfo `constants`
+
+##### Summary
+
+Gets or sets the file information of the configuration file.
+
+##### Remarks
+
+This property provides access to the file's metadata and path.
+
+<a name='F-Bb-Services-ConfigurationFile-Name'></a>
+### Name `constants`
+
+##### Summary
+
+Gets or sets the name of the configuration file.
+
+##### Remarks
+
+The name is computed based on the file's base name.
 
 <a name='T-Bb-Loaders-ConfigurationLoader'></a>
 ## ConfigurationLoader `type`
@@ -1290,12 +1390,39 @@ Bb.Loaders
 
 Download configuration form git repository and load the configuration
 
-<a name='M-Bb-Extensions-ConfigurationLoader-#ctor-System-String,System-Func{System-IO-FileInfo,System-Boolean}-'></a>
+<a name='T-Bb-Services-ConfigurationLoader'></a>
+## ConfigurationLoader `type`
+
+##### Namespace
+
+Bb.Services
+
+##### Summary
+
+Provides functionality to load and manage configuration files grouped by their names.
+
+##### Remarks
+
+This class allows loading configuration files from specified directories, filtering them based on patterns and conditions, 
+and grouping them by their names for easy access.
+
+<a name='M-Bb-Loaders-ConfigurationLoader-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Initializes a new instance of the [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader') class.
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-Bb-Services-ConfigurationLoader-#ctor-System-String,System-Func{System-IO-FileInfo,System-Boolean}-'></a>
 ### #ctor(pattern,filter) `constructor`
 
 ##### Summary
 
-Initializes a new instance of the [ConfigurationLoader](#T-Bb-Extensions-ConfigurationLoader 'Bb.Extensions.ConfigurationLoader') class.
+Initializes a new instance of the [ConfigurationLoader](#T-Bb-Services-ConfigurationLoader 'Bb.Services.ConfigurationLoader') class.
 
 ##### Parameters
 
@@ -1313,17 +1440,6 @@ var loader = new ConfigurationLoader("*.config", file =&gt; file.Length &gt; 0);
 ##### Remarks
 
 This constructor sets up the loader with a specified file pattern and optional filter for selecting files.
-
-<a name='M-Bb-Loaders-ConfigurationLoader-#ctor'></a>
-### #ctor() `constructor`
-
-##### Summary
-
-Initializes a new instance of the [ConfigurationLoader](#T-Bb-Loaders-ConfigurationLoader 'Bb.Loaders.ConfigurationLoader') class.
-
-##### Parameters
-
-This constructor has no parameters.
 
 <a name='P-Bb-Loaders-ConfigurationLoader-Configuration'></a>
 ### Configuration `property`
@@ -1363,138 +1479,6 @@ Console.WriteLine($"Git URL: {configPath["url"]}");
 
 This property is injected by the IoC container and contains keys such as "url", "user", "email", "branch", and "folder" for configuring the Git repository.
 
-<a name='M-Bb-Extensions-ConfigurationLoader-AddFolders-System-String[]-'></a>
-### AddFolders(paths) `method`
-
-##### Summary
-
-Adds folders to the configuration loader and loads matching files.
-
-##### Returns
-
-The updated [ConfigurationLoader](#T-Bb-Extensions-ConfigurationLoader 'Bb.Extensions.ConfigurationLoader') instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| paths | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | An array of folder paths to add. Can be null. |
-
-##### Example
-
-```C#
-var loader = new ConfigurationLoader("*.json");
-loader.AddFolders("C:\\Configs", "D:\\MoreConfigs");
-```
-
-##### Remarks
-
-This method scans the specified folders for configuration files matching the loader's pattern and filter, and adds them to the internal collection.
-
-<a name='M-Bb-Extensions-ConfigurationLoader-ComputeEnvironmentName-System-String-'></a>
-### ComputeEnvironmentName(name) `method`
-
-##### Summary
-
-Computes the environment name from a configuration file's filename.
-
-##### Returns
-
-The environment name if present; otherwise, `null`.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The filename to process. Must not be null or empty. |
-
-##### Remarks
-
-This method extracts the environment name from the second segment of the filename, if available.
-
-<a name='M-Bb-Extensions-ConfigurationLoader-ComputeName-System-String-'></a>
-### ComputeName(name) `method`
-
-##### Summary
-
-Computes the name of a configuration file based on its filename.
-
-##### Returns
-
-The computed name of the file.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The filename to process. Must not be null or empty. |
-
-##### Remarks
-
-This method extracts the base name of the file by splitting it on the '.' character.
-
-<a name='M-Bb-Extensions-ConfigurationLoader-GetEnumerator'></a>
-### GetEnumerator() `method`
-
-##### Summary
-
-Returns an enumerator that iterates through the grouped configuration files.
-
-##### Returns
-
-An enumerator of [IGrouping\`2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.IGrouping`2 'System.Linq.IGrouping`2') where TKey is a string and TElement is [ConfigurationFile](#T-Bb-Extensions-ConfigurationFile 'Bb.Extensions.ConfigurationFile').
-
-##### Parameters
-
-This method has no parameters.
-
-##### Example
-
-```C#
-var loader = new ConfigurationLoader("*.json");
-foreach (var group in loader)
-{
-    Console.WriteLine($"Group: {group.Key}");
-    foreach (var file in group)
-    {
-        Console.WriteLine($"File: {file.FileInfo.FullName}");
-    }
-}
-```
-
-##### Remarks
-
-This method groups the configuration files by their names and provides an enumerator for iteration.
-
-<a name='M-Bb-Extensions-ConfigurationLoader-GetFiles-System-Func{System-IO-FileInfo,System-Boolean},System-IO-DirectoryInfo,System-String-'></a>
-### GetFiles(filter,item,pattern) `method`
-
-##### Summary
-
-Retrieves a list of configuration files from the specified directory that match the given pattern and filter.
-
-##### Returns
-
-A list of [ConfigurationFile](#T-Bb-Extensions-ConfigurationFile 'Bb.Extensions.ConfigurationFile') objects that match the criteria.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| filter | [System.Func{System.IO.FileInfo,System.Boolean}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.IO.FileInfo,System.Boolean}') | A filter function to apply to files. Can be null. |
-| item | [System.IO.DirectoryInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.DirectoryInfo 'System.IO.DirectoryInfo') | The directory to search for files. Must not be null. |
-| pattern | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The file pattern to search for. Must not be null or empty. |
-
-##### Exceptions
-
-| Name | Description |
-| ---- | ----------- |
-| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if the directory or pattern is null. |
-
-##### Remarks
-
-This method scans the specified directory for files matching the given pattern and filter, and includes only files relevant to the current environment.
-
 <a name='M-Bb-Loaders-ConfigurationLoader-Execute-Microsoft-AspNetCore-Builder-WebApplicationBuilder-'></a>
 ### Execute(context) `method`
 
@@ -1526,12 +1510,148 @@ app.Run();
 
 This method downloads configuration files from a Git repository based on the provided configuration path and loads them into the application context.
 
+<a name='M-Bb-Services-ConfigurationLoader-AddFolders-System-String[]-'></a>
+### AddFolders(paths) `method`
+
+##### Summary
+
+Adds folders to the configuration loader and loads matching files.
+
+##### Returns
+
+The updated [ConfigurationLoader](#T-Bb-Services-ConfigurationLoader 'Bb.Services.ConfigurationLoader') instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| paths | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | An array of folder paths to add. Can be null. |
+
+##### Example
+
+```C#
+var loader = new ConfigurationLoader("*.json");
+loader.AddFolders("C:\\Configs", "D:\\MoreConfigs");
+```
+
+##### Remarks
+
+This method scans the specified folders for configuration files matching the loader's pattern and filter, and adds them to the internal collection.
+
+<a name='M-Bb-Services-ConfigurationLoader-ComputeEnvironmentName-System-String-'></a>
+### ComputeEnvironmentName(name) `method`
+
+##### Summary
+
+Computes the environment name from a configuration file's filename.
+
+##### Returns
+
+The environment name if present; otherwise, `null`.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The filename to process. Must not be null or empty. |
+
+##### Remarks
+
+This method extracts the environment name from the second segment of the filename, if available.
+
+<a name='M-Bb-Services-ConfigurationLoader-ComputeName-System-String-'></a>
+### ComputeName(name) `method`
+
+##### Summary
+
+Computes the name of a configuration file based on its filename.
+
+##### Returns
+
+The computed name of the file.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The filename to process. Must not be null or empty. |
+
+##### Remarks
+
+This method extracts the base name of the file by splitting it on the '.' character.
+
+<a name='M-Bb-Services-ConfigurationLoader-GetEnumerator'></a>
+### GetEnumerator() `method`
+
+##### Summary
+
+Returns an enumerator that iterates through the grouped configuration files.
+
+##### Returns
+
+An enumerator of [IGrouping\`2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.IGrouping`2 'System.Linq.IGrouping`2') where TKey is a string and TElement is [ConfigurationFile](#T-Bb-Services-ConfigurationFile 'Bb.Services.ConfigurationFile').
+
+##### Parameters
+
+This method has no parameters.
+
+##### Example
+
+```C#
+var loader = new ConfigurationLoader("*.json");
+foreach (var group in loader)
+{
+    Console.WriteLine($"Group: {group.Key}");
+    foreach (var file in group)
+    {
+        Console.WriteLine($"File: {file.FileInfo.FullName}");
+    }
+}
+```
+
+##### Remarks
+
+This method groups the configuration files by their names and provides an enumerator for iteration.
+
+<a name='M-Bb-Services-ConfigurationLoader-GetFiles-System-Func{System-IO-FileInfo,System-Boolean},System-IO-DirectoryInfo,System-String-'></a>
+### GetFiles(filter,item,pattern) `method`
+
+##### Summary
+
+Retrieves a list of configuration files from the specified directory that match the given pattern and filter.
+
+##### Returns
+
+A list of [ConfigurationFile](#T-Bb-Services-ConfigurationFile 'Bb.Services.ConfigurationFile') objects that match the criteria.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| filter | [System.Func{System.IO.FileInfo,System.Boolean}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.IO.FileInfo,System.Boolean}') | A filter function to apply to files. Can be null. |
+| item | [System.IO.DirectoryInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.DirectoryInfo 'System.IO.DirectoryInfo') | The directory to search for files. Must not be null. |
+| pattern | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The file pattern to search for. Must not be null or empty. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if the directory or pattern is null. |
+
+##### Remarks
+
+This method scans the specified directory for files matching the given pattern and filter, and includes only files relevant to the current environment.
+
 <a name='T-Bb-Extensions-HttpContextExtension'></a>
 ## HttpContextExtension `type`
 
 ##### Namespace
 
 Bb.Extensions
+
+##### Summary
+
+Extension methods for [HttpContext](#T-Microsoft-AspNetCore-Http-HttpContext 'Microsoft.AspNetCore.Http.HttpContext') to facilitate setting HTTP responses.
 
 <a name='P-Bb-Extensions-HttpContextExtension-IsDebug'></a>
 ### IsDebug `property`
@@ -1958,7 +2078,7 @@ Bb.Interfaces
 Interface for resolving and retrieving secrets from a vault or secure storage.
 
 <a name='M-Bb-Interfaces-IVaultSecretResolver-GetSecret-System-String[]-'></a>
-### GetSecret(name) `method`
+### GetSecret(path) `method`
 
 ##### Summary
 
@@ -1972,13 +2092,13 @@ The secret value as a [String](http://msdn.microsoft.com/query/dev14.query?appId
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| name | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | An array of strings representing the names or keys to locate the secret. Must not be null or empty. |
+| path | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | An array of strings representing the names or keys to locate the secret. Must not be null or empty. |
 
 ##### Exceptions
 
 | Name | Description |
 | ---- | ----------- |
-| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if the provided `name` is null or empty. |
+| [System.ArgumentNullException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.ArgumentNullException 'System.ArgumentNullException') | Thrown if the provided `path` is null or empty. |
 
 ##### Example
 
@@ -2412,45 +2532,49 @@ The configured [WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplic
 ```C#
 var builder = WebApplication.CreateBuilder(args);
 builder.ConfigureTrace();
-var app = builder.Build();
-app.Run();
+var application = builder.Build();
+application.Run();
 ```
 
 ##### Remarks
 
 This method sets up logging for the web application by using the builder's services to auto-configure logging providers.
 
-<a name='T-Bb-Loaders-SiteExtensions-OptionsEnum'></a>
+<a name='T-Bb-Loaders-Extensions-OptionsEnum'></a>
 ## OptionsEnum `type`
 
 ##### Namespace
 
-Bb.Loaders.SiteExtensions
+Bb.Loaders.Extensions
 
-<a name='F-Bb-Loaders-SiteExtensions-OptionsEnum-Configuration'></a>
+##### Summary
+
+Enumeration representing different options for configuration settings.
+
+<a name='F-Bb-Loaders-Extensions-OptionsEnum-Configuration'></a>
 ### Configuration `constants`
 
 ##### Summary
 
 Represents options related to configuration settings.
 
-<a name='T-Bb-Loaders-SiteExtensions-OptionsServices'></a>
+<a name='T-Bb-Loaders-Extensions-OptionsServices'></a>
 ## OptionsServices `type`
 
 ##### Namespace
 
-Bb.Loaders.SiteExtensions
+Bb.Loaders.Extensions
 
 ##### Summary
 
 Represents a service for managing options in a service collection.
 
-<a name='M-Bb-Loaders-SiteExtensions-OptionsServices-#ctor-Microsoft-Extensions-DependencyInjection-IServiceCollection-'></a>
+<a name='M-Bb-Loaders-Extensions-OptionsServices-#ctor-Microsoft-Extensions-DependencyInjection-IServiceCollection-'></a>
 ### #ctor(services) `constructor`
 
 ##### Summary
 
-Initializes a new instance of the [OptionsServices](#T-Bb-Loaders-SiteExtensions-OptionsServices 'Bb.Loaders.SiteExtensions.OptionsServices') class.
+Initializes a new instance of the [OptionsServices](#T-Bb-Loaders-Extensions-OptionsServices 'Bb.Loaders.Extensions.OptionsServices') class.
 
 ##### Parameters
 
@@ -2462,7 +2586,7 @@ Initializes a new instance of the [OptionsServices](#T-Bb-Loaders-SiteExtensions
 
 This constructor sets up the options services manager with the provided service collection.
 
-<a name='M-Bb-Loaders-SiteExtensions-OptionsServices-Items-System-IServiceProvider,Bb-Loaders-SiteExtensions-OptionsEnum-'></a>
+<a name='M-Bb-Loaders-Extensions-OptionsServices-Items-System-IServiceProvider,Bb-Loaders-Extensions-OptionsEnum-'></a>
 ### Items(services,option) `method`
 
 ##### Summary
@@ -2478,7 +2602,7 @@ An enumerable of [Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14I
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | services | [System.IServiceProvider](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IServiceProvider 'System.IServiceProvider') | The [IServiceProvider](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IServiceProvider 'System.IServiceProvider') used to resolve service instances. Must not be null. |
-| option | [Bb.Loaders.SiteExtensions.OptionsEnum](#T-Bb-Loaders-SiteExtensions-OptionsEnum 'Bb.Loaders.SiteExtensions.OptionsEnum') | The [OptionsEnum](#T-Bb-Loaders-SiteExtensions-OptionsEnum 'Bb.Loaders.SiteExtensions.OptionsEnum') value to filter the types. Must not be null. |
+| option | [Bb.Loaders.Extensions.OptionsEnum](#T-Bb-Loaders-Extensions-OptionsEnum 'Bb.Loaders.Extensions.OptionsEnum') | The [OptionsEnum](#T-Bb-Loaders-Extensions-OptionsEnum 'Bb.Loaders.Extensions.OptionsEnum') value to filter the types. Must not be null. |
 
 ##### Example
 
@@ -2793,18 +2917,18 @@ Console.WriteLine($"Number of packages: {packages.Count}");
 
 This operator allows an array of [Package](#T-Bb-Models-Package 'Bb.Models.Package') objects to be implicitly converted into a [Packages](#T-Bb-Models-Packages 'Bb.Models.Packages') collection, simplifying initialization.
 
-<a name='T-Bb-PolicyExtension'></a>
+<a name='T-Bb-Extensions-PolicyExtension'></a>
 ## PolicyExtension `type`
 
 ##### Namespace
 
-Bb
+Bb.Extensions
 
 ##### Summary
 
 Extension methods for configuring policies in a web application.
 
-<a name='M-Bb-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}-'></a>
+<a name='M-Bb-Extensions-PolicyExtension-AddPolicy-Microsoft-AspNetCore-Builder-WebApplicationBuilder,System-String,System-Func{Bb-Policies-Asts-PolicyRule,System-Boolean},System-Action{Microsoft-AspNetCore-Authorization-AuthorizationOptions}-'></a>
 ### AddPolicy(builder,filePath,filter,configureAction) `method`
 
 ##### Summary
@@ -2837,16 +2961,16 @@ The configured [WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplic
 ```C#
 var builder = WebApplication.CreateBuilder(args);
 builder.AddPolicy("policies.json", rule =&gt; rule.Name.StartsWith("Admin"), options =&gt; options.InvokeHandlersAfterFailure = true);
-var app = builder.Build();
-app.Run();
+var application = builder.Build();
+application.Run();
 ```
 
 ##### Remarks
 
 This method parses a policy file, evaluates its rules, and registers them into the application's authorization system.
 
-<a name='M-Bb-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication-'></a>
-### ConfigurePolicy(app) `method`
+<a name='M-Bb-Extensions-PolicyExtension-ConfigurePolicy-Microsoft-AspNetCore-Builder-WebApplication-'></a>
+### ConfigurePolicy(application) `method`
 
 ##### Summary
 
@@ -2860,7 +2984,7 @@ The configured [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication '
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| app | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
+| application | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
 
 ##### Example
 
@@ -2875,7 +2999,7 @@ app.Run();
 
 This method sets up the policy evaluator service and enables authentication and authorization middleware in the application.
 
-<a name='M-Bb-PolicyExtension-GetAuthorizePoliciesFromAssemblies'></a>
+<a name='M-Bb-Extensions-PolicyExtension-GetAuthorizePoliciesFromAssemblies'></a>
 ### GetAuthorizePoliciesFromAssemblies() `method`
 
 ##### Summary
@@ -2910,6 +3034,10 @@ This method scans all loaded assemblies for [AuthorizeAttribute](#T-Microsoft-As
 ##### Namespace
 
 Bb.Middleware.EntryFullLogger
+
+##### Summary
+
+Represents a model for logging HTTP request and response details.
 
 <a name='M-Bb-Middleware-EntryFullLogger-RequestResponseLogModel-#ctor'></a>
 ### #ctor() `constructor`
@@ -3385,6 +3513,37 @@ Console.WriteLine($"Headers: {string.Join(", ", formattedHeaders)}");
 
 This method converts the HTTP headers into a key-value pair dictionary for logging purposes.
 
+<a name='M-Bb-Middleware-RequestResponseLoggerMiddleware-FormatQueries-System-String-'></a>
+### FormatQueries(queryString) `method`
+
+##### Summary
+
+Formats query string parameters into a list of key-value pairs.
+
+##### Returns
+
+A [List\`1](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.List`1 'System.Collections.Generic.List`1') of key-value pairs representing the query parameters.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| queryString | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The query string to format. Must not be null or empty. |
+
+##### Example
+
+```C#
+var queryString = "?key1=value1&amp;key2=value2";
+var formattedQueries = FormatQueries(queryString);
+foreach (var query in formattedQueries)
+{
+    Console.WriteLine($"Key: {query.Key}, Value: {query.Value}");
+```
+
+##### Remarks
+
+This method parses the query string and converts it into a list of key-value pairs for logging purposes.
+
 <a name='M-Bb-Middleware-RequestResponseLoggerMiddleware-InvokeAsync-Microsoft-AspNetCore-Http-HttpContext,Bb-Middleware-EntryFullLogger-IRequestResponseLogModelCreator-'></a>
 ### InvokeAsync(httpContext,logCreator) `method`
 
@@ -3848,7 +4007,7 @@ Site.Services
 
 ##### Summary
 
-Generates JSON schemas for specified types and saves them to a directory.
+Generates JSON schema for specified types and saves them to a directory.
 
 <a name='M-Site-Services-SchemaGenerator-#ctor-System-String,System-String-'></a>
 ### #ctor(path,idTemplate) `constructor`
@@ -3861,7 +4020,7 @@ Initializes a new instance of the [SchemaGenerator](#T-Site-Services-SchemaGener
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| path | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The directory path where schemas will be saved. Must not be null or empty. |
+| path | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The directory path where schema will be saved. Must not be null or empty. |
 | idTemplate | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The template for generating schema IDs. Must not be null or empty. |
 
 ##### Exceptions
@@ -4054,8 +4213,47 @@ Bb.Extensions
 
 Represents the startup configuration for a web application.
 
+##### Remarks
+
+This class is responsible for configuring services, middleware, and the HTTP request pipeline for the application.
+
+<a name='M-Bb-Extensions-Startup-#ctor-Microsoft-Extensions-Configuration-IConfiguration,Bb-Services-WebService-'></a>
+### #ctor(configuration,service) `constructor`
+
+##### Summary
+
+Initializes a new instance of the [Startup](#T-Bb-Extensions-Startup 'Bb.Extensions.Startup') class with the specified configuration and web service.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| configuration | [Microsoft.Extensions.Configuration.IConfiguration](#T-Microsoft-Extensions-Configuration-IConfiguration 'Microsoft.Extensions.Configuration.IConfiguration') | configuration object |
+| service | [Bb.Services.WebService](#T-Bb-Services-WebService 'Bb.Services.WebService') | service to initialize |
+
+<a name='F-Bb-Extensions-Startup-_configuration'></a>
+### _configuration `constants`
+
+##### Summary
+
+The configuration object for the application.
+
+<a name='F-Bb-Extensions-Startup-_service'></a>
+### _service `constants`
+
+##### Summary
+
+service
+
+<a name='P-Bb-Extensions-Startup-Configuration'></a>
+### Configuration `property`
+
+##### Summary
+
+Gets the startup configuration for the application.
+
 <a name='M-Bb-Extensions-Startup-Configure-Microsoft-AspNetCore-Builder-WebApplication,Microsoft-AspNetCore-Hosting-IWebHostEnvironment-'></a>
-### Configure(app,env) `method`
+### Configure(application,environment) `method`
 
 ##### Summary
 
@@ -4065,17 +4263,17 @@ Configures the HTTP request pipeline for the web application.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| app | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
-| env | [Microsoft.AspNetCore.Hosting.IWebHostEnvironment](#T-Microsoft-AspNetCore-Hosting-IWebHostEnvironment 'Microsoft.AspNetCore.Hosting.IWebHostEnvironment') | The [IWebHostEnvironment](#T-Microsoft-AspNetCore-Hosting-IWebHostEnvironment 'Microsoft.AspNetCore.Hosting.IWebHostEnvironment') representing the hosting environment. Must not be null. |
+| application | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
+| environment | [Microsoft.AspNetCore.Hosting.IWebHostEnvironment](#T-Microsoft-AspNetCore-Hosting-IWebHostEnvironment 'Microsoft.AspNetCore.Hosting.IWebHostEnvironment') | The [IWebHostEnvironment](#T-Microsoft-AspNetCore-Hosting-IWebHostEnvironment 'Microsoft.AspNetCore.Hosting.IWebHostEnvironment') representing the hosting environment. Must not be null. |
 
 ##### Example
 
 ```C#
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+var application = builder.Build();
 var startup = new Startup(builder.Configuration, new WebService());
-startup.Configure(app, builder.Environment);
-app.Run();
+startup.Configure(application, builder.Environment);
+application.Run();
 ```
 
 ##### Remarks
@@ -4143,6 +4341,60 @@ Console.WriteLine($"Certificate loaded: {certificate.Subject}");
 
 This method attempts to load the certificate from the specified path or creates a self-signed certificate if none is found.
 
+<a name='M-Bb-Extensions-Startup-LoadFromFile-Bb-Models-Certificate-'></a>
+### LoadFromFile(certificate) `method`
+
+##### Summary
+
+Loads a certificate from a specified file or store.
+
+##### Returns
+
+The loaded [X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| certificate | [Bb.Models.Certificate](#T-Bb-Models-Certificate 'Bb.Models.Certificate') | The [Certificate](#T-Bb-Models-Certificate 'Bb.Models.Certificate') object containing certificate details. Must not be null. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.IO.FileNotFoundException](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.FileNotFoundException 'System.IO.FileNotFoundException') | Thrown if the specified file does not exist. |
+
+##### Remarks
+
+This method loads a certificate from a file or the certificate store based on the specified source type.
+
+<a name='M-Bb-Extensions-Startup-LoadFromFile2-Bb-Models-Certificate-'></a>
+### LoadFromFile2(certificate) `method`
+
+##### Summary
+
+Loads a certificate from a file or creates a self-signed certificate if no file is found.
+
+##### Returns
+
+The loaded or created [X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| certificate | [Bb.Models.Certificate](#T-Bb-Models-Certificate 'Bb.Models.Certificate') | The [Certificate](#T-Bb-Models-Certificate 'Bb.Models.Certificate') object containing certificate details. Must not be null. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | Thrown if the certificate cannot be created. |
+
+##### Remarks
+
+This method checks for existing certificate files in a folder and creates a self-signed certificate if none are found.
+
 <a name='M-Bb-Extensions-Startup-ManageBearer-Microsoft-Extensions-DependencyInjection-IServiceCollection-'></a>
 ### ManageBearer(services) `method`
 
@@ -4200,6 +4452,17 @@ Bb.Models
 
 Represents the startup configuration for the application.
 
+<a name='M-Bb-Models-StartupConfiguration-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Initializes a new instance of the [StartupConfiguration](#T-Bb-Models-StartupConfiguration 'Bb.Models.StartupConfiguration') class.
+
+##### Parameters
+
+This constructor has no parameters.
+
 <a name='P-Bb-Models-StartupConfiguration-AssemblyNames'></a>
 ### AssemblyNames `property`
 
@@ -4233,8 +4496,8 @@ Gets or sets the collection of folder paths.
 
 This property contains the paths to folders used by the application.
 
-<a name='P-Bb-Models-StartupConfiguration-HttpsCertificate'></a>
-### HttpsCertificate `property`
+<a name='P-Bb-Models-StartupConfiguration-HTTPSCertificate'></a>
+### HTTPSCertificate `property`
 
 ##### Summary
 
@@ -4418,7 +4681,7 @@ Console.WriteLine($"Service exists: {exists}");
 This method iterates through the service collection to determine if a specific service type has been registered.
 
 <a name='M-Bb-Extensions-StartupExtensions-UseStartupConfigure``1-Microsoft-AspNetCore-Builder-WebApplication,``0,Bb-ComponentModel-Factories-LocalServiceProvider-'></a>
-### UseStartupConfigure\`\`1(app,startup,serviceProvider) `method`
+### UseStartupConfigure\`\`1(application,startup,serviceProvider) `method`
 
 ##### Summary
 
@@ -4432,7 +4695,7 @@ The configured [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication '
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| app | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
+| application | [Microsoft.AspNetCore.Builder.WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') | The [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication 'Microsoft.AspNetCore.Builder.WebApplication') instance to configure. Must not be null. |
 | startup | [\`\`0](#T-``0 '``0') | The instance of the startup class. Must not be null. |
 | serviceProvider | [Bb.ComponentModel.Factories.LocalServiceProvider](#T-Bb-ComponentModel-Factories-LocalServiceProvider 'Bb.ComponentModel.Factories.LocalServiceProvider') | The local service provider to resolve dependencies. Must not be null. |
 
@@ -4446,10 +4709,10 @@ The configured [WebApplication](#T-Microsoft-AspNetCore-Builder-WebApplication '
 
 ```C#
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+var application = builder.Build();
 var startup = new MyStartup();
-app.UseStartupConfigure(startup, new LocalServiceProvider());
-app.Run();
+application.UseStartupConfigure(startup, new LocalServiceProvider());
+application.Run();
 ```
 
 ##### Remarks
@@ -4643,7 +4906,7 @@ Bb.Services
 Provides functionality to resolve and retrieve authentication tokens.
 
 <a name='M-Bb-Services-TokenResolver-#ctor-Bb-Interfaces-IRestClientFactory,Bb-Models-StartupConfiguration-'></a>
-### #ctor(restfactory,configuration) `constructor`
+### #ctor(restFactory,configuration) `constructor`
 
 ##### Summary
 
@@ -4653,7 +4916,7 @@ Initializes a new instance of the [TokenResolver](#T-Bb-Services-TokenResolver '
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| restfactory | [Bb.Interfaces.IRestClientFactory](#T-Bb-Interfaces-IRestClientFactory 'Bb.Interfaces.IRestClientFactory') | The factory to create REST clients. Must not be null. |
+| restFactory | [Bb.Interfaces.IRestClientFactory](#T-Bb-Interfaces-IRestClientFactory 'Bb.Interfaces.IRestClientFactory') | The factory to create REST clients. Must not be null. |
 | configuration | [Bb.Models.StartupConfiguration](#T-Bb-Models-StartupConfiguration 'Bb.Models.StartupConfiguration') | The startup configuration containing REST client options. Must not be null. |
 
 ##### Remarks
@@ -4661,11 +4924,11 @@ Initializes a new instance of the [TokenResolver](#T-Bb-Services-TokenResolver '
 This constructor sets up the token resolver with the necessary REST client factory and configuration.
 
 <a name='M-Bb-Services-TokenResolver-GeTokenAsync-System-String,System-String-'></a>
-### GeTokenAsync(username,password) `method`
+### GeTokenAsync(userName,password) `method`
 
 ##### Summary
 
-Retrieves a token asynchronously using the provided username and password.
+Retrieves a token asynchronously using the provided userName and password.
 
 ##### Returns
 
@@ -4675,7 +4938,7 @@ A [Task\`1](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| username | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The username for authentication. Must not be null or empty. |
+| userName | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The userName for authentication. Must not be null or empty. |
 | password | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The password for authentication. Must not be null or empty. |
 
 ##### Exceptions
@@ -4688,7 +4951,7 @@ A [Task\`1](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US
 
 ```C#
 var tokenResolver = new TokenResolver(restClientFactory, startupConfiguration);
-var tokenResponse = await tokenResolver.GeTokenAsync("username", "password");
+var tokenResponse = await tokenResolver.GeTokenAsync("userName", "password");
 ```
 
 ##### Remarks
@@ -4715,96 +4978,6 @@ This method has no parameters.
 ##### Remarks
 
 This method sets up the REST client using the configured token URL and client ID.
-
-<a name='T-Site-Services-TranslateService'></a>
-## TranslateService `type`
-
-##### Namespace
-
-Site.Services
-
-##### Summary
-
-Provides translation services for localized strings.
-
-<a name='M-Site-Services-TranslateService-#ctor'></a>
-### #ctor() `constructor`
-
-##### Summary
-
-Initializes a new instance of the [TranslateService](#T-Site-Services-TranslateService 'Site.Services.TranslateService') class.
-
-##### Parameters
-
-This constructor has no parameters.
-
-<a name='P-Site-Services-TranslateService-AvailableCultures'></a>
-### AvailableCultures `property`
-
-##### Summary
-
-Gets the available cultures for translation.
-
-##### Remarks
-
-This property provides the list of cultures supported by the translation service.
-
-<a name='M-Site-Services-TranslateService-Translate-Bb-Translations-TranslatedKeyLabel,Bb-Translations-TranslatedKeyLabel[]-'></a>
-### Translate(key,arguments) `method`
-
-##### Summary
-
-Translates a key into a localized string using the current UI culture.
-
-##### Returns
-
-The translated string.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| key | [Bb.Translations.TranslatedKeyLabel](#T-Bb-Translations-TranslatedKeyLabel 'Bb.Translations.TranslatedKeyLabel') | The key to translate. Must not be null. |
-| arguments | [Bb.Translations.TranslatedKeyLabel[]](#T-Bb-Translations-TranslatedKeyLabel[] 'Bb.Translations.TranslatedKeyLabel[]') | Optional arguments to format the translated string. Can be null. |
-
-##### Example
-
-```C#
-var translatedText = translateService.Translate(new TranslatedKeyLabel("HelloKey"), new TranslatedKeyLabel("WorldKey"));
-```
-
-##### Remarks
-
-This method retrieves the localized string for the specified key using the current UI culture and formats it with the provided arguments.
-
-<a name='M-Site-Services-TranslateService-Translate-System-Globalization-CultureInfo,Bb-Translations-TranslatedKeyLabel,Bb-Translations-TranslatedKeyLabel[]-'></a>
-### Translate(culture,key,arguments) `method`
-
-##### Summary
-
-Translates a key into a localized string using the specified culture.
-
-##### Returns
-
-The translated string.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| culture | [System.Globalization.CultureInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Globalization.CultureInfo 'System.Globalization.CultureInfo') | The culture to use for translation. Must not be null. |
-| key | [Bb.Translations.TranslatedKeyLabel](#T-Bb-Translations-TranslatedKeyLabel 'Bb.Translations.TranslatedKeyLabel') | The key to translate. Must not be null. |
-| arguments | [Bb.Translations.TranslatedKeyLabel[]](#T-Bb-Translations-TranslatedKeyLabel[] 'Bb.Translations.TranslatedKeyLabel[]') | Optional arguments to format the translated string. Can be null. |
-
-##### Example
-
-```C#
-var translatedText = translateService.Translate(new CultureInfo("fr-FR"), new TranslatedKeyLabel("HelloKey"));
-```
-
-##### Remarks
-
-This method retrieves the localized string for the specified key using the given culture and formats it with the provided arguments.
 
 <a name='T-Bb-Extensions-TypesExtension'></a>
 ## TypesExtension `type`
@@ -4873,6 +5046,73 @@ app.Run();
 ##### Remarks
 
 This method discovers all types with the `[ExposeClass]` attribute, binds their configurations, and registers them in the dependency injection container.
+
+<a name='T-Bb-Services-CertificateHelpers-Unix'></a>
+## Unix `type`
+
+##### Namespace
+
+Bb.Services.CertificateHelpers
+
+##### Summary
+
+Provides platform-specific methods for managing certificates on Unix-based systems.
+
+<a name='M-Bb-Services-CertificateHelpers-Unix-LoadCertificateFromUnixStore-System-String-'></a>
+### LoadCertificateFromUnixStore(subjectName) `method`
+
+##### Summary
+
+Loads a certificate from the Unix certificate store by subject name.
+
+##### Returns
+
+The loaded [X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| subjectName | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The subject name of the certificate. Must not be null or empty. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | Thrown if the certificate with the specified subject name is not found. |
+
+##### Example
+
+```C#
+var certificate = CertificateHelpers.Unix.LoadCertificateFromStore("MyCertificate");
+```
+
+##### Remarks
+
+This method retrieves a certificate from the Unix certificate store based on the subject name.
+
+<a name='M-Bb-Services-CertificateHelpers-Unix-SetCertificateInStore-System-Security-Cryptography-X509Certificates-X509Certificate2-'></a>
+### SetCertificateInStore(certificate) `method`
+
+##### Summary
+
+Stores a certificate in the Unix certificate store.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| certificate | [System.Security.Cryptography.X509Certificates.X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') | The certificate to store. Must not be null. |
+
+##### Example
+
+```C#
+CertificateHelpers.Unix.StoreCertificate(certificate);
+```
+
+##### Remarks
+
+This method adds the certificate to the Unix certificate store.
 
 <a name='T-Bb-Services-VaultEas256Resolver'></a>
 ## VaultEas256Resolver `type`
@@ -4959,179 +5199,6 @@ var secret = resolver.GetSecret("path", "to", "secret");
 ##### Remarks
 
 This method retrieves a secret from the vault by combining the provided path segments and decrypting the result using AES-256 encryption.
-
-<a name='T-Bb-Loaders-WebApplicationBuilderInitializerNLog'></a>
-## WebApplicationBuilderInitializerNLog `type`
-
-##### Namespace
-
-Bb.Loaders
-
-##### Summary
-
-Initializes NLog for a web application builder.
-
-<a name='M-Bb-Loaders-WebApplicationBuilderInitializerNLog-CreateDefaultFile-System-String[]@-'></a>
-### CreateDefaultFile(paths) `method`
-
-##### Summary
-
-Creates a default NLog configuration file if none exists.
-
-##### Returns
-
-The created [FileInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.FileInfo 'System.IO.FileInfo') object representing the default configuration file.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| paths | [System.String[]@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[]@ 'System.String[]@') | An array of paths where the configuration file should be created. Must not be null or empty. |
-
-##### Example
-
-```C#
-var paths = new[] { "C:\\Logs" };
-var initializer = new WebApplicationBuilderInitializerNLog();
-var file = initializer.CreateDefaultFile(ref paths);
-Console.WriteLine($"Default NLog configuration created at: {file.FullName}");
-```
-
-##### Remarks
-
-This method generates a default NLog configuration file in the specified directory if no configuration file is found.
-
-<a name='M-Bb-Loaders-WebApplicationBuilderInitializerNLog-Execute-Microsoft-AspNetCore-Builder-WebApplicationBuilder-'></a>
-### Execute(builder) `method`
-
-##### Summary
-
-Executes the NLog initializer for the web application builder.
-
-##### Returns
-
-`null` after configuring the builder.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| builder | [Microsoft.AspNetCore.Builder.WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') | The [WebApplicationBuilder](#T-Microsoft-AspNetCore-Builder-WebApplicationBuilder 'Microsoft.AspNetCore.Builder.WebApplicationBuilder') instance to configure. Must not be null. |
-
-##### Example
-
-```C#
-var builder = WebApplication.CreateBuilder(args);
-var initializer = new WebApplicationBuilderInitializerNLog();
-initializer.Execute(builder);
-var app = builder.Build();
-app.Run();
-```
-
-##### Remarks
-
-This method initializes NLog for the application by loading the configuration file, setting up logging options, and adding an NLog trace listener if none exists.
-
-<a name='M-Bb-Loaders-WebApplicationBuilderInitializerNLog-GetFile-System-String[]-'></a>
-### GetFile(paths) `method`
-
-##### Summary
-
-Retrieves the NLog configuration file from the specified paths.
-
-##### Returns
-
-The [FileInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.FileInfo 'System.IO.FileInfo') object representing the configuration file, or `null` if no file is found.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| paths | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | An array of paths to search for the configuration file. Must not be null or empty. |
-
-##### Example
-
-```C#
-var paths = new[] { "C:\\Logs", "D:\\Configs" };
-var initializer = new WebApplicationBuilderInitializerNLog();
-var file = initializer.GetFile(paths);
-if (file != null)
-{
-    Console.WriteLine($"NLog configuration found at: {file.FullName}");
-}
-else
-{
-    Console.WriteLine("No NLog configuration file found.");
-}
-```
-
-##### Remarks
-
-This method searches the specified directories for an NLog configuration file named "nlog.config".
-
-<a name='M-Bb-Loaders-WebApplicationBuilderInitializerNLog-GetFile-System-IO-DirectoryInfo-'></a>
-### GetFile(dir) `method`
-
-##### Summary
-
-Retrieves the NLog configuration file from a specific directory.
-
-##### Returns
-
-The [FileInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.FileInfo 'System.IO.FileInfo') object representing the configuration file, or `null` if no file is found.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| dir | [System.IO.DirectoryInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.DirectoryInfo 'System.IO.DirectoryInfo') | The [DirectoryInfo](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.DirectoryInfo 'System.IO.DirectoryInfo') object representing the directory to search. Must not be null. |
-
-##### Example
-
-```C#
-var dir = new DirectoryInfo("C:\\Logs");
-var initializer = new WebApplicationBuilderInitializerNLog();
-var file = initializer.GetFile(dir);
-if (file != null)
-{
-    Console.WriteLine($"NLog configuration found at: {file.FullName}");
-}
-else
-{
-    Console.WriteLine("No NLog configuration file found in the directory.");
-}
-```
-
-##### Remarks
-
-This method searches the specified directory and its subdirectories for an NLog configuration file named "nlog.config".
-
-<a name='M-Bb-Loaders-WebApplicationBuilderInitializerNLog-HasListener'></a>
-### HasListener() `method`
-
-##### Summary
-
-Checks if an NLog trace listener is already added to the trace listeners collection.
-
-##### Returns
-
-`true` if an NLog trace listener exists; otherwise, `false`.
-
-##### Parameters
-
-This method has no parameters.
-
-##### Example
-
-```C#
-var initializer = new WebApplicationBuilderInitializerNLog();
-bool hasListener = initializer.HasListener();
-Console.WriteLine($"NLog trace listener exists: {hasListener}");
-```
-
-##### Remarks
-
-This method iterates through the trace listeners collection to determine if an NLog trace listener is already present.
 
 <a name='T-Bb-Loaders-WebApplicationBuilderIocInitializer'></a>
 ## WebApplicationBuilderIocInitializer `type`
@@ -5845,4 +5912,60 @@ Bb.Services.CertificateHelpers
 
 ##### Summary
 
-Stores a certificate in the certificate store.
+Provides platform-specific methods for managing certificates on Windows.
+
+<a name='M-Bb-Services-CertificateHelpers-Windows-LoadCertificateFromWindowsStore-System-String-'></a>
+### LoadCertificateFromWindowsStore(subjectName) `method`
+
+##### Summary
+
+Loads a certificate from the Windows certificate store by subject name.
+
+##### Returns
+
+The loaded [X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| subjectName | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The subject name of the certificate. Must not be null or empty. |
+
+##### Exceptions
+
+| Name | Description |
+| ---- | ----------- |
+| [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | Thrown if the certificate with the specified subject name is not found. |
+
+##### Example
+
+```C#
+var certificate = CertificateHelpers.Windows.LoadCertificateFromStore("MyCertificate");
+```
+
+##### Remarks
+
+This method retrieves a certificate from the Windows certificate store based on the subject name.
+
+<a name='M-Bb-Services-CertificateHelpers-Windows-SetCertificateInStore-System-Security-Cryptography-X509Certificates-X509Certificate2-'></a>
+### SetCertificateInStore(certificate) `method`
+
+##### Summary
+
+Stores a certificate in the Windows certificate store.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| certificate | [System.Security.Cryptography.X509Certificates.X509Certificate2](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Security.Cryptography.X509Certificates.X509Certificate2 'System.Security.Cryptography.X509Certificates.X509Certificate2') | The certificate to store. Must not be null. |
+
+##### Example
+
+```C#
+CertificateHelpers.Windows.StoreCertificate(certificate);
+```
+
+##### Remarks
+
+This method adds the certificate to the Windows certificate store.

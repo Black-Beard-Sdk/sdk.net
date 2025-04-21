@@ -1,8 +1,13 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
+using Bb.Exceptions;
 
 namespace Bb.Services
 {
+
+    /// <summary>
+    /// Provides helper methods for managing X.509 certificates, including loading, saving, creating, and storing certificates.
+    /// </summary>
     public static class CertificateHelpers
     {
 
@@ -45,8 +50,8 @@ namespace Bb.Services
         {
             return Environment.OSVersion.Platform switch
             {
-                PlatformID.Win32NT => Windows.LoadCertificateFromStore(subjectName),
-                PlatformID.Unix => Unix.LoadCertificateFromStore(subjectName),
+                PlatformID.Win32NT => Windows.LoadCertificateFromWindowsStore(subjectName),
+                PlatformID.Unix => Unix.LoadCertificateFromUnixStore(subjectName),
                 _ => throw new PlatformNotSupportedException()
             };
         }
@@ -109,6 +114,9 @@ namespace Bb.Services
         /// <remarks>
         /// This method adds the certificate to the appropriate certificate store based on the platform.
         /// </remarks>
+        /// <exception cref="PlatformNotSupportedException">
+        /// Thrown if the current platform is not supported for storing certificates.
+        /// </exception>
         /// <example>
         /// <code lang="C#">
         /// CertificateHelpers.StoreCertificate(certificate);
@@ -120,12 +128,12 @@ namespace Bb.Services
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Unix:
-                    Unix.StoreCertificate(certificate);
+                    Unix.SetCertificateInStore(certificate);
                         break;
                 
                 case PlatformID.Win32Windows:
                 case PlatformID.Win32NT:
-                    Windows.StoreCertificate(certificate);
+                    Windows.SetCertificateInStore(certificate);
                         break;
 
                 case PlatformID.Win32S:
@@ -138,32 +146,54 @@ namespace Bb.Services
             }
         }
 
-
-
         /// <summary>
-        /// Stores a certificate in the certificate store.
+        /// Provides platform-specific methods for managing certificates on Windows.
         /// </summary>
         public static class Windows
         {
 
-            public static X509Certificate2 LoadCertificateFromStore(string subjectName)
+            /// <summary>
+            /// Loads a certificate from the Windows certificate store by subject name.
+            /// </summary>
+            /// <param name="subjectName">The subject name of the certificate. Must not be null or empty.</param>
+            /// <returns>The loaded <see cref="X509Certificate2"/> instance.</returns>
+            /// <remarks>
+            /// This method retrieves a certificate from the Windows certificate store based on the subject name.
+            /// </remarks>
+            /// <exception cref="Exception">
+            /// Thrown if the certificate with the specified subject name is not found.
+            /// </exception>
+            /// <example>
+            /// <code lang="C#">
+            /// var certificate = CertificateHelpers.Windows.LoadCertificateFromStore("MyCertificate");
+            /// </code>
+            /// </example>
+            public static X509Certificate2 LoadCertificateFromWindowsStore(string subjectName)
             {
                 using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
                 {
                     store.Open(OpenFlags.ReadOnly);
                     var certs = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, false);
                     if (certs.Count > 0)
-                    {
                         return certs[0];
-                    }
                     else
-                    {
-                        throw new Exception($"Certificat avec le nom de sujet '{subjectName}' non trouvé dans le magasin.");
-                    }
+                        throw new CertificateNotFoundException($"Certificat avec le nom de sujet '{subjectName}' non trouvé dans le magasin.");
                 }
             }
 
-            public static void StoreCertificate(X509Certificate2 certificate)
+            /// <summary>
+            /// Stores a certificate in the Windows certificate store.
+            /// </summary>
+            /// <param name="certificate">The certificate to store. Must not be null.</param>
+            /// <remarks>
+            /// This method adds the certificate to the Windows certificate store.
+            /// </remarks>
+            /// <example>
+            /// <code lang="C#">
+            /// CertificateHelpers.Windows.StoreCertificate(certificate);
+            /// </code>
+            /// </example>
+            public static void SetCertificateInStore(X509Certificate2 certificate)
             {
                 using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
                 {
@@ -174,27 +204,54 @@ namespace Bb.Services
 
         }
 
+        /// <summary>
+        /// Provides platform-specific methods for managing certificates on Unix-based systems.
+        /// </summary>
         public static class Unix
         {
 
-            public static X509Certificate2 LoadCertificateFromStore(string subjectName)
+            /// <summary>
+            /// Loads a certificate from the Unix certificate store by subject name.
+            /// </summary>
+            /// <param name="subjectName">The subject name of the certificate. Must not be null or empty.</param>
+            /// <returns>The loaded <see cref="X509Certificate2"/> instance.</returns>
+            /// <remarks>
+            /// This method retrieves a certificate from the Unix certificate store based on the subject name.
+            /// </remarks>
+            /// <exception cref="Exception">
+            /// Thrown if the certificate with the specified subject name is not found.
+            /// </exception>
+            /// <example>
+            /// <code lang="C#">
+            /// var certificate = CertificateHelpers.Unix.LoadCertificateFromStore("MyCertificate");
+            /// </code>
+            /// </example>
+            public static X509Certificate2 LoadCertificateFromUnixStore(string subjectName)
             {
                 using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
                 {
                     store.Open(OpenFlags.ReadOnly);
                     var certs = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, false);
                     if (certs.Count > 0)
-                    {
                         return certs[0];
-                    }
                     else
-                    {
-                        throw new Exception($"Certificat avec le nom de sujet '{subjectName}' non trouvé dans le magasin.");
-                    }
+                        throw new CertificateNotFoundException($"Certificat avec le nom de sujet '{subjectName}' non trouvé dans le magasin.");
                 }
             }
 
-            public static void StoreCertificate(X509Certificate2 certificate)
+            /// <summary>
+            /// Stores a certificate in the Unix certificate store.
+            /// </summary>
+            /// <param name="certificate">The certificate to store. Must not be null.</param>
+            /// <remarks>
+            /// This method adds the certificate to the Unix certificate store.
+            /// </remarks>
+            /// <example>
+            /// <code lang="C#">
+            /// CertificateHelpers.Unix.StoreCertificate(certificate);
+            /// </code>
+            /// </example>
+            public static void SetCertificateInStore(X509Certificate2 certificate)
             {
                 using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
                 {
@@ -204,6 +261,7 @@ namespace Bb.Services
             }
 
         }
+    
     }
 
 

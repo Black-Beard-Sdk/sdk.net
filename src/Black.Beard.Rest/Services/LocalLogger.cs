@@ -4,6 +4,32 @@ using System.Diagnostics;
 namespace Bb.Services
 {
 
+    /// <summary>
+    /// A generic logger that implements LocalLogger{TCategoryName} and inherits from LocalLogger.
+    /// </summary>
+    /// <typeparam name="TCategoryName">The category type for the logger.</typeparam>
+    internal class LocalLogger<TCategoryName> : LocalLogger, ILogger<TCategoryName>
+    {
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalLogger{TCategoryName}"/> class.
+        /// </summary>
+        public LocalLogger() : base(typeof(TCategoryName).FullName ?? "UnknownCategory")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LocalLogger{TCategoryName}"/> class with a custom writer.
+        /// </summary>
+        /// <param name="writer">The <see cref="TextWriter"/> instance to use for logging output.</param>
+        public LocalLogger(TextWriter writer) : base(typeof(TCategoryName).FullName ?? "UnknownCategory", writer)
+        {
+
+        }
+
+    }
+
+
     internal class LocalLogger : ILogger
     {
 
@@ -47,6 +73,7 @@ namespace Bb.Services
         /// This method returns a no-operation disposable object as the logger does not support scoped logging.
         /// </remarks>
         public IDisposable BeginScope<TState>(TState state)
+            where TState : notnull
         {
             return new NoopDisposable();
         }
@@ -61,9 +88,14 @@ namespace Bb.Services
         /// </remarks>
         public bool IsEnabled(LogLevel logLevel)
         {
-            // Active tous les niveaux de log par défaut
-            return logLevel != LogLevel.None;
+            return logLevel >= Level;
         }
+
+        /// <summary>
+        /// Gets or sets the log level for the logger.
+        /// </summary>
+        public LogLevel Level { get; set; }
+
 
         /// <summary>
         /// Logs a message with the specified log level and event data.
@@ -86,13 +118,13 @@ namespace Bb.Services
         /// logger.Log(LogLevel.Information, new EventId(1), "This is a log message.", null, (state, ex) => state.ToString());
         /// </code>
         /// </example>
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
 
             if (!IsEnabled(logLevel))
                 return;
 
-            if (state == null)
+            if (object.Equals(state, null))
                 throw new ArgumentNullException(nameof(state));
             if (formatter == null)
                 throw new ArgumentNullException(nameof(formatter));
@@ -106,7 +138,7 @@ namespace Bb.Services
             if (exception != null)
                 logMessage += Environment.NewLine + exception.ToString();
 
-            lock (_writer)
+            lock (_lock)
             {
 
                 if (Trace.Listeners.Count > 0)
@@ -149,14 +181,27 @@ namespace Bb.Services
         /// </summary>
         private class NoopDisposable : IDisposable
         {
-            /// <summary>
-            /// Performs no operation on disposal.
-            /// </summary>
-            public void Dispose() { }
+            private bool disposedValue;
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    disposedValue = true;
+                }
+            }
+
+            public void Dispose()
+            {
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
+            }
+
         }
 
         private readonly string _categoryName;
         private readonly TextWriter _writer;
+        private readonly object _lock = new object();
 
     }
 

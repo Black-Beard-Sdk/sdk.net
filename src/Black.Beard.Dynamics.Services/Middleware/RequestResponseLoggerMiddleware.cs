@@ -1,6 +1,9 @@
-﻿using Bb.Middleware.EntryFullLogger;
+﻿// Ignore Spelling: Middleware
+
+using Bb.Middleware.EntryFullLogger;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 
 namespace Bb.Middleware
 {
@@ -65,10 +68,8 @@ namespace Bb.Middleware
             HttpRequest request = httpContext.Request;
             /*log*/
             var ip = request.HttpContext.Connection.RemoteIpAddress;
-            
-            log.ClientIp = ip == null 
-                ? null 
-                : ip.ToString();
+
+            log.ClientIp = ip?.ToString();
 
             /*request*/
             log.Node = _options.Name;
@@ -80,7 +81,7 @@ namespace Bb.Middleware
             log.RequestBody = await ReadBodyFromRequest(request);
             log.RequestScheme = request.Scheme;
             log.RequestHost = request.Host.ToString();
-            log.RequestContentType = request.ContentType;
+            log.RequestContentType = request.ContentType ?? string.Empty;
 
             // Temporary replace the HttpResponseStream, which is a write-only stream, with a Memory stream to capture it's value in-flight.
             HttpResponse response = httpContext.Response;
@@ -166,10 +167,9 @@ namespace Bb.Middleware
         private Dictionary<string, string> FormatHeaders(IHeaderDictionary headers)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string>();
-            foreach (var header in headers)
-            {
-                pairs.Add(header.Key, header.Value);
-            }
+            foreach (KeyValuePair<string, StringValues> header in headers)
+                if (header.Value.Any())
+                    pairs.Add(header.Key, header.Value);
             return pairs;
         }
 
@@ -183,7 +183,7 @@ namespace Bb.Middleware
         /// </remarks>
         /// <example>
         /// <code lang="C#">
-        /// var queryString = "?key1=value1&key2=value2";
+        /// var queryString = "?key1=value1&amp;key2=value2";
         /// var formattedQueries = FormatQueries(queryString);
         /// foreach (var query in formattedQueries)
         /// {

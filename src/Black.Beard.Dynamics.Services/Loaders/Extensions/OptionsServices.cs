@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using System.Reflection;
 
-namespace Bb.Loaders.SiteExtensions
+namespace Bb.Loaders.Extensions
 {
 
 
@@ -61,32 +61,37 @@ namespace Bb.Loaders.SiteExtensions
 
             _types = new List<(OptionsEnum, Type, Type)>();
 
-            foreach (var service in _services)
-                if (service.ServiceType.IsGenericType && service.ServiceType.GetGenericTypeDefinition() == typeof(IConfigureOptions<>))
-                {
-                    var optionsType = service.ServiceType.GenericTypeArguments[0];
-
-                    var attribute = optionsType.GetCustomAttribute<ExposeClassAttribute>();
-                    if (attribute != null)
-                    {
-
-                        var instance = services.GetService(service.ServiceType);
-                        if (instance != null)
-                            _types.Add((OptionsEnum.Configuration, service.ServiceType, optionsType));
-
-                    }
-                }
+            if (_services != null)
+                foreach (var service in _services)
+                    if (service.ServiceType.IsGenericType && service.ServiceType.GetGenericTypeDefinition() == typeof(IConfigureOptions<>))
+                        ComputeItem(services, service);
 
             _services = null;
+        
         }
 
-        private IServiceCollection _services;
+        private void ComputeItem(IServiceProvider services, ServiceDescriptor service)
+        {
+            var optionsType = service.ServiceType.GenericTypeArguments[0];
+            var attribute = optionsType.GetCustomAttribute<ExposeClassAttribute>();
+            if (attribute != null)
+            {
+                var instance = services.GetService(service.ServiceType);
+                if (instance != null)
+                    _types.Add((OptionsEnum.Configuration, service.ServiceType, optionsType));
+            }
+        }
+
+        private IServiceCollection? _services;
         private List<(OptionsEnum, Type, Type)> _types;
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
     }
 
 
+    /// <summary>
+    /// Enumeration representing different options for configuration settings.
+    /// </summary>
     public enum OptionsEnum
     {
 

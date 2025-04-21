@@ -1,4 +1,7 @@
-﻿namespace Bb.Middleware.EntryFullLogger
+﻿
+// Ignore Spelling: Middleware
+
+namespace Bb.Middleware.EntryFullLogger
 {
 
     /// <summary>
@@ -37,7 +40,7 @@
         /// Console.WriteLine($"Log: {logString}");
         /// </code>
         /// </example>
-        string LogString();
+        string? LogString();
 
     }
 

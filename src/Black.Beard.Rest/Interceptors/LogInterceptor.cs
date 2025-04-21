@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Bb.Interceptors
 {
+
+    /// <summary>
+    /// Represents class for intercept and log
+    /// </summary>
     public class LogInterceptor : RestSharp.Interceptors.Interceptor
     {
         /// <summary>
@@ -16,7 +20,7 @@ namespace Bb.Interceptors
         /// <remarks>
         /// This constructor sets up the interceptor with the provided logging configurations and logger.
         /// </remarks>
-        public LogInterceptor(LogConfiguration<HttpRequestMessage> configurationRequest, LogConfiguration<HttpResponseMessage> configurationResponse, ILogger logger)
+        public LogInterceptor(LogConfiguration<HttpRequestMessage> configurationRequest, LogConfiguration<HttpResponseMessage> configurationResponse, ILogger? logger)
         {
             if (logger != null)
                 CurrentLogger = logger;
@@ -46,7 +50,7 @@ namespace Bb.Interceptors
             if (_configurationRequest.HasRule)
             {
                 var sb = new StringBuilder();
-                _configurationRequest.Log(requestMessage, sb, cancellationToken);
+                _configurationRequest?.Log(requestMessage, sb, cancellationToken);
                 sb.AppendLine();
                 CurrentLogger.LogDebug(sb.ToString());
             }
@@ -82,7 +86,7 @@ namespace Bb.Interceptors
             if (_configurationResponse.HasRule)
             {
                 var sb = new StringBuilder();
-                _configurationResponse.Log(responseMessage, sb, cancellationToken);
+                _configurationResponse?.Log(responseMessage, sb, cancellationToken);
                 CurrentLogger.LogDebug(sb.ToString());
             }
             await base.AfterHttpRequest(responseMessage, cancellationToken);
@@ -108,12 +112,12 @@ namespace Bb.Interceptors
         /// <remarks>
         /// This method creates a logger with the name "http client" if no logger is provided.
         /// </remarks>
-        private ILogger? CreateLogger()
+        private ILogger CreateLogger()
         {
             return new LocalLogger("http client");
         }
 
-        private ILogger _logger;
+        private ILogger? _logger;
         private readonly Stopwatch _stopwatch;
         private readonly LogConfiguration<HttpRequestMessage> _configurationRequest;
         private readonly LogConfiguration<HttpResponseMessage> _configurationResponse;

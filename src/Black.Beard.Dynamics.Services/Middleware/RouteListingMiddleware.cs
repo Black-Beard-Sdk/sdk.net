@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿// Ignore Spelling: Middleware
+
+using System.Text;
 
 namespace Bb.Middleware
 {

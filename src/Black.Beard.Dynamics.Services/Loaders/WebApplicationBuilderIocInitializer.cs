@@ -1,4 +1,6 @@
-﻿using Bb.ComponentModel;
+﻿// Ignore Spelling: Ioc
+
+using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.Extensions;
 
@@ -9,7 +11,7 @@ namespace Bb.Loaders
     /// <summary>
     /// Initializer
     /// </summary>
-    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScopeEnum.Transiant)]
+    [ExposeClass(ConstantsCore.Initialization, ExposedType = typeof(IInjectBuilder<WebApplicationBuilder>), LifeCycle = IocScope.Transiant)]
     public class WebApplicationBuilderIocInitializer : InjectBuilder<WebApplicationBuilder>
     {
 

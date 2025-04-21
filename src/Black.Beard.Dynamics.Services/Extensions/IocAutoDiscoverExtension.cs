@@ -1,4 +1,6 @@
-﻿using Bb.ComponentModel.Attributes;
+﻿// Ignore Spelling: Ioc
+
+using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
 using Bb.Configurations;
 using Site.Services;
@@ -17,8 +19,9 @@ namespace Bb.Extensions
 
         static IocAutoDiscoverExtension()
         {
-            _methodRegister = typeof(IocAutoDiscoverExtension).GetMethod(nameof(AddType), BindingFlags.NonPublic | BindingFlags.Static);
-            _methodOptionConfiguration = typeof(IocAutoDiscoverExtension).GetMethod(nameof(BindConfiguration), BindingFlags.NonPublic | BindingFlags.Static);            
+            var bindings = BindingFlags.NonPublic | BindingFlags.Static;
+            _methodRegister = typeof(IocAutoDiscoverExtension).GetMethod(nameof(AddType), bindings);
+            _methodOptionConfiguration = typeof(IocAutoDiscoverExtension).GetMethod(nameof(BindConfiguration), bindings);            
         }
 
         /// <summary>
@@ -226,23 +229,23 @@ namespace Bb.Extensions
             }
         }
 
-        private static void RegisterType<T>(this IServiceCollection services, Func<IServiceProvider, T> func, IocScopeEnum lifeCycle, Type exposedType)
+        private static void RegisterType<T>(this IServiceCollection services, Func<IServiceProvider, T> func, IocScope lifeCycle, Type exposedType)
             where T : class
         {
 
             switch (lifeCycle)
             {
 
-                case IocScopeEnum.Scoped:
+                case IocScope.Scoped:
                     services.AddScoped(exposedType, func);
                     break;
 
-                case IocScopeEnum.Singleton:
+                case IocScope.Singleton:
                     services.AddSingleton(exposedType, func);
                     break;
 
                 default:
-                case IocScopeEnum.Transiant:
+                case IocScope.Transiant:
                     services.AddTransient(exposedType, func);
                     break;
 
@@ -251,22 +254,22 @@ namespace Bb.Extensions
 
         }
 
-        private static void RegisterType<T>(this IServiceCollection services, IocScopeEnum lifeCycle, Type exposedType)
+        private static void RegisterType<T>(this IServiceCollection services, IocScope lifeCycle, Type exposedType)
             where T : class
         {
 
             switch (lifeCycle)
             {
 
-                case IocScopeEnum.Singleton:
+                case IocScope.Singleton:
                     services.AddSingleton(exposedType, typeof(T));
                     break;
 
-                case IocScopeEnum.Scoped:
+                case IocScope.Scoped:
                     services.AddScoped(exposedType, typeof(T));
                     break;
 
-                case IocScopeEnum.Transiant:
+                case IocScope.Transiant:
                 default:
                     services.AddTransient(exposedType, typeof(T));
                     break;

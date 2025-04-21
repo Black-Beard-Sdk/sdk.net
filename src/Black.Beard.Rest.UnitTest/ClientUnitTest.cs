@@ -1,3 +1,5 @@
+// Ignore Spelling: Auth
+
 using Bb.Curls;
 using RestSharp;
 using System.Net;
@@ -14,11 +16,12 @@ namespace Black.Beard.Rest.UnitTest
 
         public class ClientUnitTest
         {
+
             [Theory]
             [InlineData("--request", "POST")]
             [InlineData("-X", "GET")]
             [InlineData("--request", "PUT")]
-            public async Task ParseCurlLine_Request(string option, string method)
+            public void ParseCurlLine_Request(string option, string method)
             {
 
                 var request = Request.Create().WithPath("/");
@@ -37,7 +40,8 @@ namespace Black.Beard.Rest.UnitTest
 
                 // Arrange
                 var response = $"curl {option} {method} http://example.com"
-                    .CallRestAsync();
+                    .AsCurl()
+                    .CallAsync();
 
             }
 
@@ -103,7 +107,7 @@ namespace Black.Beard.Rest.UnitTest
 
             [Theory]
             [InlineData("--oauth2-bearer", "your_token_here")]
-            public void ParseCurlLine_Oauth2Bearer(string option, string token)
+            public void ParseCurlLine_OAuth2Bearer(string option, string token)
             {
                 // Arrange
                 var curlLine = $"curl {option} \"{token}\" http://example.com".ParseCurlLine();

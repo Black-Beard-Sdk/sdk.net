@@ -1,6 +1,7 @@
-﻿using Bb.ComponentModel;
-using Bb.ComponentModel.Attributes;
+﻿// Ignore Spelling: Middleware
 
+using Bb.ComponentModel;
+using Bb.ComponentModel.Attributes;
 
 namespace Bb.Middleware.EntryFullLogger
 {
@@ -8,7 +9,7 @@ namespace Bb.Middleware.EntryFullLogger
     /// <summary>
     /// Represents a factory for creating request and response log models.
     /// </summary>
-    [ExposeClass(Context = ConstantsCore.Service, ExposedType = typeof(IRequestResponseLogModelCreator), LifeCycle = IocScopeEnum.Singleton)]
+    [ExposeClass(Context = ConstantsCore.Service, ExposedType = typeof(IRequestResponseLogModelCreator), LifeCycle = IocScope.Singleton)]
     public class RequestResponseLogModelCreator : IRequestResponseLogModelCreator
     {
 
@@ -53,7 +54,7 @@ namespace Bb.Middleware.EntryFullLogger
         /// Console.WriteLine($"Serialized Log: {logString}");
         /// </code>
         /// </example>
-        public string LogString()
+        public string? LogString()
         {
             var jsonString = LogModel.Serialize(true);
             return jsonString;

@@ -50,7 +50,7 @@ namespace Bb.Extensions
             new AddonsResolver()
                     .WithReference(typeof(ExposeClassAttribute))
                     .SearchAssemblies()
-                    .ToList()
+                    .AsEnumerable()
                     .EnsureIsLoaded()
                     ;
 
@@ -158,10 +158,23 @@ namespace Bb.Extensions
         public static WebApplicationBuilder Initialize(this WebApplicationBuilder self)
         {
 
-            var SchemasPaths = Assembly.GetExecutingAssembly().GetDirectory().Combine("schemas");
-            var idTemplate = "http://Black.Beard.com/schema/{0}";
-            SchemaGenerator.Initialize(SchemasPaths, idTemplate);
 
+            #region initialize Schema
+
+            ContentFolder contentFolder = StaticContainer.Get<GlobalConfiguration>()[GlobalConfiguration.Schema];
+            if (!contentFolder.Any)
+            {
+                var SchemasPaths = Assembly.GetExecutingAssembly()
+                    .GetDirectory().Combine("Schemas");
+                contentFolder.AddDirectory(SchemasPaths);
+            }
+            var path = contentFolder.GetPaths().First();
+            var idTemplate = "http://Black.Beard.com/schema/{0}";
+            SchemaGenerator.Initialize(path, idTemplate);
+
+            #endregion initialize Schema
+
+            self.LoadConfiguration(null, null);
 
             self.AutoConfigure
             (
@@ -215,19 +228,11 @@ namespace Bb.Extensions
             self.AutoConfigure
             (
                 self.Services,
-                ConstantsCore.Initialization,
-                c =>
-                {
-                    //c.WithInjectValue(name => self.Configuration.GetValue<string>(name));
-                },
-                d =>
-                {
-                    //d.WithInjectValue(name => self.Configuration.GetValue<string>(name));
-                },
-                e =>
-                {
-                    e.WithInjectValue(name => self.Configuration.GetValue<string>(name));
-                }
+                ConstantsCore.Initialization, null, null,
+                  e =>
+                  {
+                      e.WithInjectValue(name => self.Configuration.GetValue<string>(name));
+                  }
                 );
 
             return self;

@@ -4,6 +4,9 @@ using RestSharp;
 namespace Bb.Extensions
 {
 
+    /// <summary>
+    /// Extension methods for <see cref="HttpContext"/> to facilitate setting HTTP responses.
+    /// </summary>
     public static class HttpContextExtension
     {
 
@@ -37,8 +40,9 @@ namespace Bb.Extensions
         /// </code>
         /// </example>
         public static async Task SetResponse(this HttpContext context, object data)
-        {            
-            await context.SetResponse(ContentTypes.ApplicationJson, data.Serialize(IsDebug));
+        {
+            var datas = data.Serialize(IsDebug) ?? string.Empty;
+            await context.SetResponse(ContentTypes.ApplicationJson, datas);
         }
 
         /// <summary>

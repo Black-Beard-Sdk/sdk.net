@@ -1,4 +1,6 @@
-﻿namespace Bb.Middleware.EntryFullLogger
+﻿// Ignore Spelling: Middleware
+
+namespace Bb.Middleware.EntryFullLogger
 {
 
     /// <summary>

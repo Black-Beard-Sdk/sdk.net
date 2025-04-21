@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Web;
+using System.Collections.Specialized;
 
 
 namespace Bb.Urls
@@ -20,31 +22,54 @@ namespace Bb.Urls
         /// <param name="obj">The object to parse into key-value pairs</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> is <see langword="null" />.</exception>
-        public static IEnumerable<(string Key, object Value)> ToKeyValuePairs(this object obj)
+        public static IEnumerable<(string Name, object? Value)> ToKeyValuePairs(this object obj)
         {
             if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
+                return [];
 
-            return
-                obj is string s ? StringToKV(s) :
-                obj is IEnumerable e ? CollectionToKV(e) :
-                ObjectToKV(obj);
+            if (obj is string s)
+                return StringToKV(s);
+
+            if (obj is IEnumerable e)
+                return CollectionToKV(e);
+
+            var result = ObjectToKV(obj);
+            if (result == null)
+                return [];
+
+            return result;
+
         }
 
         /// <summary>
         /// Returns a string that represents the current object, using CultureInfo.InvariantCulture where possible.
         /// Dates are represented in IS0 8601.
         /// </summary>
-        public static string? ToInvariantString(this object obj)
+        public static string ToInvariantString(this object obj)
         {
-            // inspired by: http://stackoverflow.com/a/19570016/62600
-            return
-                obj == null ? null :
-                obj is DateTime dt ? dt.ToString("o", CultureInfo.InvariantCulture) :
-                obj is DateTimeOffset dto ? dto.ToString("o", CultureInfo.InvariantCulture) :
-                obj is IConvertible c ? c.ToString(CultureInfo.InvariantCulture) :
-                obj is IFormattable f ? f.ToString(null, CultureInfo.InvariantCulture) :
-                obj.ToString();
+
+            if (obj == null)
+                return string.Empty;
+
+            if (obj is DateTime dt)
+                return dt.ToString("o", CultureInfo.InvariantCulture);
+
+            if (obj is DateTimeOffset dto)
+                return dto.ToString("o", CultureInfo.InvariantCulture);
+
+            if (obj is IConvertible c)
+                return c.ToString(CultureInfo.InvariantCulture);
+
+            if (obj is IFormattable f)
+                return f.ToString(null, CultureInfo.InvariantCulture);
+
+            var result = obj.ToString();
+
+            if (result == null)
+                result = string.Empty;
+
+            return result;
+
         }
 
         internal static bool OrdinalEquals(this string s, string value, bool ignoreCase = false) =>
@@ -65,32 +90,34 @@ namespace Bb.Urls
         /// <param name="s">The string to split.</param>
         /// <param name="separator">The separator to split on.</param>
         /// <returns>Array of at most 2 strings. (1 if separator is not found.)</returns>
-        public static string[] SplitOnFirstOccurence(this string s, string separator)
+        public static string[] SplitOnFirstOccurrence(this string s, string separator)
         {
             // Needed because full PCL profile doesn't support Split(char[], int) (#119)
             if (string.IsNullOrEmpty(s))
-                return new[] { s };
+                return [s];
 
             var i = s.IndexOf(separator);
             return i == -1 ?
-                new[] { s } :
-                new[] { s.Substring(0, i), s.Substring(i + separator.Length) };
+                [s] :
+                [s.Substring(0, i), s.Substring(i + separator.Length)];
         }
 
-        private static IEnumerable<(string Key, object Value)> StringToKV(string s)
+        private static IEnumerable<(string Key, object? Value)> StringToKV(string queryString)
         {
-            if (string.IsNullOrEmpty(s))
-                return Enumerable.Empty<(string, object)>();
 
-            return
-                from p in s.Split('&')
-                let pair = p.SplitOnFirstOccurence("=")
-                let name = pair[0]
-                let value = pair.Length == 1 ? null : pair[1]
-                select (name, (object)value);
+            if (string.IsNullOrEmpty(queryString))
+                return [];
+
+            var list = new List<(string Key, object Value)>();
+            NameValueCollection queryParams = HttpUtility.ParseQueryString(queryString);
+            foreach (string key in queryParams)
+                list.Add(new(key, queryParams[key] ?? string.Empty));
+
+            return (IEnumerable<(string Key, object? Value)>)list; // Don't remove the cast.
+
         }
 
-        private static IEnumerable<(string Name, object Value)> ObjectToKV(object obj) =>
+        private static IEnumerable<(string Name, object? Value)> ObjectToKV(object obj) =>
             from prop in obj.GetType().GetProperties()
             let getter = prop.GetGetMethod(false)
             where getter != null
@@ -120,9 +147,10 @@ namespace Bb.Urls
             return value;
         }
 
-        private static IEnumerable<(string Key, object Value)> CollectionToKV(IEnumerable col)
+        private static IEnumerable<(string Key, object? Value)> CollectionToKV(IEnumerable col)
         {
-            bool TryGetProp(object obj, string name, out object value)
+
+            bool TryGetProp(object obj, string name, out object? value)
             {
                 var prop = obj.GetType().GetProperty(name);
                 var field = obj.GetType().GetField(name);
@@ -141,7 +169,7 @@ namespace Bb.Urls
                 return false;
             }
 
-            bool IsTuple2(object item, out object name, out object val)
+            bool IsTuple2(object item, out object? name, out object? val)
             {
                 name = null;
                 val = null;
@@ -152,7 +180,7 @@ namespace Bb.Urls
                     !TryGetProp(item, "Item3", out _);
             }
 
-            bool LooksLikeKV(object item, out object name, out object val)
+            bool LooksLikeKV(object item, out object? name, out object? val)
             {
                 name = null;
                 val = null;
@@ -166,9 +194,9 @@ namespace Bb.Urls
                 if (item == null)
                     continue;
                 if (!IsTuple2(item, out var name, out var val) && !LooksLikeKV(item, out name, out val))
-                    yield return (item.ToInvariantString(), null);
+                    yield return (item.ToInvariantString() ?? string.Empty, null);
                 else if (name != null)
-                    yield return (name.ToInvariantString(), val);
+                    yield return (name.ToInvariantString() ?? string.Empty, val);
             }
         }
 

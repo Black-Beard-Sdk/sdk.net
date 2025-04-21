@@ -1,9 +1,10 @@
-﻿using Bb.Policies;
+﻿using Bb.Exceptions;
+using Bb.Policies;
 using Bb.Policies.Asts;
 using Microsoft.AspNetCore.Authorization;
 using System.Reflection;
 
-namespace Bb
+namespace Bb.Extensions
 {
 
 
@@ -46,8 +47,8 @@ namespace Bb
         /// <code lang="C#">
         /// var builder = WebApplication.CreateBuilder(args);
         /// builder.AddPolicy("policies.json", rule => rule.Name.StartsWith("Admin"), options => options.InvokeHandlersAfterFailure = true);
-        /// var app = builder.Build();
-        /// app.Run();
+        /// var application = builder.Build();
+        /// application.Run();
         /// </code>
         /// </example>
         public static WebApplicationBuilder AddPolicy(this WebApplicationBuilder builder, string filePath, Func<PolicyRule, bool>? filter = null, Action<AuthorizationOptions>? configureAction = null)
@@ -63,7 +64,7 @@ namespace Bb
 
             PolicyContainer policies = Policy.ParsePath(filePath);
             if (!policies.Diagnostics.Success)
-                throw new Exception("Failed to evaluate file policies");
+                throw new PolicyEvaluationException("Failed to evaluate file policies");
             var evaluator = new PolicyEvaluator(policies);
 
             services.AddSingleton(evaluator);
@@ -71,26 +72,7 @@ namespace Bb
 
             services.AddAuthorization(options =>
             {
-
-                ManageDefaults(options, policies, evaluator);
-
-                foreach (var policyRule in policies.Rules)
-                    if (filter != null && filter(policyRule))
-                        options.AddPolicy(policyRule.Name, policy =>
-                        {
-
-                            if (items.Contains(policyRule.Name))
-                                items.Remove(policyRule.Name);
-
-                            policy.RequireAssertion(c => evaluator.Evaluate(policyRule.Name, c.User, out RuntimeContext context));
-
-                        });
-
-                if (configureAction != null)
-                    configureAction(options);
-
-                foreach (var item in items)
-                    _logger.LogDebug($"Policy {item} not found in policies file");
+                AddAuthorisation(filter, configureAction, options, policies, evaluator, items);
 
             });
 
@@ -98,10 +80,33 @@ namespace Bb
 
         }
 
+        private static void AddAuthorisation(Func<PolicyRule, bool>? filter, Action<AuthorizationOptions>? configureAction, AuthorizationOptions options, PolicyContainer policies, PolicyEvaluator evaluator, List<string> items)
+        {
+            ManageDefaults(options, policies, evaluator);
+
+            foreach (var policyRule in policies.Rules)
+                if (filter != null && filter(policyRule))
+                    options.AddPolicy(policyRule.Name, policy =>
+                    {
+
+                        if (items.Contains(policyRule.Name))
+                            items.Remove(policyRule.Name);
+
+                        policy.RequireAssertion(c => evaluator.Evaluate(policyRule.Name, c.User, out RuntimeContext context));
+
+                    });
+
+            if (configureAction != null)
+                configureAction(options);
+
+            foreach (var item in items)
+                _logger.LogDebug("Policy {policy} not found in policies file", item);
+        }
+
         /// <summary>
         /// Configures the policy evaluator service.
         /// </summary>
-        /// <param name="app">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
+        /// <param name="application">The <see cref="WebApplication"/> instance to configure. Must not be null.</param>
         /// <returns>The configured <see cref="WebApplication"/> instance.</returns>
         /// <remarks>
         /// This method sets up the policy evaluator service and enables authentication and authorization middleware in the application.
@@ -114,16 +119,16 @@ namespace Bb
         /// app.Run();
         /// </code>
         /// </example>
-        public static WebApplication ConfigurePolicy(this WebApplication app)
+        public static WebApplication ConfigurePolicy(this WebApplication application)
         {
             
-            var evaluator = app.Services.GetRequiredService<PolicyEvaluator>();
-            evaluator.ServiceProvider = app.Services.GetRequiredService<IServiceProvider>();
+            var evaluator = application.Services.GetRequiredService<PolicyEvaluator>();
+            evaluator.ServiceProvider = application.Services.GetRequiredService<IServiceProvider>();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            application.UseAuthentication();
+            application.UseAuthorization();
 
-            return app;
+            return application;
         }
 
         /// <summary>
@@ -147,6 +152,7 @@ namespace Bb
 
             var policies = new HashSet<string>();
 
+            var bindings = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
@@ -158,11 +164,11 @@ namespace Bb
                         CollectPoliciesFromAttributes(type.GetCustomAttributes<AuthorizeAttribute>(), policies);
 
                         // Check method-level attributes
-                        foreach (var method in type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                        foreach (var method in type.GetMethods(bindings))
                             CollectPoliciesFromAttributes(method.GetCustomAttributes<AuthorizeAttribute>(), policies);
 
                         // Check property-level attributes
-                        foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                        foreach (var property in type.GetProperties(bindings))
                             CollectPoliciesFromAttributes(property.GetCustomAttributes<AuthorizeAttribute>(), policies);
 
                     }
@@ -192,10 +198,6 @@ namespace Bb
                     .RequireAssertion((c) => evaluator.Evaluate("default", c.User, out RuntimeContext context))
                     .Build();
             }
-            else
-            {
-
-            }
 
             if (policies.FallbackRule != null)
             {
@@ -206,10 +208,7 @@ namespace Bb
             else if (policies.DefaultRule != null)
                 options.FallbackPolicy = options.DefaultPolicy;
 
-            else
-            {
-
-            }
+        
         }
 
 

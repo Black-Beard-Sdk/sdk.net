@@ -281,7 +281,7 @@ namespace Bb.Diagnostics
         internal static ActivitySource Source;
         public static readonly string Name;
         public static readonly Version Version;
-        public static bool WithTelemetry = true;
+        public static readonly bool WithTelemetry = true;
 
     }
 
